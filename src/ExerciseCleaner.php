@@ -16,11 +16,30 @@ class ExerciseCleaner
         $this->stopTagRegex = "@{$this->stopTagConstant} (?<step>[0-9]+)@";
     }
 
-    public function cleanCodeLines($lines, $targetStep = 1, $keepTags = false)
+    public function cleanCodeLines($lines, $targetStep = 1, $keepTags = false, $fileType=null)
     {
         $keptLines = [];
         $isInside = [];
         $step = 0;
+        $commentPattern = '';
+        switch ($fileType) {
+            case 'json':
+                $commentPattern = ''; // There is no comment in JSON
+                break;
+            case 'twig':
+                $commentPattern = '{* %CODE% *}';
+                break;
+            case 'php':
+                $commentPattern = '// %CODE%';
+                break;
+            case 'sh':
+            case 'zsh':
+            case 'bash':
+            case 'yaml':
+            case 'yml':
+            default:
+                $commentPattern = '# %CODE%';
+        }
         foreach ($lines as $lineIndex => $line) {
             if (false !== strpos($line, $this->stopTagConstant)) {
                 $matches = [];
@@ -31,10 +50,10 @@ class ExerciseCleaner
                     //TODO: error or warning
                 }
                 array_pop($isInside);
-                if ($keepTags) {
+                if ($keepTags && $step <= $targetStep) {
                     $keptLines[] = $line;
                 }
-            } else if (false !== strpos($line, $this->startTagConstant)) {
+            } elseif (false !== strpos($line, $this->startTagConstant)) {
                 $matches = [];
                 preg_match($this->startTagRegex, $line, $matches);
                 $step = (int)$matches['step'];
@@ -43,18 +62,17 @@ class ExerciseCleaner
                 if (count($isInside) > $step) {
                     //TODO: error or warning
                 }
-                if ($keepTags) {
+                if ($keepTags && $step <= $targetStep) {
                     $keptLines[] = $line;
                 }
-            } else if (count($isInside)) {
+            } elseif (count($isInside)) {
                 $currentTag = $isInside[count($isInside)-1];
                 $step = (int)$currentTag['step'];
                 if ($step < $targetStep) {
                     $action = $currentTag['action'];
                     switch ($action) {
                         case 'COMMENT':
-                            //TODO: Twig or sharp (YAML, shell) comments
-                            $keptLines[] = "//$line";
+                            $keptLines[] = str_replace('%CODE%', $line, $commentPattern);
                             break;
                         case 'REMOVE':
                             break;
@@ -83,7 +101,7 @@ class ExerciseCleaner
             }
             if (is_dir($path)) {
                 $fileList = explode(PHP_EOL, trim(shell_exec("grep '{$this->startTagConstant}' -Rl $path;")));
-            } else if (is_file($path)) {
+            } elseif (is_file($path)) {
                 $fileList = [$path];
             } else {
                 trigger_error("$path is not a file nor a directory", E_USER_WARNING);
@@ -94,7 +112,7 @@ class ExerciseCleaner
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
-                file_put_contents($file . $suffix, $this->cleanCodeLines(file($file), $targetStep, $keepTags));
+                file_put_contents($file . $suffix, $this->cleanCodeLines(file($file), $targetStep, $keepTags, pathinfo($file, PATHINFO_EXTENSION)));
             }
         }
     }
