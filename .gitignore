@@ -1,2 +1,3 @@
 *.cleaned
 *.phar
+vendor/

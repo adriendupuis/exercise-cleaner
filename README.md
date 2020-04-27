@@ -125,7 +125,7 @@ Step 3:
 
 ### Script Usage
 
-`php exercise-cleaner`
+`php exercise-cleaner [--keep-orig] [--keep-tag] <step> [folder [folder...]]`
 
 Options:
 * `--help`: Display usage help
@@ -141,19 +141,32 @@ About
 
 ### Compile Phar
 
-`php -d phar.readonly=0 compile-phar.php;`
+`php -d phar.readonly=Off compile-phar.php;`
 
-### Run tests
-* `rm -f exercise-cleaner-test/*.cleaned; php src/Command.php --keep-orig 1 test;`
-* `rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig 2 test;`
-* `rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig --keep-tags 3 test;`
+### Run unit tests
+`./vendor/bin/phpunit tests;`
+
+### Run examples
+Run example without compiling:
+```shell
+rm -f exercise-cleaner-test/*.cleaned; php src/Command.php --keep-orig 1 examples;
+rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig 2 examples;
+rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig --keep-tags 3 examples;
+```
+Run examples with compiling:
+```shell
+php -d phar.readonly=0 compile-phar.php; chmod +x exercise-cleaner.phar;
+rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.phar --keep-orig 1 examples;
+rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig 2 examples;
+rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig --keep-tags 3 examples;
+```
 
 ### TODO
-* Test with / Update for eZ Platform v3
 
 `TRAINING EXERCISE START STEP <STEP NUMBER> <ACTION_B> UNTIL <THRESHOLD_STEP_NUMBER> THEN <ACTION_A>`
 `TRAINING EXERCISE STOP STEP <STEP NUMBER>`
 
 * `--solution`: Compile exercice's solution (by default, it compile the exercise itself)
-
+* Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar
+* Test with / Update for eZ Platform v3
 * Stop writing exercise with two 'c'

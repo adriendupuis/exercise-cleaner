@@ -1,11 +1,11 @@
 <?php
 
 require __DIR__ . '/ExerciseCleaner.php';
+use ExerciseCleaner\ExerciseCleaner;
 
-// Options
+// Help
 
-if (in_array('--help', $argv, true)) {
-    echo <<<'EOD'
+$help = <<<'EOD'
 Usage: php exercise-cleaner.phar [--keep-orig] [--keep-tags] [<STEP> [<FOLDER> [<FOLDER>...]]]
     --keep-orig: Do not rewrite files but write a new one adding .cleaned extension
     --keep-tags: Do not remove start/stop tags
@@ -13,6 +13,17 @@ Usage: php exercise-cleaner.phar [--keep-orig] [--keep-tags] [<STEP> [<FOLDER> [
     FOLDER: Search inside this folder(s) (default: app src)
 
 EOD;
+
+if (1 >= count($argv)) {
+    echo "Error: Missing arguments\n";
+    echo $help;
+    exit(1);
+}
+
+// Options
+
+if (in_array('--help', $argv, true)) {
+    echo $help;
     exit(0);
 }
 
