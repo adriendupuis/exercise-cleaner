@@ -5,10 +5,13 @@ Training exercise's steps manager and cleaner.
 
 The Exercise Cleaner removes code between tags which number is equal or greater than the desired step.
 
-Tags can be add as comment in files and the cleaner will remove what's inside.
-The tags include a step number. The cleaning script get a step as an argument and will clean inside tags having this step or greater.
+Usage
+-----
 
 ### Tag Usage
+
+Tags can be add as comment in files and the cleaner will remove what's inside.
+The tags include a step number. The cleaning script get a step as an argument and will clean inside tags having this step or greater.
 
 The script will first check for lines containing `TRAINING EXERCISE START STEP`.
 
@@ -120,8 +123,9 @@ Step 3:
     }
 ```
 
-
 ### Script Usage
+
+`php exercise-cleaner`
 
 Options:
 * `--help`: Display usage help
@@ -132,10 +136,17 @@ Arguments:
 * first argument: step number: clean inside this and higher tags; By default, step 1
 * following arguments: folder to search in; By default, it looks inside app/ and src/
 
-Run tests:
-* `rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.php --keep-orig 1 test;`
-* `rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.php --keep-orig 2 test;`
-* `rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.php --keep-orig --keep-tags 3 test;`
+About
+-----
+
+### Compile Phar
+
+`php -d phar.readonly=0 compile-phar.php;`
+
+### Run tests
+* `rm -f exercise-cleaner-test/*.cleaned; php src/Command.php --keep-orig 1 test;`
+* `rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig 2 test;`
+* `rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig --keep-tags 3 test;`
 
 ### TODO
 * Test with / Update for eZ Platform v3
