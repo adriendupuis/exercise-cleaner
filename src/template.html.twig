@@ -1,0 +1,14 @@
+{* TRAINING EXERCISE START STEP 1 *}
+{% extends '@ezdesign/pagelayout.html.twig' %}
+{% block content %}
+    <h1>{{ ez_content_name(content) }}</h1>
+    <div>{{ ez_render_field(content, 'body') }}</div>
+    {* TRAINING EXERCISE START STEP 2 *}
+    <ul>
+        {% for child in children %}
+            <li>{{ ez_content_name(child) }}</li>
+        {% endfor %}
+    </ul>
+    {* TRAINING EXERCISE STOP STEP 2 *}
+{% endblock %}
+{* TRAINING EXERCISE STOP STEP 1 *}
