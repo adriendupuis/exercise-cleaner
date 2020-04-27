@@ -15,6 +15,10 @@ The tags include a step number. The cleaning script get a step as an argument an
 
 The script will first check for lines containing `TRAINING EXERCISE START STEP`.
 
+Tags can be embed in several comment syntax, or whatever. It's followed by a step number. If the step number is equal or greater than the wanted step, the script search for the closing tag with the same number and remove all in between.
+
+Notice: The tag doesn't care if its embed in a comment or something else. For examples comment doesn't exist in JSON, there is some trick to not trigger syntax errors but with a limitation for last line without ending coma.
+
 Simple:
 - `TRAINING EXERCISE START STEP <step_number>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
@@ -23,16 +27,22 @@ With afterward action:
 - `TRAINING EXERCISE START STEP <step_number> <action>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
-When `<step_number>` is smaller than the wanted step number, execute `<action>`
+When `<step_number>` is smaller than the wanted step number, execute `<action>`.
 
 Available actions:
 * KEEP (default)
 * COMMENT
 * REMOVE
 
-This can be embed in several comment syntax, or whatever. It's followed by a step number. If the step number is equal or greater than the wanted step, the script search for the closing tag with the same number and remove all in between.
+With afterward conditional actions:
+- `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number> THEN <action_a>`
+- `TRAINING EXERCISE STOP STEP <step_number>`
 
-Notice: The tag doesn't care if its embed in a comment or something else. For examples comment doesn't exist in JSON, there is some trick to not trigger syntax errors but with a limitation for last line without ending coma.
+When `<step_number>` is smaller than the wanted step number, execute one action:
+* When `<threshold_step_number>` is greater than or equal to the wanted step number, execute `<action_b>`;
+* When `<threshold_step_number>` is smaller than the wanted step number, execute `<action_a>`.
+
+`<threshold_step_number>` must be greater than `<step_number>`.
 
 #### Examples
 
@@ -153,7 +163,7 @@ rm -f exercise-cleaner-test/*.cleaned; php src/Command.php --keep-orig 1 example
 rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig 2 examples;
 rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig --keep-tags 3 examples;
 ```
-Run examples with compiling:
+Run examples after compiling:
 ```shell
 php -d phar.readonly=0 compile-phar.php; chmod +x exercise-cleaner.phar;
 rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.phar --keep-orig 1 examples;
@@ -162,9 +172,6 @@ rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig --keep-tags 3
 ```
 
 ### TODO
-
-`TRAINING EXERCISE START STEP <STEP NUMBER> <ACTION_B> UNTIL <THRESHOLD_STEP_NUMBER> THEN <ACTION_A>`
-`TRAINING EXERCISE STOP STEP <STEP NUMBER>`
 
 * `--solution`: Compile exercice's solution (by default, it compile the exercise itself)
 * Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar

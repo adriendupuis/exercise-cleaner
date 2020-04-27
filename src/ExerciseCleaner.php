@@ -9,10 +9,11 @@ class ExerciseCleaner
     public $startTagRegex;
     public $stopTagConstant = 'TRAINING EXERCISE STOP STEP';
     public $stopTagRegex;
+    public $thresholdActionRegex = '@(?<action_before>[A-Z]+) UNTIL (?<threshold_step>[0-9]+) THEN (?<action_after>[A-Z]+)@';
 
     public function __construct()
     {
-        $this->startTagRegex = "@{$this->startTagConstant} (?<step>[0-9]+) ?(?<action>[A-Z]*)@";
+        $this->startTagRegex = "@{$this->startTagConstant} (?<step>[0-9]+) ?(?<action>[ A-Z1-9]*)@";
         $this->stopTagRegex = "@{$this->stopTagConstant} (?<step>[0-9]+)@";
     }
 
@@ -59,6 +60,14 @@ class ExerciseCleaner
                 $step = (int)$matches['step'];
                 $action = strtoupper(trim($matches['action']));
                 $isInside[] = ['step' => $step, 'action' => $action];
+                if ('' !== trim($action) && false !== strpos($action, ' ')) {
+                    $matches = [];
+                    if (preg_match($this->thresholdActionRegex, $action, $matches)) {
+                        $isInside[count($isInside) - 1]['before'] = strtoupper(trim($matches['action_before']));
+                        $isInside[count($isInside) - 1]['threshold'] = (int)$matches['threshold_step'];
+                        $isInside[count($isInside) - 1]['after'] = strtoupper(trim($matches['action_after']));
+                    }
+                }
                 if (count($isInside) > $step) {
                     //TODO: error or warning
                 }
@@ -70,6 +79,13 @@ class ExerciseCleaner
                 $step = (int)$currentTag['step'];
                 if ($step < $targetStep) {
                     $action = $currentTag['action'];
+                    if (array_key_exists('threshold', $currentTag)) {
+                        if ($currentTag['threshold'] >= $targetStep) {
+                            $action = $currentTag['before'];
+                        } else {
+                            $action = $currentTag['after'];
+                        }
+                    }
                     switch ($action) {
                         case 'COMMENT':
                             $keptLines[] = str_replace('%CODE%', $line, $commentPattern);

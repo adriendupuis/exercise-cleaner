@@ -103,7 +103,7 @@ CODE;
         $this->assertEquals($codeLines, $this->exerciseCleaner->cleanCodeLines($codeLines, 3, true));
     }
 
-    public function testCommentActionTag()
+    public function testCommentActionTag(): void
     {
         $code = <<<'CODE'
 // TRAINING EXERCISE START STEP 1 COMMENT
@@ -116,6 +116,46 @@ CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $this->assertCount(0, $this->exerciseCleaner->cleanCodeLines($codeLines, 1));
-        $this->assertEquals(['// Step 1'], $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, 'php'));
+        $this->assertEquals(['// Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, 'php'));
+    }
+
+    public function testThresholdActionTag(): void
+    {
+        $code = <<<'CODE'
+# TRAINING EXERCISE START STEP 1 COMMENT
+Method 1
+# TRAINING EXERCISE STOP STEP 1
+# TRAINING EXERCISE START STEP 2 COMMENT
+Method 2
+# TRAINING EXERCISE STOP STEP 2
+# TRAINING EXERCISE START STEP 1 KEEP UNTIL 2 THEN COMMENT
+Common to methods 1 & 2
+# TRAINING EXERCISE STOP STEP 1
+# TRAINING EXERCISE START STEP 3
+Method 3
+# TRAINING EXERCISE STOP STEP 3
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1);
+        $this->assertCount(0, $cleanedCodeLines);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2);
+        $this->assertCount(2, $cleanedCodeLines);
+        $this->assertEquals([
+            '# Method 1', // Step 1's method is commented for step 2
+            'Common to methods 1 & 2', // Steps 1 & 2 common part is kept
+            // Trainee got to implement method 2
+        ], $cleanedCodeLines);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2);
+        $this->assertCount(3, $cleanedCodeLines);
+        $this->assertEquals([
+            '# Method 1', // Step 1's method is commented for step 3
+            '# Method 2', // Step 2's method is commented for step 3
+            '# Common to methods 1 & 2', // Steps 1 & 2's common part is commented for step 3
+        ], $cleanedCodeLines);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 3);
+        var_dump($cleanedCodeLines);
     }
 }
