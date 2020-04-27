@@ -5,20 +5,142 @@ Training exercise's steps manager and cleaner.
 
 The Exercise Cleaner removes code between tags which number is equal or greater than the desired step.
 
-Usage
------
+Tags can be add as comment in files and the cleaner will remove what's inside.
+The tags include a step number. The cleaning script get a step as an argument and will clean inside tags having this step or greater.
 
-### Tags
+### Tag Usage
 
-Opening tag: `TRAINING EXERCISE START STEP <step_number>`
-Closing tag: `TRAINING EXERCISE STOP STEP <step_number>`
+The script will first check for lines containing `TRAINING EXERCISE START STEP`.
 
-Can be nested.
+Simple:
+- `TRAINING EXERCISE START STEP <step_number>`
+- `TRAINING EXERCISE STOP STEP <step_number>`
 
-See test examples for more.
+With afterward action:
+- `TRAINING EXERCISE START STEP <step_number> <action>`
+- `TRAINING EXERCISE STOP STEP <step_number>`
 
-### Command
+When `<step_number>` is smaller than the wanted step number, execute `<action>`
 
-`php exercise-cleaner.php <step_number>;`
+Available actions:
+* KEEP (default)
+* COMMENT
+* REMOVE
 
-`<step_number>`: exercise step for which the code must be cleaned.
+This can be embed in several comment syntax, or whatever. It's followed by a step number. If the step number is equal or greater than the wanted step, the script search for the closing tag with the same number and remove all in between.
+
+Notice: The tag doesn't care if its embed in a comment or something else. For examples comment doesn't exist in JSON, there is some trick to not trigger syntax errors but with a limitation for last line without ending coma.
+
+#### Examples
+
+See [exercise-cleaner-test/](exercise-cleaner-test) folder for some examples.
+
+Tagged Reference:
+```json
+{
+  "TRAINING EXERCISE START STEP 1": "",
+  "key1": "value1",
+  "TRAINING EXERCISE START STEP 2": "",
+  "key2": "value2",
+  "TRAINING EXERCISE STOP STEP 2": "",
+  "key3": "value3",
+  "TRAINING EXERCISE STOP STEP 1": "",
+  "key4": "value4"
+}
+```
+
+Step 1:
+```json
+{
+  "key4": "value4"
+}
+```
+
+Step 2:
+```json
+{
+  "key1": "value1",
+  "key3": "value3",
+  "key4": "value4"
+}
+```
+
+Step 3:
+```json
+{
+  "key1": "value1",
+  "key2": "value2",
+  "key3": "value3",
+  "key4": "value4"
+}
+```
+
+Tagged Reference:
+```php
+protected function configure()
+{
+    // TRAINING EXERCISE START STEP 1
+    $this
+        // TRAINING EXERCISE START STEP 1 COMMENT
+        ->setDescription('Step 1')
+        // TRAINING EXERCISE STOP STEP 1
+        // TRAINING EXERCISE START STEP 2
+        ->setDescription('Step 2+')
+        // TRAINING EXERCISE STOP STEP 2
+        ->setHelp('Just an example');
+    // TRAINING EXERCISE STOP STEP 1
+}
+```
+
+Step 1:
+```php
+protected function configure()
+{
+}
+```
+
+Step 2:
+```php
+    protected function configure()
+    {
+        $this
+//            ->setDescription('Step 1')
+            ->setHelp('Just an example');
+    }
+```
+
+Step 3:
+```php
+    protected function configure()
+    {
+        $this
+//            ->setDescription('Step 1')
+            ->setDescription('Step 2+')
+            ->setHelp('Just an example');
+    }
+```
+
+
+### Script Usage
+
+Options:
+* `--help`: Display usage help
+* `--keep-orig`: Instead of replacing content in file, write a new file with .cleaned added extension.
+* `--keep-tag`: Do not remove tags
+
+Arguments:
+* first argument: step number: clean inside this and higher tags; By default, step 1
+* following arguments: folder to search in; By default, it looks inside app/ and src/
+
+Run tests:
+* `rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.php --keep-orig 1 test;`
+* `rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.php --keep-orig 2 test;`
+* `rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.php --keep-orig --keep-tags 3 test;`
+
+### TODO
+* Test with / Update for eZ Platform v3
+
+`TRAINING EXERCISE START STEP <STEP NUMBER> <ACTION_B> UNTIL <THRESHOLD_STEP_NUMBER> THEN <ACTION_A>`
+`TRAINING EXERCISE STOP STEP <STEP NUMBER>`
+
+* `--solution`: Compile exercice's solution (by default, it compile the exercise itself)
