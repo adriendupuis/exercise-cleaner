@@ -1,6 +1,6 @@
 <?php
 
-include(__DIR__.'/ExerciceCleaner.php');
+require __DIR__ . '/ExerciseCleaner.php';
 
 // Options
 

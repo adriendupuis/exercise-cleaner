@@ -1,5 +1,7 @@
 <?php
 
+namespace ExerciseCleaner;
+
 class ExerciseCleaner
 {
     // Tag Syntax Config

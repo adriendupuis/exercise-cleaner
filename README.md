@@ -155,3 +155,5 @@ About
 `TRAINING EXERCISE STOP STEP <STEP NUMBER>`
 
 * `--solution`: Compile exercice's solution (by default, it compile the exercise itself)
+
+* Stop writing exercise with two 'c'
