@@ -76,6 +76,9 @@ class ExerciseCleaner
             if ('' === $path) {
                 continue;
             }
+            if ('/' !== $path[0]) {
+                $path = trim(`pwd`)."/$path";//TODO: Better fix
+            }
             if (is_dir($path)) {
                 $fileList = explode(PHP_EOL, trim(shell_exec("grep '{$this->startTagConstant}' -Rl $path;")));
             } else if (is_file($path)) {
