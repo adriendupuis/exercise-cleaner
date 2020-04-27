@@ -6,7 +6,7 @@ require __DIR__ . '/ExerciseCleaner.php';
 
 if (in_array('--help', $argv, true)) {
     echo <<<'EOD'
-Usage: php exercice-cleaner.php [--keep-orig] [--keep-tags] [<STEP> [<FOLDER> [<FOLDER>...]]]
+Usage: php exercise-cleaner.phar [--keep-orig] [--keep-tags] [<STEP> [<FOLDER> [<FOLDER>...]]]
     --keep-orig: Do not rewrite files but write a new one adding .cleaned extension
     --keep-tags: Do not remove start/stop tags
     STEP: Remove inside tags having this step and greater.

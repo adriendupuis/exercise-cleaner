@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-$pharFileName='exercice-cleaner.phar';
+$pharFileName='exercise-cleaner.phar';
 
 $phar = new Phar($pharFileName);
 $phar->buildFromDirectory('src');
