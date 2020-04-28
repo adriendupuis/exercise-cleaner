@@ -1,4 +1,5 @@
-*.cleaned
+*.step*.exercise
+*.step*.solution
 *.phar
 vendor/
 .php_cs.cache

@@ -7,7 +7,7 @@ use ExerciseCleaner\ExerciseCleaner;
 
 $help = <<<'EOD'
 Usage: php exercise-cleaner.phar [--keep-orig] [--keep-tags] [--solution] [<STEP> [<FOLDER> [<FOLDER>...]]]
-    --keep-orig: Do not rewrite files but write a new one adding .cleaned extension
+    --keep-orig: Do not rewrite files but write a new one adding an extension which includes step number and if it's an exercise or a solution
     --keep-tags: Do not remove start/stop tags
     --solution: Write exercise's solution instead of exercise itself
     STEP: Remove inside tags having this step and greater.
@@ -29,13 +29,10 @@ if (in_array('--help', $argv, true)) {
     exit(0);
 }
 
-$suffix = '';
 $isSuffixed = array_search('--keep-orig', $argv, true);
 if (false !== $isSuffixed) {
-    $suffix = '.cleaned';
     array_splice($argv, $isSuffixed, 1);
 }
-unset($isSuffixed);
 
 $keepTags = in_array('--keep-tags', $argv, true);
 if ($keepTags) {
@@ -58,6 +55,6 @@ if (2 < count($argv)) {
 
 // Treatment
 
-(new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $suffix);
+(new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $isSuffixed ? ".step$targetStep.".($solution?'solution':'exercise') : '');
 
 exit(0);
