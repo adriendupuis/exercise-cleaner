@@ -141,6 +141,7 @@ Options:
 * `--help`: Display usage help
 * `--keep-orig`: Instead of replacing content in file, write a new file with .cleaned added extension.
 * `--keep-tag`: Do not remove tags
+* `--solution`: Compile exercise's solution (by default, it compile the exercise itself)
 
 Arguments:
 * first argument: step number: clean inside this and higher tags; By default, step 1
@@ -173,7 +174,6 @@ rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig --keep-tags 3
 
 ### TODO
 
-* `--solution`: Compile exercice's solution (by default, it compile the exercise itself)
 * Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar
 * Test with / Update for eZ Platform v3
-* Stop writing exercise with two 'c'
+* Stop writing "exercise" with two 'c'

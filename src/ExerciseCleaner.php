@@ -17,7 +17,7 @@ class ExerciseCleaner
         $this->stopTagRegex = "@{$this->stopTagConstant} (?<step>[0-9]+)@";
     }
 
-    public function cleanCodeLines($lines, $targetStep = 1, $keepTags = false, $fileType=null)
+    public function cleanCodeLines($lines, $targetStep = 1, $solution = false, $keepTags = false, $fileType = null)
     {
         $keptLines = [];
         $isInside = [];
@@ -46,7 +46,7 @@ class ExerciseCleaner
                 $matches = [];
                 preg_match($this->stopTagRegex, $line, $matches);
                 $step = (int)$matches['step'];
-                $currentTag = $isInside[count($isInside)-1];
+                $currentTag = $isInside[count($isInside) - 1];
                 if ($step !== $currentTag['step']) {
                     //TODO: error or warning
                 }
@@ -75,7 +75,7 @@ class ExerciseCleaner
                     $keptLines[] = $line;
                 }
             } elseif (count($isInside)) {
-                $currentTag = $isInside[count($isInside)-1];
+                $currentTag = $isInside[count($isInside) - 1];
                 $step = (int)$currentTag['step'];
                 if ($step < $targetStep) {
                     $action = $currentTag['action'];
@@ -97,6 +97,8 @@ class ExerciseCleaner
                         default:
                             $keptLines[] = $line;
                     }
+                } elseif ($solution && $step === $targetStep) {
+                    $keptLines[] = $line;
                 }
             } else {
                 $keptLines[] = $line;
@@ -106,14 +108,14 @@ class ExerciseCleaner
         return $keptLines;
     }
 
-    public function cleanFiles(array $pathList, $targetStep = 1, $keepTags = false, $suffix = '')
+    public function cleanFiles(array $pathList, $targetStep = 1, $solution = false, $keepTags = false, $suffix = '')
     {
         foreach ($pathList as $path) {
             if ('' === $path) {
                 continue;
             }
             if ('/' !== $path[0]) {
-                $path = trim(`pwd`)."/$path";//TODO: Better fix
+                $path = trim(`pwd`) . "/$path";//TODO: Better fix
             }
             if (is_dir($path)) {
                 $fileList = explode(PHP_EOL, trim(shell_exec("grep '{$this->startTagConstant}' -Rl $path;")));
@@ -128,7 +130,7 @@ class ExerciseCleaner
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
-                file_put_contents($file . $suffix, $this->cleanCodeLines(file($file), $targetStep, $keepTags, pathinfo($file, PATHINFO_EXTENSION)));
+                file_put_contents($file . $suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, pathinfo($file, PATHINFO_EXTENSION)));
             }
         }
     }
