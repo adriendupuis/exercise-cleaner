@@ -30,9 +30,9 @@ With afterward action:
 When `<step_number>` is smaller than the wanted step number, execute `<action>`.
 
 Available actions:
-* KEEP (default)
-* COMMENT
-* REMOVE
+* `KEEP` (default)
+* `COMMENT`
+* `REMOVE`
 
 With afterward conditional actions:
 - `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number> THEN <action_a>`
