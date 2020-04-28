@@ -13,11 +13,11 @@ Usage
 Tags can be add as comment in files and the cleaner will remove what's inside.
 The tags include a step number. The cleaning script get a step as an argument and will clean inside tags having this step or greater.
 
-The script will first check for lines containing `TRAINING EXERCISE START STEP`.
+For each given folder, the script will first search recursively for files containing `TRAINING EXERCISE START STEP`.
 
 Tags can be embed in several comment syntax, or whatever. It's followed by a step number. If the step number is equal or greater than the wanted step, the script search for the closing tag with the same number and remove all in between.
 
-Notice: The tag doesn't care if its embed in a comment or something else. For examples comment doesn't exist in JSON, there is some trick to not trigger syntax errors but with a limitation for last line without ending coma.
+Notice: The tag doesn't care if its embed in a comment or something else. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending coma.
 
 Simple:
 - `TRAINING EXERCISE START STEP <step_number>`
