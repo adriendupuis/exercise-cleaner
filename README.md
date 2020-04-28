@@ -168,7 +168,8 @@ Note: A `composer install --dev` (or alike) must have been previously executed.
 Run examples without compiling:
 ```shell
 rm -f examples/*.step*.*; # Clean previous treatment
-for step in "1 2 3"; do
+for step in 1 2 3; do
+    echo "step: $step";
     php src/Command.php --keep-orig $step examples;
     php src/Command.php --keep-orig --solution $step examples;
 done;
@@ -178,7 +179,7 @@ Run examples after compiling:
 ```shell
 php -d phar.readonly=0 compile-phar.php;
 rm -f examples/*.step*.*;
-for step in "1 2 3"; do
+for step in 1 2 3; do
     php exercise-cleaner.phar --keep-orig $step examples;
     php exercise-cleaner.phar --keep-orig --solution $step examples;
 done;
