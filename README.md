@@ -154,7 +154,7 @@ About
 
 ```shell
 php -d phar.readonly=Off compile-phar.php;
-php exercise-cleaner --version;
+php exercise-cleaner.phar --version;
 ```
 
 ### Run unit tests
