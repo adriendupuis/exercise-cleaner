@@ -11,10 +11,14 @@ class ExerciseCleaner
     public $stopTagRegex;
     public $thresholdActionRegex = '@(?<action_before>[A-Z]+) UNTIL (?<threshold_step>[0-9]+) THEN (?<action_after>[A-Z]+)@';
 
+    /** @var bool */
+    private $isPhar;
+
     public function __construct()
     {
         $this->startTagRegex = "@{$this->startTagConstant} (?<step>[0-9]+) ?(?<action>[ A-Z1-9]*)@";
         $this->stopTagRegex = "@{$this->stopTagConstant} (?<step>[0-9]+)@";
+        $this->isPhar = (bool) preg_match('@^phar:///@', __DIR__);
     }
 
     public function cleanCodeLines($lines, $targetStep = 1, $solution = false, $keepTags = false, $fileType = null)
@@ -114,11 +118,20 @@ class ExerciseCleaner
             if ('' === $path) {
                 continue;
             }
-            if ('/' !== $path[0]) {
+            if ($this->isPhar && '/' !== $path[0]) {
                 $path = trim(`pwd`) . "/$path";//TODO: Better fix
             }
             if (is_dir($path)) {
-                $fileList = explode(PHP_EOL, trim(shell_exec("grep '{$this->startTagConstant}' -Rl $path;")));
+                if ('/' === substr($path, -1)) {
+                    // Avoid double slashes in grep result
+                    $path = substr($path, 0, -1);
+                }
+                $grepCmd = "grep '{$this->startTagConstant}' -Rl $path;";
+                $fileList = explode(PHP_EOL, trim(shell_exec($grepCmd)));
+                if (1 === count($fileList) && '' === $fileList[0]) {
+                    // Grep didn't find any appropriate file
+                    $fileList = [];
+                }
             } elseif (is_file($path)) {
                 $fileList = [$path];
             } else {
