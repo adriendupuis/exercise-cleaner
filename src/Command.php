@@ -29,13 +29,10 @@ if (in_array('--help', $argv, true)) {
     exit(0);
 }
 
-$suffix = '';
 $isSuffixed = array_search('--keep-orig', $argv, true);
 if (false !== $isSuffixed) {
-    $suffix = '.cleaned';
     array_splice($argv, $isSuffixed, 1);
 }
-unset($isSuffixed);
 
 $keepTags = in_array('--keep-tags', $argv, true);
 if ($keepTags) {
@@ -58,6 +55,6 @@ if (2 < count($argv)) {
 
 // Treatment
 
-(new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $suffix);
+(new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $isSuffixed ? ".step$targetStep.".($solution?'solution':'exercise') : '');
 
 exit(0);

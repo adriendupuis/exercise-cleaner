@@ -1,4 +1,4 @@
-*.cleaned
+*.*.step*.*
 *.phar
 vendor/
 .php_cs.cache

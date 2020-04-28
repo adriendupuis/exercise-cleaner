@@ -167,19 +167,21 @@ Note: A `composer install --dev` (or alike) must have been previously executed.
 
 Run examples without compiling:
 ```shell
-rm -f examples/*.cleaned; php src/Command.php --keep-orig 1 examples;
-rm -f examples/*.cleaned; php src/Command.php --keep-orig --solution 1 examples;
-rm -f examples/*.cleaned; php src/Command --keep-orig 2 examples;
-rm -f examples/*.cleaned; php src/Command.php --keep-orig --solution 2 examples;
-rm -f examples/*.cleaned; php src/Command --keep-orig 3 examples;
-rm -f examples/*.cleaned; php src/Command.php --keep-orig --solution 3 examples;
+rm -f examples/*.step*.*; # Clean previous treatment
+for step in "1 2 3"; do
+    php src/Command.php --keep-orig $step examples;
+    php src/Command.php --keep-orig --solution $step examples;
+done;
 ```
 
 Run examples after compiling:
 ```shell
 php -d phar.readonly=0 compile-phar.php;
-rm -f examples/*.cleaned; php exercise-cleaner.phar --keep-orig 1 examples;
-# etc
+rm -f examples/*.step*.*;
+for step in "1 2 3"; do
+    php exercise-cleaner.phar --keep-orig $step examples;
+    php exercise-cleaner.phar --keep-orig --solution $step examples;
+done;
 ```
 
 ### TODO
