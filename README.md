@@ -139,7 +139,7 @@ Step 3:
 
 Options:
 * `--help`: Display usage help
-* `--keep-orig`: Instead of replacing content in file, write a new file with .cleaned added extension.
+* `--keep-orig`: Instead of replacing content in file, write a new file with extension .step<step_number>.<exercise|solution>.
 * `--keep-tag`: Do not remove tags
 * `--solution`: Compile exercise's solution (by default, it compile the exercise itself)
 
