@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/ExerciseCleaner.php';
+require __DIR__.'/ExerciseCleaner.php';
 use ExerciseCleaner\ExerciseCleaner;
 
 // About
@@ -49,7 +49,7 @@ if ($solution) {
 
 // Arguments
 
-$targetStep = 1 < count($argv) ? (int)$argv[1] : 1;
+$targetStep = 1 < count($argv) ? (int) $argv[1] : 1;
 
 $folders = 'app src';
 if (2 < count($argv)) {

@@ -21,7 +21,8 @@ class ExerciseCleaner
         $this->isPhar = (bool) preg_match('@^phar:///@', __DIR__);
     }
 
-    public function cleanCodeLines($lines, $targetStep = 1, $solution = false, $keepTags = false, $fileType = null)
+    /** @return string[] */
+    public function cleanCodeLines(array $lines, int $targetStep = 1, bool $solution = false, bool $keepTags = false, string $fileType = null): array
     {
         $keptLines = [];
         $nestedTags = [];
@@ -49,7 +50,7 @@ class ExerciseCleaner
             if (false !== strpos($line, $this->stopTagConstant)) {
                 $matches = [];
                 preg_match($this->stopTagRegex, $line, $matches);
-                $step = (int)$matches['step'];
+                $step = (int) $matches['step'];
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 if ($step !== $currentTag['step']) {
                     //TODO: error or warning
@@ -61,14 +62,14 @@ class ExerciseCleaner
             } elseif (false !== strpos($line, $this->startTagConstant)) {
                 $matches = [];
                 preg_match($this->startTagRegex, $line, $matches);
-                $step = (int)$matches['step'];
+                $step = (int) $matches['step'];
                 $action = strtoupper(trim($matches['action']));
                 $nestedTags[] = ['step' => $step, 'action' => $action];
                 if ('' !== trim($action) && false !== strpos($action, ' ')) {
                     $matches = [];
                     if (preg_match($this->thresholdActionRegex, $action, $matches)) {
                         $nestedTags[count($nestedTags) - 1]['before'] = strtoupper(trim($matches['action_before']));
-                        $nestedTags[count($nestedTags) - 1]['threshold'] = (int)$matches['threshold_step'];
+                        $nestedTags[count($nestedTags) - 1]['threshold'] = (int) $matches['threshold_step'];
                         $nestedTags[count($nestedTags) - 1]['after'] = strtoupper(trim($matches['action_after']));
                     }
                 }
@@ -80,7 +81,7 @@ class ExerciseCleaner
                 }
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
-                $step = (int)$currentTag['step'];
+                $step = (int) $currentTag['step'];
                 if ($step < $targetStep) {
                     $action = $currentTag['action'];
                     if (array_key_exists('threshold', $currentTag)) {
@@ -112,14 +113,14 @@ class ExerciseCleaner
         return $keptLines;
     }
 
-    public function cleanFiles(array $pathList, $targetStep = 1, $solution = false, $keepTags = false, $suffix = '')
+    public function cleanFiles(array $pathList, int $targetStep = 1, bool $solution = false, bool $keepTags = false, string $suffix = ''): void
     {
         foreach ($pathList as $path) {
             if ('' === $path) {
                 continue;
             }
             if ($this->isPhar && '/' !== $path[0]) {
-                $path = trim(`pwd`) . "/$path";//TODO: Better fix
+                $path = trim(`pwd`)."/$path"; //TODO: Better fix
             }
             if (is_dir($path)) {
                 if ('/' === substr($path, -1)) {
@@ -143,7 +144,7 @@ class ExerciseCleaner
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
-                file_put_contents($file . $suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, pathinfo($file, PATHINFO_EXTENSION)));
+                file_put_contents($file.$suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, pathinfo($file, PATHINFO_EXTENSION)));
             }
         }
     }
