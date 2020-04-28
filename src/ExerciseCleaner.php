@@ -20,7 +20,7 @@ class ExerciseCleaner
     public function cleanCodeLines($lines, $targetStep = 1, $solution = false, $keepTags = false, $fileType = null)
     {
         $keptLines = [];
-        $isInside = [];
+        $nestedTags = [];
         $step = 0;
         $commentPattern = '';
         switch ($fileType) {
@@ -46,11 +46,11 @@ class ExerciseCleaner
                 $matches = [];
                 preg_match($this->stopTagRegex, $line, $matches);
                 $step = (int)$matches['step'];
-                $currentTag = $isInside[count($isInside) - 1];
+                $currentTag = $nestedTags[count($nestedTags) - 1];
                 if ($step !== $currentTag['step']) {
                     //TODO: error or warning
                 }
-                array_pop($isInside);
+                array_pop($nestedTags);
                 if ($keepTags && $step <= $targetStep) {
                     $keptLines[] = $line;
                 }
@@ -59,23 +59,23 @@ class ExerciseCleaner
                 preg_match($this->startTagRegex, $line, $matches);
                 $step = (int)$matches['step'];
                 $action = strtoupper(trim($matches['action']));
-                $isInside[] = ['step' => $step, 'action' => $action];
+                $nestedTags[] = ['step' => $step, 'action' => $action];
                 if ('' !== trim($action) && false !== strpos($action, ' ')) {
                     $matches = [];
                     if (preg_match($this->thresholdActionRegex, $action, $matches)) {
-                        $isInside[count($isInside) - 1]['before'] = strtoupper(trim($matches['action_before']));
-                        $isInside[count($isInside) - 1]['threshold'] = (int)$matches['threshold_step'];
-                        $isInside[count($isInside) - 1]['after'] = strtoupper(trim($matches['action_after']));
+                        $nestedTags[count($nestedTags) - 1]['before'] = strtoupper(trim($matches['action_before']));
+                        $nestedTags[count($nestedTags) - 1]['threshold'] = (int)$matches['threshold_step'];
+                        $nestedTags[count($nestedTags) - 1]['after'] = strtoupper(trim($matches['action_after']));
                     }
                 }
-                if (count($isInside) > $step) {
+                if (count($nestedTags) > $step) {
                     //TODO: error or warning
                 }
                 if ($keepTags && $step <= $targetStep) {
                     $keptLines[] = $line;
                 }
-            } elseif (count($isInside)) {
-                $currentTag = $isInside[count($isInside) - 1];
+            } elseif (count($nestedTags)) {
+                $currentTag = $nestedTags[count($nestedTags) - 1];
                 $step = (int)$currentTag['step'];
                 if ($step < $targetStep) {
                     $action = $currentTag['action'];
