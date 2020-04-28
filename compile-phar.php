@@ -5,7 +5,7 @@ use PHPUnit\TextUI\Command;
 
 $pharFileName='exercise-cleaner.phar';
 
-$version = shell_exec('git fetch --tags && git describe --tags 2>&-;') ?? 'dev';
+$version = shell_exec('git fetch --tags --force && git describe --tags 2>&-;') ?? 'dev';
 
 $phar = new Phar($pharFileName);
 $phar->addFromString('Command.php', preg_replace('@\$version = .+;@', "\$version = '$version';", file_get_contents('src/Command.php')));
