@@ -3,7 +3,7 @@
 require __DIR__ . '/ExerciseCleaner.php';
 use ExerciseCleaner\ExerciseCleaner;
 
-// Help
+// About
 
 $help = <<<'EOD'
 Usage: php exercise-cleaner.phar [--keep-orig] [--keep-tags] [--solution] [<STEP> [<FOLDER> [<FOLDER>...]]]
@@ -14,18 +14,13 @@ Usage: php exercise-cleaner.phar [--keep-orig] [--keep-tags] [--solution] [<STEP
     FOLDER: Search inside this folder(s) (default: app src)
 
 EOD;
-$version = 'dev';
 
-if (1 >= count($argv)) {
-    echo "Error: Missing arguments\n";
-    echo $help;
-    exit(1);
-}
+$version = 'raw';
 
 // Options
 
 if (in_array('--version', $argv, true)) {
-    echo $version;
+    echo "$version\n";
     exit(0);
 }
 

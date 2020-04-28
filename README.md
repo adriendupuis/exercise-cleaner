@@ -152,28 +152,37 @@ About
 
 ### Compile Phar
 
-`php -d phar.readonly=Off compile-phar.php;`
+```shell
+php -d phar.readonly=Off compile-phar.php;
+php exercise-cleaner --version;
+```
 
 ### Run unit tests
-`./vendor/bin/phpunit tests;`
+
+Note: A `composer install --dev` (or alike) must have been previously executed.
+
+`./vendor/bin/phpunit --colors tests;`
 
 ### Run examples
+
 Run example without compiling:
 ```shell
 rm -f exercise-cleaner-test/*.cleaned; php src/Command.php --keep-orig 1 examples;
 rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig 2 examples;
 rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig --keep-tags 3 examples;
 ```
+
 Run examples after compiling:
 ```shell
-php -d phar.readonly=0 compile-phar.php; chmod +x exercise-cleaner.phar;
+php -d phar.readonly=0 compile-phar.php;
 rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.phar --keep-orig 1 examples;
-rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig 2 examples;
-rm -f exercise-cleaner-test/*.cleaned; php src/Command --keep-orig --keep-tags 3 examples;
+rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.phar --keep-orig 2 examples;
+rm -f exercise-cleaner-test/*.cleaned; php exercise-cleaner.phar --keep-orig --keep-tags 3 examples;
 ```
 
 ### TODO
 
+* More unit tests
 * Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar
 * Test with / Update for eZ Platform v3
 * Stop writing "exercise" with two 'c'
