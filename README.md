@@ -46,7 +46,7 @@ When `<step_number>` is smaller than the wanted step number, execute one action:
 
 #### Examples
 
-See [exercise-cleaner-test/](exercise-cleaner-test) folder for some examples.
+Note: See [examples/](examples) folder for more.
 
 Tagged Reference:
 ```json
@@ -132,6 +132,8 @@ Step 3:
             ->setHelp('Just an example');
     }
 ```
+
+Note: [tests/ExerciseCleanerTest.php](tests/ExerciseCleanerTest.php) also contains some (harder to read) usage examples
 
 ### Script Usage
 
