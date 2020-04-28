@@ -167,7 +167,7 @@ Note: A `composer install --dev` (or alike) must have been previously executed.
 
 Run examples without compiling:
 ```shell
-find examples -name *.step*.exercise -o -name *.step*.solution | xargs rm -f; # Clean previous treatment
+find examples -name *.step*.exercise -o -name *.step*.solution | xargs rm -f; # Clean previous runs
 for step in 1 2 3; do
     php src/Command.php --keep-orig $step examples;
     php src/Command.php --keep-orig --solution $step examples;
@@ -186,6 +186,7 @@ done;
 
 ### TODO
 
+* Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
 * More unit tests
 * Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar
 * Test with / Update for eZ Platform v3
