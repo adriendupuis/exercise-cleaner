@@ -167,9 +167,8 @@ Note: A `composer install --dev` (or alike) must have been previously executed.
 
 Run examples without compiling:
 ```shell
-rm -f examples/*.step*.*; # Clean previous treatment
+find examples -name *.step*.exercise -o -name *.step*.solution | xargs rm -f; # Clean previous treatment
 for step in 1 2 3; do
-    echo "step: $step";
     php src/Command.php --keep-orig $step examples;
     php src/Command.php --keep-orig --solution $step examples;
 done;
