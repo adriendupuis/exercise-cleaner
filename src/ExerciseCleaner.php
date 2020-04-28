@@ -22,12 +22,12 @@ class ExerciseCleaner
     }
 
     /** @return string[] */
-    public function cleanCodeLines(array $lines, int $targetStep = 1, bool $solution = false, bool $keepTags = false, string $fileType = null): array
+    public function cleanCodeLines(array $lines, int $targetStep = 1, bool $solution = false, bool $keepTags = false, string $file = null): array
     {
+        $fileType = $file ? pathinfo($file, PATHINFO_EXTENSION) : null;
         $keptLines = [];
         $nestedTags = [];
         $step = 0;
-        $commentPattern = '';
         switch ($fileType) {
             case 'json':
                 $commentPattern = ''; // There is no comment in JSON
@@ -53,7 +53,7 @@ class ExerciseCleaner
                 $step = (int) $matches['step'];
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 if ($step !== $currentTag['step']) {
-                    //TODO: error or warning
+                    trigger_error('Parse Error: STOP tag not matching START tag'.($file ? " in file $file" : '')." at line $lineIndex", E_USER_ERROR);
                 }
                 array_pop($nestedTags);
                 if ($keepTags && $step <= $targetStep) {
@@ -72,9 +72,12 @@ class ExerciseCleaner
                         $nestedTags[count($nestedTags) - 1]['threshold'] = (int) $matches['threshold_step'];
                         $nestedTags[count($nestedTags) - 1]['after'] = strtoupper(trim($matches['action_after']));
                     }
+                    if ($matches['threshold_step'] <= $step) {
+                        trigger_error('Threshold less or equals to step'.($file ? " in file $file" : '')." at line $lineIndex", E_USER_WARNING);
+                    }
                 }
                 if (count($nestedTags) > $step) {
-                    //TODO: error or warning
+                    trigger_error('More nested tags than steps'.($file ? " in file $file" : '')." at line $lineIndex", E_USER_NOTICE);
                 }
                 if ($keepTags && $step <= $targetStep) {
                     $keptLines[] = $line;
@@ -144,7 +147,7 @@ class ExerciseCleaner
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
-                file_put_contents($file.$suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, pathinfo($file, PATHINFO_EXTENSION)));
+                file_put_contents($file.$suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, $file));
             }
         }
     }

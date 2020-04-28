@@ -55,6 +55,6 @@ if (2 < count($argv)) {
 
 // Treatment
 
-(new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $isSuffixed ? ".step$targetStep.".($solution?'solution':'exercise') : '');
+(new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $isSuffixed ? ".step$targetStep.".($solution ? 'solution' : 'exercise') : '');
 
 exit(0);

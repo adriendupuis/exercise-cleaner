@@ -116,7 +116,7 @@ CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $this->assertCount(0, $this->exerciseCleaner->cleanCodeLines($codeLines, 1));
-        $this->assertEquals(['// Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, 'php'));
+        $this->assertEquals(['// Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
     }
 
     public function testThresholdActionTag(): void
@@ -198,5 +198,32 @@ CODE;
             '# Common to methods 1 & 2', // Steps 1 & 2's common part is commented for step 3
             'Method 3', // Step 3's solution
         ], $cleanedCodeLines);
+    }
+
+    public function testParseError(): void
+    {
+        $code = <<<'CODE'
+0 # TRAINING EXERCISE START STEP 1
+1 # TRAINING EXERCISE START STEP 2
+2 Whatever
+3 # TRAINING EXERCISE STOP STEP 1
+4 # TRAINING EXERCISE STOP STEP 1
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        set_error_handler(array($this, 'errorHandler'));
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines);
+
+        $this->assertStringStartsWith('Parse Error:', $this->lastError);
+        $this->assertStringContainsString('at line 3', $this->lastError);
+    }
+
+    /** @var string */
+    private $lastError;
+
+    public function errorHandler($errno, $errstr)
+    {
+        $this->lastError = $errstr;
     }
 }
