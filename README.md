@@ -194,4 +194,5 @@ done;
 * More unit tests
 * Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar
 * Test with / Update for eZ Platform v3
+* How to easily distribute the .phar?
 * Stop writing "exercise" with two 'c'
