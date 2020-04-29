@@ -4,13 +4,13 @@ namespace ExerciseCleaner;
 
 require __DIR__.'/../vendor/autoload.php';
 
-use Symfony\Component\Console\Command\Command as SymfonyConsoleCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Command extends SymfonyConsoleCommand
+class CleanCommand extends Command
 {
     protected static $defaultName = 'exercise:clean';
 

@@ -16,7 +16,7 @@ $phar->setStub(Phar::createDefaultStub('src/Application.php'));
 
 foreach ([
              // Exercise Cleaner files except stub
-             'src/Command.php',
+             'src/CleanCommand.php',
              'src/ExerciseCleaner.php',
              'src/Utils.php',
              // Composer's autoload parts
