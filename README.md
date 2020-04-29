@@ -188,7 +188,10 @@ done;
 
 ### TODO
 
-* Placeholder: When $step === $targetStep, have an optional placeholder (to give instructions, clues, ressources, etc.)
+* Float or version step numbers
+* Config file to name and describe steps
+* Dedicated file extension for original files
+* Placeholder: When $step === $targetStep, have an optional placeholder (to give instructions, clues, resources, etc.)
 * Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
 * Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)
 * More unit tests
@@ -196,7 +199,3 @@ done;
 * Test with / Update for eZ Platform v3
 * How to easily distribute the .phar?
 * Stop writing "exercise" with two 'c'
-
-* Float or version step numbers
-* Config file to name and describe steps
-* Dedicated file extension for original files
