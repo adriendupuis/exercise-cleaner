@@ -33,7 +33,7 @@ class ExerciseCleaner
                 $commentPattern = ''; // There is no comment in JSON
                 break;
             case 'twig':
-                $commentPattern = '{* %CODE% *}';
+                $commentPattern = '{# %CODE% #}';
                 break;
             case 'php':
                 $commentPattern = '// %CODE%';
