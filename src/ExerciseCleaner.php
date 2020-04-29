@@ -22,7 +22,7 @@ class ExerciseCleaner
     }
 
     /** @return string[] */
-    public function cleanCodeLines(array $lines, int $targetStep = 1, bool $solution = false, bool $keepTags = false, string $fileType = null): array
+    public function cleanCodeLines(array $lines, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $fileType = null): array
     {
         $keptLines = [];
         $nestedTags = [];
@@ -113,7 +113,7 @@ class ExerciseCleaner
         return $keptLines;
     }
 
-    public function cleanFiles(array $pathList, int $targetStep = 1, bool $solution = false, bool $keepTags = false, string $suffix = ''): void
+    public function cleanFiles(array $pathList, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $suffix = ''): void
     {
         foreach ($pathList as $path) {
             if ('' === $path) {

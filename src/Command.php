@@ -46,7 +46,7 @@ if ($solution) {
 
 // Arguments
 
-$targetStep = 1 < count($argv) ? (int) $argv[1] : 1;
+$targetStep = 1 < count($argv) ? (float) $argv[1] : 1;
 
 $folders = 'app src';
 if (2 < count($argv)) {
