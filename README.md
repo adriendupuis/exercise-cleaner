@@ -188,7 +188,9 @@ done;
 
 ### TODO
 
+* Placeholder: When $step === $targetStep, have an optional placeholder (to give instructions, clues, ressources, etc.)
 * Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
+* Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)
 * More unit tests
 * Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar
 * Test with / Update for eZ Platform v3
