@@ -196,3 +196,7 @@ done;
 * Test with / Update for eZ Platform v3
 * How to easily distribute the .phar?
 * Stop writing "exercise" with two 'c'
+
+* Float or version step number 
+* Config file to name and describe steps
+* Dedicated file extension for original files

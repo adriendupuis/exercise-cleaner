@@ -18,9 +18,9 @@ class ExerciseCleanerTest extends TestCase
     public function testSimplestTag()
     {
         $code = <<<'CODE'
-TRAINING EXERCISE START STEP 1
+TRAINING EXERCISE START STEP 1.0
 test
-TRAINING EXERCISE STOP STEP 1
+TRAINING EXERCISE STOP STEP 1.0
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 

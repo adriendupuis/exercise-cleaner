@@ -9,15 +9,15 @@ class ExerciseCleaner
     public $startTagRegex;
     public $stopTagConstant = 'TRAINING EXERCISE STOP STEP';
     public $stopTagRegex;
-    public $thresholdActionRegex = '@(?<action_before>[A-Z]+) UNTIL (?<threshold_step>[0-9]+) THEN (?<action_after>[A-Z]+)@';
+    public $thresholdActionRegex = '@(?<action_before>[A-Z]+) UNTIL (?<threshold_step>[\.0-9]+) THEN (?<action_after>[A-Z]+)@';
 
     /** @var bool */
     private $isPhar;
 
     public function __construct()
     {
-        $this->startTagRegex = "@{$this->startTagConstant} (?<step>[0-9]+) ?(?<action>[ A-Z1-9]*)@";
-        $this->stopTagRegex = "@{$this->stopTagConstant} (?<step>[0-9]+)@";
+        $this->startTagRegex = "@{$this->startTagConstant} (?<step>[\.0-9]+) ?(?<action>[ A-Z\.0-9]*)@";
+        $this->stopTagRegex = "@{$this->stopTagConstant} (?<step>[\.0-9]+)@";
         $this->isPhar = (bool) preg_match('@^phar:///@', __DIR__);
     }
 
@@ -50,7 +50,7 @@ class ExerciseCleaner
             if (false !== strpos($line, $this->stopTagConstant)) {
                 $matches = [];
                 preg_match($this->stopTagRegex, $line, $matches);
-                $step = (int) $matches['step'];
+                $step = (float) $matches['step'];
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 if ($step !== $currentTag['step']) {
                     //TODO: error or warning
@@ -62,7 +62,7 @@ class ExerciseCleaner
             } elseif (false !== strpos($line, $this->startTagConstant)) {
                 $matches = [];
                 preg_match($this->startTagRegex, $line, $matches);
-                $step = (int) $matches['step'];
+                $step = (float) $matches['step'];
                 $action = strtoupper(trim($matches['action']));
                 $nestedTags[] = ['step' => $step, 'action' => $action];
                 if ('' !== trim($action) && false !== strpos($action, ' ')) {
@@ -81,7 +81,7 @@ class ExerciseCleaner
                 }
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
-                $step = (int) $currentTag['step'];
+                $step = (float) $currentTag['step'];
                 if ($step < $targetStep) {
                     $action = $currentTag['action'];
                     if (array_key_exists('threshold', $currentTag)) {
