@@ -8,7 +8,9 @@ use ExerciseCleaner\DefaultSingleCommand;
 $version = 'raw';
 
 $application = new Application('Exercise Cleaner', $version);
+
 $defaultSingleCommand = new DefaultSingleCommand();
 $application->add($defaultSingleCommand);
 $application->setDefaultCommand($defaultSingleCommand->getName(), true);
+
 $application->run();
