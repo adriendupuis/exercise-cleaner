@@ -10,7 +10,7 @@ class ExerciseCleanerTest extends TestCase
     /** @var ExerciseCleaner */
     private $exerciseCleaner;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         $this->exerciseCleaner = new ExerciseCleaner();
     }
