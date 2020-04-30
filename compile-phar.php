@@ -20,7 +20,7 @@ shell_exec('composer install --no-dev --quiet;');
 
 foreach ([
              // Exercise Cleaner files except stub
-             'src/CleanCommand.php',
+             'src/DefaultSingleCommand.php',
              'src/ExerciseCleaner.php',
              'src/Utils.php',
              // Dependencies
