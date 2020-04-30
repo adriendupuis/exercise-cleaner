@@ -1,7 +1,7 @@
 Exercise Cleaner
 ================
 
-Training exercise's steps manager and cleaner.
+Training exercises' steps manager and cleaner.
 
 The Exercise Cleaner removes code between tags which number is equal or greater than the desired step.
 
@@ -30,9 +30,9 @@ With afterward action:
 When `<step_number>` is smaller than the wanted step number, execute `<action>`.
 
 Available actions:
-* KEEP (default)
-* COMMENT
-* REMOVE
+* `KEEP` (default)
+* `COMMENT`
+* `REMOVE`
 
 With afterward conditional actions:
 - `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number> THEN <action_a>`
@@ -188,8 +188,15 @@ done;
 
 ### TODO
 
+* Float or version step numbers
+* Config file to name and describe steps
+* Dedicated file extension for original files
+* Placeholder: When $step === $targetStep, have an optional placeholder (to give instructions, clues, resources, etc.)
 * Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
+* Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)
 * More unit tests
 * Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar
 * Test with / Update for eZ Platform v3
+* How to easily distribute the .phar?
+* Define an license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
 * Stop writing "exercise" with two 'c'

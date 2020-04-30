@@ -33,7 +33,7 @@ class ExerciseCleaner
                 $commentPattern = ''; // There is no comment in JSON
                 break;
             case 'twig':
-                $commentPattern = '{* %CODE% *}';
+                $commentPattern = '{# %CODE% #}';
                 break;
             case 'php':
                 $commentPattern = '// %CODE%';
@@ -130,12 +130,8 @@ class ExerciseCleaner
                     // Avoid double slashes in grep result
                     $path = substr($path, 0, -1);
                 }
-                $grepCmd = "grep '{$this->startTagConstant}' -Rl $path;";
-                $fileList = explode(PHP_EOL, trim(shell_exec($grepCmd)));
-                if (1 === count($fileList) && '' === $fileList[0]) {
-                    // Grep didn't find any appropriate file
-                    $fileList = [];
-                }
+                $cmd = "grep '{$this->startTagConstant}' -Rl $path;";
+                $fileList = Utils::getFileListFromShellCmd($cmd);
             } elseif (is_file($path)) {
                 $fileList = [$path];
             } else {

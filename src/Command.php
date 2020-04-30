@@ -48,7 +48,7 @@ if ($solution) {
 
 $targetStep = 1 < count($argv) ? (int) $argv[1] : 1;
 
-$folders = 'app src';
+$folders = ['app', 'src'];
 if (2 < count($argv)) {
     $folders = array_slice($argv, 2);
 }
