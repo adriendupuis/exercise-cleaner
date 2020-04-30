@@ -1,4 +1,6 @@
 {
+    "name": "adriendupuis/exercise-cleaner",
+    "description": "Training exercises' steps manager and cleaner.",
     "autoload": {
         "psr-4": {"ExerciseCleaner\\": "src/"}
     },
