@@ -35,7 +35,12 @@ class DefaultSingleCommand extends Command
         $keepTags = $input->getOption('keep-tags');
         $suffix = $input->getOption('keep-orig') ? ".step$targetStep.".($solution?'solution':'exercise') : '';
 
-        (new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $suffix);
+        if (is_numeric($targetStep)) {
+            (new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $suffix);
+        } else {
+            $output->writeln('<error>Step argument is missing or isn\'t numeric</error>');
+            return 1;
+        }
 
         return 0;
     }
