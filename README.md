@@ -156,7 +156,7 @@ About
 
 ```shell
 php -d phar.readonly=Off compile-phar.php;
-php exercise-cleaner.phar clean --version;
+./exercise-cleaner.phar clean --version;
 ```
 
 ### Run unit tests
@@ -181,8 +181,8 @@ Run examples after compiling:
 php -d phar.readonly=0 compile-phar.php;
 rm -f examples/*.step*.*;
 for step in 1 2 3; do
-    php exercise-cleaner.phar clean --keep-orig $step examples;
-    php exercise-cleaner.phar clean --keep-orig --solution $step examples;
+    ./exercise-cleaner.phar clean --keep-orig $step examples;
+    ./exercise-cleaner.phar clean --keep-orig --solution $step examples;
 done;
 ```
 
