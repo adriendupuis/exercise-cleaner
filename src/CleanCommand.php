@@ -22,7 +22,7 @@ class CleanCommand extends Command
             ->setHelp('TODO')
             ->addOption('keep-orig', 'o', InputOption::VALUE_NONE, 'Do not rewrite files but write a new one adding an extension which includes step number and if it\'s an exercise or a solution')
             ->addOption('keep-tags', 't', InputOption::VALUE_NONE, 'Do not remove start/stop tags')
-            ->addOption('solution', 's',  InputOption::VALUE_NONE, 'Write exercise\'s solution instead of exercise itself')
+            ->addOption('solution', 's', InputOption::VALUE_NONE, 'Write exercise\'s solution instead of exercise itself')
             ->addArgument('step', InputArgument::OPTIONAL, 'Remove inside tags having this step and greater.', 1)
             ->addArgument('folders', InputArgument::IS_ARRAY, 'Search inside this folder(s).', ['app', 'src'])
         ;
