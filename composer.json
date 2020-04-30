@@ -1,4 +1,6 @@
 {
+    "name": "adriendupuis/exercise-cleaner",
+    "description": "Training exercises' steps manager and cleaner.",
     "autoload": {
         "psr-4": {"ExerciseCleaner\\": "src/"}
     },
@@ -7,5 +9,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^9.1"
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit tests"
     }
 }
