@@ -1,7 +1,7 @@
 Exercise Cleaner
 ================
 
-Training exercise's steps manager and cleaner.
+Training exercises' steps manager and cleaner.
 
 The Exercise Cleaner removes code between tags which number is equal or greater than the desired step.
 
