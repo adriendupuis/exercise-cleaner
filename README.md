@@ -188,6 +188,7 @@ done;
 
 ### TODO
 
+* Increase verbosity
 * Float or version step numbers
 * Config file to name and describe steps
 * Dedicated file extension for original files
