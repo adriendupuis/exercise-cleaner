@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-use PHPUnit\TextUI\Command;
-
 $pharFileName='exercise-cleaner.phar';
 
 $version = trim(shell_exec('git fetch --tags --force --quiet && git describe --tags 2>&-;')) ?? 'dev';
