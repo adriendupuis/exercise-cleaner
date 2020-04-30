@@ -1,5 +1,7 @@
 <?php
 
+namespace ExerciseCleaner;
+
 require __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
