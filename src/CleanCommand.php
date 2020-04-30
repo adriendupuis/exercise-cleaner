@@ -12,12 +12,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class CleanCommand extends Command
 {
-    protected static $defaultName = 'exercise:clean';
+    protected static $defaultName = 'default:single:command';
 
     protected function configure()
     {
         $this
-            ->setAliases(['clean'])
             ->setDescription('Prepare files for an exercise or its solution at a given step')
             ->setHelp('TODO')
             ->addOption('keep-orig', 'o', InputOption::VALUE_NONE, 'Do not rewrite files but write a new one adding an extension which includes step number and if it\'s an exercise or a solution')
@@ -34,9 +33,9 @@ class CleanCommand extends Command
         $targetStep = $input->getArgument('step');
         $solution = $input->getOption('solution');
         $keepTags = $input->getOption('keep-tags');
-        $isSuffixed = $input->getOption('keep-orig');
+        $suffix = $input->getOption('keep-orig') ? ".step$targetStep.".($solution?'solution':'exercise') : '';
 
-        (new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $isSuffixed ? ".step$targetStep.".($solution?'solution':'exercise') : '');
+        (new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $suffix);
 
         return 0;
     }

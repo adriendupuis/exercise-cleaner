@@ -156,7 +156,7 @@ About
 
 ```shell
 php -d phar.readonly=Off compile-phar.php;
-./exercise-cleaner.phar clean --version;
+./exercise-cleaner.phar --version;
 ```
 
 ### Run unit tests
@@ -171,8 +171,8 @@ Run examples without compiling:
 ```shell
 find examples -name *.step*.exercise -o -name *.step*.solution | xargs rm -f; # Clean previous runs
 for step in 1 2 3; do
-    php src/Application.php clean --keep-orig $step examples;
-    php src/Application.php clean --keep-orig --solution $step examples;
+    php src/Application.php --keep-orig $step examples;
+    php src/Application.php --keep-orig --solution $step examples;
 done;
 ```
 
@@ -181,8 +181,8 @@ Run examples after compiling:
 php -d phar.readonly=0 compile-phar.php;
 rm -f examples/*.step*.*;
 for step in 1 2 3; do
-    ./exercise-cleaner.phar clean --keep-orig $step examples;
-    ./exercise-cleaner.phar clean --keep-orig --solution $step examples;
+    ./exercise-cleaner.phar --keep-orig $step examples;
+    ./exercise-cleaner.phar --keep-orig --solution $step examples;
 done;
 ```
 
