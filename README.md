@@ -198,4 +198,5 @@ done;
 * Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar
 * Test with / Update for eZ Platform v3
 * How to easily distribute the .phar?
+* Define an license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
 * Stop writing "exercise" with two 'c'
