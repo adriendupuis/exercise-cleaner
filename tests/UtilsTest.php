@@ -2,8 +2,8 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use PHPUnit\Framework\TestCase;
 use ExerciseCleaner\Utils;
+use PHPUnit\Framework\TestCase;
 
 class UtilsTest extends TestCase
 {
