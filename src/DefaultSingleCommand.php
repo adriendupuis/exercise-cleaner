@@ -1,60 +1,45 @@
 <?php
 
-require __DIR__.'/ExerciseCleaner.php';
-use ExerciseCleaner\ExerciseCleaner;
+namespace ExerciseCleaner;
 
-// About
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
-$help = <<<'EOD'
-Usage: php exercise-cleaner.phar [--keep-orig] [--keep-tags] [--solution] [<STEP> [<FOLDER> [<FOLDER>...]]]
-    --keep-orig: Do not rewrite files but write a new one adding an extension which includes step number and if it's an exercise or a solution
-    --keep-tags: Do not remove start/stop tags
-    --solution: Write exercise's solution instead of exercise itself
-    STEP: Remove inside tags having this step and greater.
-    FOLDER: Search inside this folder(s) (default: app src)
+class DefaultSingleCommand extends Command
+{
+    protected static $defaultName = 'default:single:command';
 
-EOD;
+    protected function configure()
+    {
+        $this
+            ->setDescription('Prepare files for an exercise or its solution at a given step')
+            ->setHelp('TODO')
+            ->addOption('keep-orig', 'o', InputOption::VALUE_NONE, 'Do not rewrite files but write a new one adding an extension which includes step number and if it\'s an exercise or a solution')
+            ->addOption('keep-tags', 't', InputOption::VALUE_NONE, 'Do not remove start/stop tags')
+            ->addOption('solution', 's', InputOption::VALUE_NONE, 'Write exercise\'s solution instead of exercise itself')
+            ->addArgument('step', InputArgument::OPTIONAL, 'Remove inside tags having this step and greater.', 1)
+            ->addArgument('folders', InputArgument::IS_ARRAY, 'Search inside this folder(s).', ['app', 'src'])
+        ;
+    }
 
-$version = 'raw';
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $folders = $input->getArgument('folders');
+        $targetStep = $input->getArgument('step');
+        $solution = $input->getOption('solution');
+        $keepTags = $input->getOption('keep-tags');
+        $suffix = $input->getOption('keep-orig') ? ".step$targetStep.".($solution?'solution':'exercise') : '';
 
-// Options
+        if (is_numeric($targetStep)) {
+            (new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $suffix);
+        } else {
+            $output->writeln('<error>Step argument is missing or isn\'t numeric</error>');
+            return 1;
+        }
 
-if (in_array('--version', $argv, true)) {
-    echo "$version\n";
-    exit(0);
+        return 0;
+    }
 }
-
-if (in_array('--help', $argv, true)) {
-    echo $help;
-    exit(0);
-}
-
-$isSuffixed = array_search('--keep-orig', $argv, true);
-if (false !== $isSuffixed) {
-    array_splice($argv, $isSuffixed, 1);
-}
-
-$keepTags = in_array('--keep-tags', $argv, true);
-if ($keepTags) {
-    array_splice($argv, array_search('--keep-tags', $argv, true), 1);
-}
-
-$solution = in_array('--solution', $argv, true);
-if ($solution) {
-    array_splice($argv, array_search('--solution', $argv, true), 1);
-}
-
-// Arguments
-
-$targetStep = 1 < count($argv) ? (float) $argv[1] : 1;
-
-$folders = ['app', 'src'];
-if (2 < count($argv)) {
-    $folders = array_slice($argv, 2);
-}
-
-// Treatment
-
-(new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $isSuffixed ? ".step$targetStep.".($solution?'solution':'exercise') : '');
-
-exit(0);
