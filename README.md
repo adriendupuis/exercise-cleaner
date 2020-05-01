@@ -156,7 +156,7 @@ About
 
 ```shell
 php -d phar.readonly=Off compile-phar.php;
-php exercise-cleaner.phar --version;
+./exercise-cleaner.phar --version;
 ```
 
 ### Run unit tests
@@ -171,8 +171,8 @@ Run examples without compiling:
 ```shell
 find examples -name *.step*.exercise -o -name *.step*.solution | xargs rm -f; # Clean previous runs
 for step in 1 2 3; do
-    php src/Command.php --keep-orig $step examples;
-    php src/Command.php --keep-orig --solution $step examples;
+    php src/Application.php --keep-orig $step examples;
+    php src/Application.php --keep-orig --solution $step examples;
 done;
 ```
 
@@ -181,21 +181,22 @@ Run examples after compiling:
 php -d phar.readonly=0 compile-phar.php;
 rm -f examples/*.step*.*;
 for step in 1 2 3; do
-    php exercise-cleaner.phar --keep-orig $step examples;
-    php exercise-cleaner.phar --keep-orig --solution $step examples;
+    ./exercise-cleaner.phar --keep-orig $step examples;
+    ./exercise-cleaner.phar --keep-orig --solution $step examples;
 done;
 ```
 
 ### TODO
 
+* Increase verbosity
 * Float or version step numbers
 * Config file to name and describe steps
 * Dedicated file extension for original files
 * Placeholder: When $step === $targetStep, have an optional placeholder (to give instructions, clues, resources, etc.)
 * Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
 * Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)
+* Avoid re-run on previously generated files when using `--keep-orig --keep-tags`
 * More unit tests
-* Maybe use [symfony/console](https://packagist.org/packages/symfony/console) now that there is a .phar
 * Test with / Update for eZ Platform v3
 * How to easily distribute the .phar?
 * Define an license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
