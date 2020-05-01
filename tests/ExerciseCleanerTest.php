@@ -13,6 +13,7 @@ class ExerciseCleanerTest extends TestCase
     protected function setUp(): void
     {
         $this->exerciseCleaner = new ExerciseCleaner();
+        set_error_handler([$this, 'errorHandler']);
     }
 
     public function testSimplestTag()
@@ -211,30 +212,27 @@ CODE;
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
-        set_error_handler([$this, 'errorHandler']);
+        $this->exerciseCleaner->cleanCodeLines($codeLines);
 
-        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines);
-
-        $this->assertStringContainsString('Parse Error:', $this->getLastErrorString());
+        $this->assertStringContainsString('Parse Error', $this->getLastErrorString());
         $this->assertStringContainsString('at line 3', $this->getLastErrorString());
-        var_dump($this->getLastErrorNumber());
+        $this->assertEquals(E_USER_ERROR, $this->getLastErrorNumber());
     }
 
     public function testThresholdWarning(): void
     {
         $code = <<<'CODE'
-# TRAINING EXERCISE START STEP 1 KEEP UNTIL 1 THEN COMMENT
-Whatever
-# TRAINING EXERCISE STOP STEP 1
+0 # TRAINING EXERCISE START STEP 1 KEEP UNTIL 1 THEN COMMENT
+1 Whatever
+2 # TRAINING EXERCISE STOP STEP 1
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
-        set_error_handler([$this, 'errorHandler']);
-
-        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines);
+        $this->exerciseCleaner->cleanCodeLines($codeLines);
 
         $this->assertStringContainsString('Threshold less or equals to step', $this->getLastErrorString());
         $this->assertStringContainsString('at line 0', $this->getLastErrorString());
+        $this->assertEquals(E_USER_WARNING, $this->getLastErrorNumber());
     }
 
     /** @var string */
