@@ -2,8 +2,8 @@
 
 require __DIR__.'/../vendor/autoload.php';
 
-use PHPUnit\Framework\TestCase;
 use ExerciseCleaner\ExerciseCleaner;
+use PHPUnit\Framework\TestCase;
 
 class ExerciseCleanerTest extends TestCase
 {
@@ -211,19 +211,47 @@ CODE;
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
-        set_error_handler(array($this, 'errorHandler'));
+        set_error_handler([$this, 'errorHandler']);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines);
 
-        $this->assertStringStartsWith('Parse Error:', $this->lastError);
-        $this->assertStringContainsString('at line 3', $this->lastError);
+        $this->assertStringContainsString('Parse Error:', $this->getLastErrorString());
+        $this->assertStringContainsString('at line 3', $this->getLastErrorString());
+        var_dump($this->getLastErrorNumber());
+    }
+
+    public function testThresholdWarning(): void
+    {
+        $code = <<<'CODE'
+# TRAINING EXERCISE START STEP 1 KEEP UNTIL 1 THEN COMMENT
+Whatever
+# TRAINING EXERCISE STOP STEP 1
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        set_error_handler([$this, 'errorHandler']);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines);
+
+        $this->assertStringContainsString('Threshold less or equals to step', $this->getLastErrorString());
+        $this->assertStringContainsString('at line 0', $this->getLastErrorString());
     }
 
     /** @var string */
     private $lastError;
 
-    public function errorHandler($errno, $errstr)
+    public function errorHandler($number, $string): void
     {
-        $this->lastError = $errstr;
+        $this->lastError = compact('number', 'string');
+    }
+
+    private function getLastErrorString(): string
+    {
+        return $this->lastError['string'];
+    }
+
+    private function getLastErrorNumber()
+    {
+        return $this->lastError['number'];
     }
 }
