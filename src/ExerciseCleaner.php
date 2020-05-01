@@ -76,9 +76,6 @@ class ExerciseCleaner
                         trigger_error('Threshold less or equals to step'.($file ? " in file $file" : '')." at line $lineIndex", E_USER_WARNING);
                     }
                 }
-                if (count($nestedTags) > $step) {
-                    trigger_error('More nested tags than steps'.($file ? " in file $file" : '')." at line $lineIndex", E_USER_NOTICE);
-                }
                 if ($keepTags && $step <= $targetStep) {
                     $keptLines[] = $line;
                 }
