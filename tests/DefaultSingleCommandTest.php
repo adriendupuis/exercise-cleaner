@@ -28,7 +28,7 @@ class DefaultSingleCommandTest extends TestCase
         $this->assertGreaterThan(0, $this->defaultSingleCommandTester->getStatusCode());
     }
 
-    public function testExamplesStep1():void
+    public function testExamplesStep1(): void
     {
         $this->defaultSingleCommandTester->execute($this->getInput('--keep-orig 1 examples/'));
         $this->assertStringNotContainsString('Step argument is missing or isn\'t numeric', $this->defaultSingleCommandTester->getDisplay());
