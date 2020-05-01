@@ -31,12 +31,13 @@ class DefaultSingleCommand extends Command
         $targetStep = $input->getArgument('step');
         $solution = $input->getOption('solution');
         $keepTags = $input->getOption('keep-tags');
-        $suffix = $input->getOption('keep-orig') ? ".step$targetStep.".($solution?'solution':'exercise') : '';
+        $suffix = $input->getOption('keep-orig') ? ".step$targetStep.".($solution ? 'solution' : 'exercise') : '';
 
         if (is_numeric($targetStep)) {
             (new ExerciseCleaner())->cleanFiles($folders, $targetStep, $solution, $keepTags, $suffix);
         } else {
             $output->writeln('<error>Step argument is missing or isn\'t numeric</error>');
+
             return 1;
         }
 
