@@ -35,14 +35,18 @@ class DefaultSingleCommand extends Command
         $keepTags = $input->getOption('keep-tags');
         $suffix = $input->getOption('keep-orig') ? ".step$targetStep.".($solution ? 'solution' : 'exercise') : '';
 
-        $configFile = $input->getOption('config');
         $config = null;
-        if (!is_null($configFile) && is_file($configFile)) {
-            switch (pathinfo($configFile, PATHINFO_EXTENSION)) {
-                case 'yaml':
-                case 'yml':
-                default:
-                $config =Yaml::parse(file_get_contents($configFile));
+        if ($this->getDefinition()->hasOption('config')) {
+            $configFile = $input->getOption('config');
+            if (is_file($configFile)) {
+                switch (pathinfo($configFile, PATHINFO_EXTENSION)) {
+                    case 'yaml':
+                    case 'yml':
+                    default:
+                        $config = Yaml::parse(file_get_contents($configFile));
+                }
+            } else {
+                $output->writeln("<error>Config file $configFile doesn't exist or isn't a file.</error>");
             }
         }
 
