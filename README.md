@@ -159,7 +159,7 @@ Arguments:
 ```yaml
 steps:
     names:
-        - { n: 1.1, name: 'First Step: Exercise 1' }
+        - { number: 1.1, name: 'First Step: Exercise 1' }
         - { n: 1.2, name: 'First Step: Exercise 2' }
         - { n: 2, name: 'Second Step' }
 ```
@@ -194,6 +194,7 @@ done;
 Run examples after compiling and with verbosity:
 ```shell
 php -d phar.readonly=0 compile-phar.php;
+./exercise-cleaner.phar --version;
 rm -f examples/*.step*.*;
 for step in 1 2 3; do
     ./exercise-cleaner.phar --config examples/config2.yml --verbose --keep-orig $step examples;
