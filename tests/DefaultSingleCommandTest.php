@@ -4,6 +4,8 @@ require __DIR__.'/../vendor/autoload.php';
 
 use ExerciseCleaner\DefaultSingleCommand;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -18,6 +20,18 @@ class DefaultSingleCommandTest extends TestCase
     public function setUp(): void
     {
         $this->defaultSingleCommand = new DefaultSingleCommand();
+
+        // Avoid a bug where option --config become mandatory while testing.
+        $definition = new InputDefinition();
+        $definition->setArguments($this->defaultSingleCommand->getDefinition()->getArguments());
+        /** @var InputOption $option */
+        foreach ($options = $this->defaultSingleCommand->getDefinition()->getOptions() as $option) {
+            if ('config' !== $option->getName()) {
+                $definition->addOption($option);
+            }
+        }
+        $this->defaultSingleCommand->setDefinition($definition);
+
         $this->defaultSingleCommandTester = new CommandTester($this->defaultSingleCommand);
     }
 

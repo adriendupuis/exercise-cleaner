@@ -11,7 +11,7 @@ Usage
 ### Tag Usage
 
 Tags can be add as comment in files and the cleaner will remove what's inside.
-The tags include a step number. The cleaning script get a step as an argument and will clean inside tags having this step or greater.
+The tags include a step number which can be a float. The cleaning script get a step as an argument and will clean inside tags having this step or greater.
 
 For each given folder, the script will first search recursively for files containing `TRAINING EXERCISE START STEP`.
 
@@ -144,10 +144,25 @@ Options:
 * `--keep-orig`: Instead of replacing content in file, write a new file with extension .step<step_number>.<exercise|solution>.
 * `--keep-tag`: Do not remove tags
 * `--solution`: Compile exercise's solution (by default, it compile the exercise itself)
+* `--config YAML_CONFIG_FILE`: associate a config file
+* `--verbose`: Display information about found tags
+* `--quiet`: Do not display information about found files
 
 Arguments:
 * first argument: step number: clean inside this and higher tags; By default, step 1
 * following arguments: folder to search in; By default, it looks inside app/ and src/
+
+### Config File
+
+#### Step Naming
+
+```yaml
+steps:
+    names:
+        - { n: 1.1, name: 'First Step: Exercise 1' }
+        - { n: 1.2, name: 'First Step: Exercise 2' }
+        - { n: 2, name: 'Second Step' }
+```
 
 About
 -----
@@ -171,18 +186,18 @@ Run examples without compiling:
 ```shell
 find examples -name *.step*.exercise -o -name *.step*.solution | xargs rm -f; # Clean previous runs
 for step in 1 2 3; do
-    php src/Application.php --keep-orig $step examples;
-    php src/Application.php --keep-orig --solution $step examples;
+    php src/Application.php --keep-orig $step examples/;
+    php src/Application.php --keep-orig --solution $step examples/;
 done;
 ```
 
-Run examples after compiling:
+Run examples after compiling and with verbosity:
 ```shell
 php -d phar.readonly=0 compile-phar.php;
 rm -f examples/*.step*.*;
 for step in 1 2 3; do
-    ./exercise-cleaner.phar --keep-orig $step examples;
-    ./exercise-cleaner.phar --keep-orig --solution $step examples;
+    ./exercise-cleaner.phar --config examples/config2.yml --verbose --keep-orig $step examples;
+    ./exercise-cleaner.phar --config examples/config2.yml --verbose --keep-orig --solution $step examples;
 done;
 ```
 
