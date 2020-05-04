@@ -54,8 +54,8 @@ class DefaultSingleCommand extends Command
                         default:
                             $config = Yaml::parse(file_get_contents($configFile));
                     }
-                } else {
-                    $output->writeln("<error>Config file $configFile doesn't exist or isn't a file.</error>");
+                } else if (!$output->isQuiet()) {
+                    $output->writeln("<warning>Config file $configFile doesn't exist or isn't a file.</warning>");
                 }
             }
         }

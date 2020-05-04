@@ -95,7 +95,7 @@ class ExerciseCleaner
                 if (count($nestedTags)) {
                     $currentTag = $nestedTags[count($nestedTags) - 1];
                     $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineIndex:", OutputInterface::VERBOSITY_VERBOSE);
-                    $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…');
+                    $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERBOSE);
                 }
             } elseif (false !== strpos($line, $this->startTagConstant)) {
                 $matches = [];
@@ -126,7 +126,7 @@ class ExerciseCleaner
                 }
 
                 $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineIndex:", OutputInterface::VERBOSITY_VERBOSE);
-                $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…');
+                $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…', OutputInterface::VERBOSITY_VERBOSE);
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 $step = (float) $currentTag['step'];
