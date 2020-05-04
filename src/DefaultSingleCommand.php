@@ -48,7 +48,7 @@ class DefaultSingleCommand extends Command
 
         if (is_numeric($targetStep)) {
             (new ExerciseCleaner($config, $output))->cleanFiles($folders, $targetStep, $solution, $keepTags, $suffix);
-        } else if ($output->isVerbose()) {
+        } else if (!$output->isQuiet()) {
             $output->writeln('<error>Step argument is missing or isn\'t numeric</error>');
 
             return 1;
