@@ -156,6 +156,8 @@ Arguments:
 
 #### Step Naming
 
+Step naming is used by `--verbose` option.
+
 ```yaml
 steps:
     names:
