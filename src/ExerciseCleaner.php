@@ -30,7 +30,7 @@ class ExerciseCleaner
         $this->stopTagRegex = "@{$this->stopTagConstant} (?<step>[\.0-9]+)@";
 
         // Executable Phar
-        $this->isPhar = (bool) preg_match('@^phar:///@', __DIR__);
+        $this->isPhar = Utils::isPhar();
 
         if (!is_null($config)) {
             // Step Names Parsing
@@ -166,8 +166,8 @@ class ExerciseCleaner
             if ('' === $path) {
                 continue;
             }
-            if ($this->isPhar && '/' !== $path[0]) {
-                $path = trim(`pwd`)."/$path"; //TODO: Better fix
+            if ($this->isPhar) {
+                $path = Utils::getAbsolutePath($path);
             }
             if (is_dir($path)) {
                 if ('/' === substr($path, -1)) {
