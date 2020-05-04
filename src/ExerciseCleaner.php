@@ -91,11 +91,11 @@ class ExerciseCleaner
                     $keptLines[] = $line;
                 }
 
-                $this->outputWrite("Stop step $step".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineIndex", OutputInterface::VERBOSITY_VERBOSE);
+                $this->outputWrite("Stop step $step".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineIndex.", OutputInterface::VERBOSITY_VERBOSE);
                 if (count($nestedTags)) {
                     $currentTag = $nestedTags[count($nestedTags) - 1];
-                    $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineIndex", OutputInterface::VERBOSITY_VERBOSE);
-                    $this->outputWrite($this->getActionVerb($currentTag).' line(s)…');
+                    $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineIndex:", OutputInterface::VERBOSITY_VERBOSE);
+                    $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…');
                 }
             } elseif (false !== strpos($line, $this->startTagConstant)) {
                 $matches = [];
@@ -112,7 +112,7 @@ class ExerciseCleaner
                     $matches = [];
                     if (preg_match($this->thresholdActionRegex, $action, $matches)) {
                         $startedTag['before'] = strtoupper(trim($matches['action_before']));
-                        $startedTag['threshold'] = (int) $matches['threshold_step'];
+                        $startedTag['threshold'] = (float) $matches['threshold_step'];
                         $startedTag['after'] = strtoupper(trim($matches['action_after']));
                     }
                     if ($matches['threshold_step'] <= $step) {
@@ -125,9 +125,8 @@ class ExerciseCleaner
                     $keptLines[] = $line;
                 }
 
-                $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineIndex", OutputInterface::VERBOSITY_VERBOSE);
-                // Display incoming action
-                $this->outputWrite($this->getActionVerb($startedTag).' line(s)…');
+                $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineIndex:", OutputInterface::VERBOSITY_VERBOSE);
+                $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…');
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 $step = (float) $currentTag['step'];
@@ -195,28 +194,36 @@ class ExerciseCleaner
         }
     }
 
-    private function getActionVerb($tag) {
-        if (array_key_exists('threshold', $tag)) {
-            if ($tag['threshold'] >= $tag) {
-                $action = $tag['before'];
+    private function getActionVerb(array $tag, float $targetStep)
+    {
+        if ($tag['step'] < $targetStep) {
+            if (array_key_exists('threshold', $tag)) {
+                if ($tag['threshold'] >= $targetStep) {
+                    $action = $tag['before'];
+                } else {
+                    $action = $tag['after'];
+                }
+            } elseif (array_key_exists('action', $tag)) {
+                $action = $tag['action'];
             } else {
-                $action = $tag['after'];
+                $action = null;
             }
-        } else if (array_key_exists('action', $tag)) {
-            $action = $tag['action'];
-        } else {
-            $action = null;
+            switch ($action) {
+                case 'COMMENT':
+                    return 'Comment previous step line(s)';
+                case 'REMOVE':
+                    return 'Remove previous step line(s)';
+                case 'KEEP':
+                case '':
+                default:
+                    return 'Keep previous step line(s)';
+            }
+        } elseif ($tag['step'] === $targetStep) {
+            return 'Remove current step line(s)';
+        } else /*if ($tag['step'] > $targetStep)*/ {
+            return 'Remove next step line(s)';
         }
-        switch ($action) {
-            case 'COMMENT':
-                return 'Comment';
-            case 'REMOVE':
-                return 'Remove';
-            case 'KEEP':
-            case '':
-            default:
-            return 'Keep';
-        }
+        return 'Remove unknown step line(s)';
     }
 
     private function outputWrite($messages, $verbosity=OutputInterface::VERBOSITY_QUIET)
