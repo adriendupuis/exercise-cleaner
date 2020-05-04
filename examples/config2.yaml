@@ -1,0 +1,13 @@
+steps:
+    names:
+        # Using float as step numbers
+        - { n: 1, name: 'First Step' }
+        - { n: 1.1, name: 'First Step: Exercise 1' }
+        - { n: 1.2, name: 'First Step: Exercise 2' }
+        - { n: 2, name: 'Second Step' }
+        - { n: 3, name: 'Third Step' }
+# Numeric keys are not supported.
+#        1: 'First Step'
+#        1.1: 'First Step: Exercise 1'
+#        1.2: 'First Step: Exercise 2'
+#        2: 'Second Step'

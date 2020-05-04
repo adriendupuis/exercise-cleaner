@@ -2,6 +2,9 @@
 
 namespace ExerciseCleaner;
 
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
+
 class ExerciseCleaner
 {
     // Tag Syntax Config
@@ -14,11 +17,39 @@ class ExerciseCleaner
     /** @var bool */
     private $isPhar;
 
-    public function __construct()
+    /** @var array|null */
+    private $config;
+
+    /** @var OutputInterface */
+    private $output;
+
+    public function __construct(array $config = null, OutputInterface $output = null)
     {
+        // Tag Syntax Config
         $this->startTagRegex = "@{$this->startTagConstant} (?<step>[\.0-9]+) ?(?<action>[ A-Z\.0-9]*)@";
         $this->stopTagRegex = "@{$this->stopTagConstant} (?<step>[\.0-9]+)@";
+
+        // Executable Phar
         $this->isPhar = (bool) preg_match('@^phar:///@', __DIR__);
+
+        if (!is_null($config)) {
+            // Step Names Parsing
+            if (array_key_exists('steps', $config) && array_key_exists('names', $config['steps'])) {
+                $stepNames = [];
+                foreach ($config['steps']['names'] as $index => $name) {
+                    if (is_numeric($index) && is_string($name)) {
+                        $stepNames["step_$index"] = $name;
+                    } elseif (is_array($name) && array_key_exists('name', $name)) {
+                        $stepNames['step_' . (array_key_exists('n', $name) ? $name['n'] : $name['number'])] = $name['name'];
+                    }
+                }
+                $config['steps']['names'] = $stepNames;
+            }
+        }
+
+        // Config
+        $this->config = $config;
+        $this->output = $output;
     }
 
     /** @return string[] */
@@ -51,34 +82,47 @@ class ExerciseCleaner
                 $matches = [];
                 preg_match($this->stopTagRegex, $line, $matches);
                 $step = (float) $matches['step'];
-                $currentTag = $nestedTags[count($nestedTags) - 1];
-                if ($step !== $currentTag['step']) {
+                $stoppedTag = array_pop($nestedTags);
+                if ($step !== $stoppedTag['step']) {
                     //TODO: error or warning
                 }
-                array_pop($nestedTags);
+
                 if ($keepTags && $step <= $targetStep) {
                     $keptLines[] = $line;
+                }
+
+                $this->outputWrite("Stop step $step".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineIndex", OutputInterface::VERBOSITY_VERBOSE);
+                if (count($nestedTags)) {
+                    $currentTag = $nestedTags[count($nestedTags) - 1];
+                    $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineIndex", OutputInterface::VERBOSITY_VERBOSE);
                 }
             } elseif (false !== strpos($line, $this->startTagConstant)) {
                 $matches = [];
                 preg_match($this->startTagRegex, $line, $matches);
                 $step = (float) $matches['step'];
                 $action = strtoupper(trim($matches['action']));
-                $nestedTags[] = ['step' => $step, 'action' => $action];
+
+                $startedTag = [
+                    'step' => $step,
+                    'action' => $action,
+                    'name' => $this->config['steps']['names']["step_$step"] ?? '',
+                ];
                 if ('' !== trim($action) && false !== strpos($action, ' ')) {
                     $matches = [];
                     if (preg_match($this->thresholdActionRegex, $action, $matches)) {
-                        $nestedTags[count($nestedTags) - 1]['before'] = strtoupper(trim($matches['action_before']));
-                        $nestedTags[count($nestedTags) - 1]['threshold'] = (int) $matches['threshold_step'];
-                        $nestedTags[count($nestedTags) - 1]['after'] = strtoupper(trim($matches['action_after']));
+                        $startedTag['before'] = strtoupper(trim($matches['action_before']));
+                        $startedTag['threshold'] = (int) $matches['threshold_step'];
+                        $startedTag['after'] = strtoupper(trim($matches['action_after']));
                     }
                 }
-                if (count($nestedTags) > $step) {
-                    //TODO: error or warning
-                }
+                $nestedTags[] = $startedTag;
+
                 if ($keepTags && $step <= $targetStep) {
                     $keptLines[] = $line;
                 }
+
+                $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineIndex", OutputInterface::VERBOSITY_VERBOSE);
+                //TODO: Display action
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 $step = (float) $currentTag['step'];
@@ -136,12 +180,20 @@ class ExerciseCleaner
                 continue;
             }
             foreach ($fileList as $file) {
+                $this->outputWrite("<info>Treat {$file}…</info>", OutputInterface::VERBOSITY_NORMAL);
                 if (!is_file($file)) {
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
                 file_put_contents($file.$suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, pathinfo($file, PATHINFO_EXTENSION)));
             }
+        }
+    }
+
+    private function outputWrite($messages, $verbosity=OutputInterface::VERBOSITY_QUIET)
+    {
+        if (!is_null($this->output)) {
+            $this->output->writeln($messages, $verbosity);
         }
     }
 }
