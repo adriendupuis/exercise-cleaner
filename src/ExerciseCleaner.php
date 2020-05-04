@@ -95,6 +95,7 @@ class ExerciseCleaner
                 if (count($nestedTags)) {
                     $currentTag = $nestedTags[count($nestedTags) - 1];
                     $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineIndex", OutputInterface::VERBOSITY_VERBOSE);
+                    $this->outputWrite($this->getActionVerb($currentTag).' line(s)…');
                 }
             } elseif (false !== strpos($line, $this->startTagConstant)) {
                 $matches = [];
@@ -125,7 +126,8 @@ class ExerciseCleaner
                 }
 
                 $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineIndex", OutputInterface::VERBOSITY_VERBOSE);
-                //TODO: Display action
+                // Display incoming action
+                $this->outputWrite($this->getActionVerb($startedTag).' line(s)…');
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 $step = (float) $currentTag['step'];
@@ -190,6 +192,30 @@ class ExerciseCleaner
                 }
                 file_put_contents($file.$suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, $file));
             }
+        }
+    }
+
+    private function getActionVerb($tag) {
+        if (array_key_exists('threshold', $tag)) {
+            if ($tag['threshold'] >= $tag) {
+                $action = $tag['before'];
+            } else {
+                $action = $tag['after'];
+            }
+        } else if (array_key_exists('action', $tag)) {
+            $action = $tag['action'];
+        } else {
+            $action = null;
+        }
+        switch ($action) {
+            case 'COMMENT':
+                return 'Comment';
+            case 'REMOVE':
+                return 'Remove';
+            case 'KEEP':
+            case '':
+            default:
+            return 'Keep';
         }
     }
 
