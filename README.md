@@ -11,7 +11,9 @@ Usage
 ### Tag Usage
 
 Tags can be add as comment in files and the cleaner will remove what's inside.
-The tags include a step number which can be a float. The cleaning script get a step as an argument and will clean inside tags having this step or greater.
+
+The tags include a step number which can be a float.
+The cleaning script get a step as an argument and will clean inside tags having this step or greater.
 
 For each given folder, the script will first search recursively for files containing `TRAINING EXERCISE START STEP`.
 
@@ -23,11 +25,17 @@ Simple:
 - `TRAINING EXERCISE START STEP <step_number>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
+When `<step_number>` is **greater than or equal to** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
+
 With afterward action:
 - `TRAINING EXERCISE START STEP <step_number> <action>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
-When `<step_number>` is smaller than the wanted step number, execute `<action>`.
+When `<step_number>` is **greater than or equal to** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **smaller than** the wanted step number, **execute `<action>`** on inside content.
 
 Available actions:
 * `KEEP` (default)
@@ -38,15 +46,17 @@ With afterward conditional actions:
 - `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number> THEN <action_a>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
-When `<step_number>` is smaller than the wanted step number, execute one action:
-* When `<threshold_step_number>` is greater than or equal to the wanted step number, execute `<action_b>`;
-* When `<threshold_step_number>` is smaller than the wanted step number, execute `<action_a>`.
+When `<step_number>` is **greater than or equal to** than the wanted step number, **remove** inside content.
+
+When `<step_number>` is **smaller than** the wanted step number, **execute** one action:
+* When `<threshold_step_number>` is **greater than or equal to** the wanted step number, **execute `<action_b>`**;
+* When `<threshold_step_number>` is **smaller than** the wanted step number, **execute `<action_a>`**.
 
 `<threshold_step_number>` must be greater than `<step_number>`.
 
 #### Examples
 
-Note: See [examples/](examples) folder for more.
+Note: See [examples/](examples) folder and *[Run ](#run-examples)* section for more.
 
 Tagged Reference:
 ```json
@@ -176,15 +186,15 @@ php -d phar.readonly=Off compile-phar.php;
 ./exercise-cleaner.phar --version;
 ```
 
-### Run unit tests
+### Run Unit Tests
 
 Note: A `composer install --dev` (or alike) must have been previously executed.
 
 `./vendor/bin/phpunit --colors tests;`
 
-### Run examples
+### Run Examples
 
-Run examples without compiling:
+Treat examples without compiling:
 ```shell
 find examples -name *.step*.exercise -o -name *.step*.solution | xargs rm -f; # Clean previous runs
 for step in 1 2 3; do
@@ -193,7 +203,7 @@ for step in 1 2 3; do
 done;
 ```
 
-Run examples after compiling and with verbosity:
+Treat examples after compiling and with verbosity:
 ```shell
 php -d phar.readonly=0 compile-phar.php;
 ./exercise-cleaner.phar --version;
@@ -204,8 +214,23 @@ for step in 1 2 3; do
 done;
 ```
 
+Treat shell example and execute the result:
+```shell
+for step in 1 2 3; do
+    echo "\nSTEP $step EXERCISE";
+    php src/Application.php $step examples/example.sh;
+    zsh examples/example.sh;
+    git checkout -- examples/example.sh;
+    echo "\nSTEP $step SOLUTION";
+    php src/Application.php --solution $step examples/example.sh;
+    zsh examples/example.sh;
+    git checkout -- examples/example.sh;
+done;
+```
+
 ### TODO
 
+* Document solution treatment
 * Increase verbosity
 * Version string as step numbers
 * Config file to name and describe steps
