@@ -3,8 +3,6 @@ Exercise Cleaner
 
 *Training exercises' steps manager and cleaner*
 
-The Exercise Cleaner removes code between tags which number is equal or greater than the desired step.
-
 * [Usage](#usage)
   - [Tags](#tags)
   - [Command](#command)
@@ -18,6 +16,10 @@ The Exercise Cleaner removes code between tags which number is equal or greater 
 Usage
 -----
 
+The Exercise Cleaner is used to prepare exercises (code templates with missing parts that trainees must fill) and their solutions.
+
+The Exercise Cleaner mainly cleans code between tags which number is equal or greater than a desired exercise step.
+
 ### Tags
 
 Tags can be added as comments in exercises' files and the cleaner will treat what's inside.
@@ -28,7 +30,7 @@ The command get a step as an argument and will remove content inside tags having
 
 The command get paths as arguments; for each given folder, the script will first search recursively for files containing `TRAINING EXERCISE START STEP`, the core part of a starting tag.
 
-The tag doesn't care if its embed in a comment or something else. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma.
+A tag doesn't care if is embed in a comment or something else. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma.
 
 #### Simple Tag
 
@@ -82,21 +84,23 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 Note: See [examples/](examples) folder and *[Run Examples](#run-examples)* section for more.
 
+##### JSON Example
+
 Tagged Reference:
 ```json
 {
-  "TRAINING EXERCISE START STEP 1": "",
+  "TRAINING EXERCISE START STEP 1": "Step 1's needs",
   "key1": "value1",
-  "TRAINING EXERCISE START STEP 2": "",
+  "Step 2' need": "TRAINING EXERCISE START STEP 2",
   "key2": "value2",
-  "TRAINING EXERCISE STOP STEP 2": "",
+  "TRAINING EXERCISE STOP STEP 2": ~,
   "key3": "value3",
-  "TRAINING EXERCISE STOP STEP 1": "",
+  "TRAINING EXERCISE STOP STEP 1": ~,
   "key4": "value4"
 }
 ```
 
-Step 1:
+Step 1's Exercise:
 ```json
 {
   "key4": "value4"
