@@ -219,6 +219,13 @@ CODE;
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1);
         $this->assertCount(0, $cleanedCodeLines);
 
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true);
+        $this->assertCount(2, $cleanedCodeLines);
+        $this->assertEquals([
+            'Method 1', // Step 1's solution
+            'Common to methods 1 & 2', // Steps 1 & 2's solution
+        ], $cleanedCodeLines);
+
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2);
         $this->assertCount(2, $cleanedCodeLines);
         $this->assertEquals([
@@ -227,46 +234,20 @@ CODE;
             // Trainee got to implement method 2
         ], $cleanedCodeLines);
 
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true);
+        $this->assertCount(3, $cleanedCodeLines);
+        $this->assertEquals([
+            '# Method 1', // Step 1's method is commented for step 2
+            'Method 2', // Step 2's solution
+            'Common to methods 1 & 2', // Steps 1 & 2's solution
+        ], $cleanedCodeLines);
+
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 3);
         $this->assertCount(3, $cleanedCodeLines);
         $this->assertEquals([
             '# Method 1', // Step 1's method is commented for step 3
             '# Method 2', // Step 2's method is commented for step 3
             '# Common to methods 1 & 2', // Steps 1 & 2's common part is commented for step 3
-        ], $cleanedCodeLines);
-    }
-
-    public function testThresholdActionTagSolution(): void
-    {
-        $code = <<<'CODE'
-# TRAINING EXERCISE START STEP 1 COMMENT
-Method 1
-# TRAINING EXERCISE STOP STEP 1
-# TRAINING EXERCISE START STEP 2 COMMENT
-Method 2
-# TRAINING EXERCISE STOP STEP 2
-# TRAINING EXERCISE START STEP 1 KEEP UNTIL 2 THEN COMMENT
-Common to methods 1 & 2
-# TRAINING EXERCISE STOP STEP 1
-# TRAINING EXERCISE START STEP 3
-Method 3
-# TRAINING EXERCISE STOP STEP 3
-CODE;
-        $codeLines = explode(PHP_EOL, $code);
-
-        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true);
-        $this->assertCount(2, $cleanedCodeLines);
-        $this->assertEquals([
-            'Method 1', // Part of step 1's solution
-            'Common to methods 1 & 2', // Part of step 1's solution
-        ], $cleanedCodeLines);
-
-        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true);
-        $this->assertCount(3, $cleanedCodeLines);
-        $this->assertEquals([
-            '# Method 1', // Step 1's solution is commented for step 2
-            'Method 2', // Part of step 2's solution
-            'Common to methods 1 & 2', // Still available as part of the solution
         ], $cleanedCodeLines);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 3, true);
