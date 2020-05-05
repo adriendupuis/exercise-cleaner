@@ -39,7 +39,11 @@ When `<step_number>` is **smaller than** the wanted step number, **keep** inside
 - `TRAINING EXERCISE START STEP <step_number> <action>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
-When `<step_number>` is **greater than or equal to** the wanted step number, **remove** inside content.
+When `<step_number>` is **greater than** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **equal to** the wanted step number:
+* **remove** inside content from **exercise**;
+* **keep** inside content into **solution**.
 
 When `<step_number>` is **smaller than** the wanted step number, **execute `<action>`** on inside content.
 
@@ -53,7 +57,11 @@ Available actions:
 - `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number> THEN <action_a>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
-When `<step_number>` is **greater than or equal to** than the wanted step number, **remove** inside content.
+When `<step_number>` is **greater than** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **equal to** the wanted step number:
+* **remove** inside content from **exercise**;
+* **keep** inside content into **solution**.
 
 When `<step_number>` is **smaller than** the wanted step number, **execute** one action:
 * When `<threshold_step_number>` is **greater than or equal to** the wanted step number, **execute `<action_b>`**;
