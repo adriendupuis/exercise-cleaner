@@ -1,16 +1,26 @@
 Exercise Cleaner
 ================
 
-Training exercises' steps manager and cleaner.
+*Training exercises' steps manager and cleaner*
 
 The Exercise Cleaner removes code between tags which number is equal or greater than the desired step.
+
+* [Usage](#usage)
+  - [Tags](#tags)
+  - [Command](#command)
+  - [Config File](#config-file)
+* [About](#about)
+  - [Compile Phar](#compile-phar)
+  - [Run Tests](#run-tests)
+  - [Run Examples](#run-examples)
+  - [To Do](#todo)  
 
 Usage
 -----
 
-### Tag Usage
+### Tags
 
-Tags can be add as comment in files and the cleaner will remove what's inside.
+Tags can be add as comment in exercises' files and the cleaner will remove what's inside.
 
 The tags include a step number which can be a float.
 The cleaning script get a step as an argument and will clean inside tags having this step or greater.
@@ -160,7 +170,7 @@ Step 3:
 
 Note: [tests/ExerciseCleanerTest.php](tests/ExerciseCleanerTest.php) also contains some (harder to read) usage examples
 
-### Script Usage
+### Command
 
 `php exercise-cleaner [--keep-orig] [--keep-tag] <step> [folder [folder...]]`
 
