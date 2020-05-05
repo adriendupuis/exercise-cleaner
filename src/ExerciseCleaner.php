@@ -3,7 +3,6 @@
 namespace ExerciseCleaner;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
 
 class ExerciseCleaner
 {
@@ -40,7 +39,7 @@ class ExerciseCleaner
                     if (is_numeric($index) && is_string($name)) {
                         $stepNames["step_$index"] = $name;
                     } elseif (is_array($name) && array_key_exists('name', $name)) {
-                        $stepNames['step_' . (array_key_exists('n', $name) ? $name['n'] : $name['number'])] = $name['name'];
+                        $stepNames['step_'.(array_key_exists('n', $name) ? $name['n'] : $name['number'])] = $name['name'];
                     }
                 }
                 $config['steps']['names'] = $stepNames;
@@ -223,10 +222,11 @@ class ExerciseCleaner
         } else /*if ($tag['step'] > $targetStep)*/ {
             return 'Remove next step line(s)';
         }
+
         return 'Remove unknown step line(s)';
     }
 
-    private function outputWrite($messages, $verbosity=OutputInterface::VERBOSITY_QUIET)
+    private function outputWrite($messages, $verbosity = OutputInterface::VERBOSITY_QUIET)
     {
         if (!is_null($this->output)) {
             $this->output->writeln($messages, $verbosity);

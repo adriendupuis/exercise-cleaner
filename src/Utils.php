@@ -23,8 +23,9 @@ class Utils
     public static function getAbsolutePath(string $relativePath): string
     {
         if ('' !== $relativePath && '/' !== $relativePath[0]) {
-            return trim(`pwd`) . "/$relativePath";
+            return trim(`pwd`)."/$relativePath";
         }
+
         return $relativePath;
     }
 

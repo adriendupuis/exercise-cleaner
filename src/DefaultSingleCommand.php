@@ -54,7 +54,7 @@ class DefaultSingleCommand extends Command
                         default:
                             $config = Yaml::parse(file_get_contents($configFile));
                     }
-                } else if (!$output->isQuiet()) {
+                } elseif (!$output->isQuiet()) {
                     $output->writeln("<warning>Config file $configFile doesn't exist or isn't a file.</warning>");
                 }
             }
@@ -62,7 +62,7 @@ class DefaultSingleCommand extends Command
 
         if (is_numeric($targetStep)) {
             (new ExerciseCleaner($config, $output))->cleanFiles($folders, $targetStep, $solution, $keepTags, $suffix);
-        } else if (!$output->isQuiet()) {
+        } elseif (!$output->isQuiet()) {
             $output->writeln('<error>Step argument is missing or isn\'t numeric</error>');
 
             return 1;
