@@ -144,6 +144,7 @@ CODE;
 
     public function testKeptNestedSimpleTags(): void
     {
+        //Same as testNestedSimpleTags but with $keepTags=true
         $code = <<<'CODE'
 line#0
 line#1 TRAINING EXERCISE START STEP 1
@@ -190,7 +191,11 @@ CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $this->assertCount(0, $this->exerciseCleaner->cleanCodeLines($codeLines, 1));
+        $this->assertEquals(['Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
         $this->assertEquals(['// Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
+        $this->assertEquals(['// Step 1', 'Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
+        $this->assertEquals(['// Step 1', 'Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, false, false, '.php'));
+        $this->assertEquals(['// Step 1', 'Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, true, false, '.php'));
     }
 
     public function testThresholdActionTag(): void
