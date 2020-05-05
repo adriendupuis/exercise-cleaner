@@ -20,7 +20,7 @@ Usage
 
 ### Tags
 
-Tags can be add as comment in exercises' files and the cleaner will remove what's inside.
+Tags can be added as comment in exercises' files and the cleaner will remove what's inside.
 
 The tags include a step number which can be a float.
 The cleaning script get a step as an argument and will clean inside tags having this step or greater.
