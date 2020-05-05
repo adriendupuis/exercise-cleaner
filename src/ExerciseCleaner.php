@@ -188,7 +188,11 @@ class ExerciseCleaner
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
-                file_put_contents($file.$suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, $file));
+                if (false !== file_put_contents($file.$suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, $file))) {
+                    $this->outputWrite("<info>…{$file}{$suffix} written.</info>", OutputInterface::VERBOSITY_NORMAL);
+                } else {
+                    trigger_error("$file$suffix couldn't be written", E_USER_ERROR);
+                }
             }
         }
     }
