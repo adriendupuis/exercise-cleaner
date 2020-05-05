@@ -81,7 +81,7 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 #### Examples
 
-Note: See [examples/](examples) folder and *[Run ](#run-examples)* section for more.
+Note: See [examples/](examples) folder and *[Run Examples](#run-examples)* section for more.
 
 Tagged Reference:
 ```json
