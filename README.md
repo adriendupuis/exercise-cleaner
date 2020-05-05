@@ -20,18 +20,17 @@ Usage
 
 ### Tags
 
-Tags can be added as comment in exercises' files and the cleaner will remove what's inside.
+Tags can be added as comments in exercises' files and the cleaner will treat what's inside.
 
-The tags include a step number which can be a float.
-The cleaning script get a step as an argument and will clean inside tags having this step or greater.
+The tags include a step number as an integer or a float.
 
-For each given folder, the script will first search recursively for files containing `TRAINING EXERCISE START STEP`.
+The command get a step as an argument and will remove content inside tags having a greater one. When it's equal or smaller, see details in below subsections.
 
-Tags can be embed in several comment syntax, or whatever. It's followed by a step number. If the step number is equal or greater than the wanted step, the script search for the closing tag with the same number and remove all in between.
+The command get paths as arguments; for each given folder, the script will first search recursively for files containing `TRAINING EXERCISE START STEP`, the core part of a starting tag.
 
-Notice: The tag doesn't care if its embed in a comment or something else. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending coma.
+The tag doesn't care if its embed in a comment or something else. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma.
 
-### Simple Tag
+#### Simple Tag
 
 - `TRAINING EXERCISE START STEP <step_number>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
@@ -44,7 +43,7 @@ When `<step_number>` is **equal to** the wanted step number:
 
 When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
 
-### Single Afterward Action Tag
+#### Single Afterward Action Tag
 
 - `TRAINING EXERCISE START STEP <step_number> <action>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
@@ -62,7 +61,7 @@ Available actions:
 * `COMMENT`
 * `REMOVE`
 
-### Threshold Conditioned Afterward Action Tag
+#### Threshold Conditioned Afterward Action Tag
 
 - `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number> THEN <action_a>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
