@@ -19,16 +19,36 @@ class ExerciseCleanerTest extends TestCase
     public function testSimplestTag()
     {
         $code = <<<'CODE'
-TRAINING EXERCISE START STEP 1
+TRAINING EXERCISE START STEP 2
 test
-TRAINING EXERCISE STOP STEP 1
+TRAINING EXERCISE STOP STEP 2
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
+        // Step 1's exercise
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines);
         $this->assertCount(0, $cleanedCodeLines);
 
+        // Step 1's solution
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true);
+        $this->assertCount(0, $cleanedCodeLines);
+
+        // Step 2's exercise
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2);
+        $this->assertCount(0, $cleanedCodeLines);
+
+        // Step 2's solution
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true);
+        $this->assertCount(1, $cleanedCodeLines);
+        $this->assertEquals('test', $cleanedCodeLines[0]);
+
+        // Step 3's exercise
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 3);
+        $this->assertCount(1, $cleanedCodeLines);
+        $this->assertEquals('test', $cleanedCodeLines[0]);
+
+        // Step 3's solution
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 3, true);
         $this->assertCount(1, $cleanedCodeLines);
         $this->assertEquals('test', $cleanedCodeLines[0]);
     }

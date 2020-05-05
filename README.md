@@ -21,7 +21,8 @@ Tags can be embed in several comment syntax, or whatever. It's followed by a ste
 
 Notice: The tag doesn't care if its embed in a comment or something else. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending coma.
 
-Simple:
+### Simple Tag
+
 - `TRAINING EXERCISE START STEP <step_number>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
@@ -33,7 +34,8 @@ When `<step_number>` is **equal to** the wanted step number:
 
 When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
 
-With afterward action:
+### Single Afterward Action Tag
+
 - `TRAINING EXERCISE START STEP <step_number> <action>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
@@ -46,7 +48,8 @@ Available actions:
 * `COMMENT`
 * `REMOVE`
 
-With afterward conditional actions:
+### Threshold Conditional Afterward Action Tag
+
 - `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number> THEN <action_a>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
