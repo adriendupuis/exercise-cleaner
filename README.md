@@ -62,7 +62,7 @@ Available actions:
 * `COMMENT`
 * `REMOVE`
 
-### Threshold Conditional Afterward Action Tag
+### Threshold Conditioned Afterward Action Tag
 
 - `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number> THEN <action_a>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
