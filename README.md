@@ -25,7 +25,11 @@ Simple:
 - `TRAINING EXERCISE START STEP <step_number>`
 - `TRAINING EXERCISE STOP STEP <step_number>`
 
-When `<step_number>` is **greater than or equal to** the wanted step number, **remove** inside content.
+When `<step_number>` is **greater than** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **equal to** the wanted step number:
+* **remove** inside content from **exercise**;
+* **keep** inside content into **solution**.
 
 When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
 
