@@ -236,7 +236,7 @@ Note: A `composer install --dev` (or alike) must have been previously executed.
 Treat examples with the source code (without compiling):
 ```shell
 find examples -name *.step*.exercise -o -name *.step*.solution | xargs rm -f; # Clean previous runs
-for step in 1 2 3; do
+for step in 1 1.1 1.2 2 3; do
     php src/Application.php --keep-orig $step examples/;
     php src/Application.php --keep-orig --solution $step examples/;
 done;
@@ -247,7 +247,7 @@ Treat examples after compiling and with verbosity:
 php -d phar.readonly=0 compile-phar.php;
 ./exercise-cleaner.phar --version;
 rm -f examples/*.step*.*; # Clean previous runs
-for step in 1 2 3; do
+for step in 1 1.1 1.2 2 3; do
     ./exercise-cleaner.phar --config examples/config2.yml --verbose --keep-orig $step examples;
     ./exercise-cleaner.phar --config examples/config2.yml --verbose --keep-orig --solution $step examples;
 done;
@@ -255,7 +255,7 @@ done;
 
 Treat shell example and execute the result:
 ```shell
-for step in 1 2 3; do
+for step in 1 1.1 1.2 2 3; do
     echo "\nSTEP $step EXERCISE";
     php src/Application.php $step examples/example.sh;
     zsh examples/example.sh;
