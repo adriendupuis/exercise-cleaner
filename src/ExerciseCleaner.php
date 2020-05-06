@@ -140,7 +140,8 @@ class ExerciseCleaner
                     }
                     switch ($action) {
                         case 'COMMENT':
-                            $keptLines[] = str_replace('%CODE%', $line, $commentPattern);
+                            preg_match('@^(?<indent> *)(?<code>.*)$@', $line, $matches);
+                            $keptLines[] = ($matches['indent'] ?? '').str_replace('%CODE%', $matches['code'] ?? '', $commentPattern);
                             break;
                         case 'REMOVE':
                             break;
@@ -188,7 +189,7 @@ class ExerciseCleaner
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
-                if (false !== file_put_contents($file.$suffix, $this->cleanCodeLines(file($file), $targetStep, $solution, $keepTags, $file))) {
+                if (false !== file_put_contents($file.$suffix, implode(PHP_EOL, $this->cleanCodeLines(file($file, FILE_IGNORE_NEW_LINES), $targetStep, $solution, $keepTags, $file)))) {
                     $this->outputWrite("<info>…{$file}{$suffix} written.</info>", OutputInterface::VERBOSITY_NORMAL);
                 } else {
                     trigger_error("$file$suffix couldn't be written", E_USER_ERROR);

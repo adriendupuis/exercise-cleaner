@@ -182,20 +182,20 @@ CODE;
     {
         $code = <<<'CODE'
 // TRAINING EXERCISE START STEP 1 COMMENT
-Step 1
+  Step 1
 // TRAINING EXERCISE STOP STEP 1
 // TRAINING EXERCISE START STEP 2
-Step 2+
+  Step 2+
 // TRAINING EXERCISE STOP STEP 2
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $this->assertCount(0, $this->exerciseCleaner->cleanCodeLines($codeLines, 1));
-        $this->assertEquals(['Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
-        $this->assertEquals(['// Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
-        $this->assertEquals(['// Step 1', 'Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
-        $this->assertEquals(['// Step 1', 'Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, false, false, '.php'));
-        $this->assertEquals(['// Step 1', 'Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, true, false, '.php'));
+        $this->assertEquals(['  Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
+        $this->assertEquals(['  // Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
+        $this->assertEquals(['  // Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
+        $this->assertEquals(['  // Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, false, false, '.php'));
+        $this->assertEquals(['  // Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, true, false, '.php'));
     }
 
     public function testThresholdActionTag(): void
