@@ -102,7 +102,6 @@ class ExerciseCleaner
                 preg_match($this->startTagRegex, $line, $matches);
                 $step = (float) $matches['step'];
                 $action = strtoupper(trim($matches['action']));
-                var_dump($action);
                 if (null === $commentPattern && false !== strpos($action, 'COMMENT')) {
                     trigger_error("Unsupported COMMENT action at line $lineIndex", E_USER_WARNING);
                 }
