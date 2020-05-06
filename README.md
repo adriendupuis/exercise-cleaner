@@ -159,6 +159,7 @@ Step 1's worksheet:
 ```php
 protected function configure()
 {
+    // TODO: Set the description and the help
 }
 ```
 
@@ -167,29 +168,30 @@ Step 1's solution:
 protected function configure()
 {
     $this
-        ->setDescription('Step 1')
-        ->setHelp('Just an example');
+        ->setDescription('Just an example')
+        ->setHelp('Step 1 feature');
 }
 ```
 
 Step 2's worksheet:
 ```php
-    protected function configure()
-    {
-        $this
-//            ->setDescription('Step 1')
-            ->setHelp('Just an example');
-    }
+protected function configure()
+{
+    $this
+        ->setDescription('Just an example')
+        // ->setHelp('Step 1 feature');
+        // TODO: Update the description
+}
 ```
-Step 2's solution (and both step 3's worksheet and solution):
+Step 2's solution (and nex steps' worksheets and solutions):
 ```php
-    protected function configure()
-    {
-        $this
-//             ->setDescription('Step 1')
-            ->setDescription('Step 2+')
-            ->setHelp('Just an example');
-    }
+protected function configure()
+{
+    $this
+        ->setDescription('Just an example')
+        // ->setHelp('Step 1 feature');
+        ->setHelp("Step 1 feature\nStep 2 feature");
+}
 ```
 
 ### Command
