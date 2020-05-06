@@ -80,6 +80,12 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 `<threshold_step_number>` must be greater than `<step_number>`.
 
+#### Placeholder Tag
+
+- `TRAINING EXERCISE STEP PLACEHOLDER`
+
+A line containing this tag will be kept with this tag removed when found in a tag equal to the wanted step.
+
 #### Examples
 
 Notes:
@@ -135,18 +141,20 @@ Tagged Reference:
 protected function configure()
 {
     // TRAINING EXERCISE START STEP 1
+    // TRAINING EXERCISE STEP PLACEHOLDER TODO: Set the description and the help
     $this
+        ->setDescription('Just an example')
         // TRAINING EXERCISE START STEP 1 COMMENT
-        ->setDescription('Step 1')
+        ->setHelp("Step 1 feature");
         // TRAINING EXERCISE STOP STEP 1
         // TRAINING EXERCISE START STEP 2
-        ->setDescription('Step 2+')
+        // TRAINING EXERCISE STEP PLACEHOLDER TODO: Update the description
+        ->setHelp("Step 1 feature\nStep 2 feature");
         // TRAINING EXERCISE STOP STEP 2
-        ->setHelp('Just an example');
     // TRAINING EXERCISE STOP STEP 1
 }
 ```
-
+TODO: Update the following results
 Step 1's worksheet:
 ```php
 protected function configure()
