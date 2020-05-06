@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 use ExerciseCleaner\ExerciseCleaner;
 use PHPUnit\Framework\TestCase;
@@ -14,6 +14,7 @@ class ExerciseCleanerTest extends TestCase
     {
         $this->exerciseCleaner = new ExerciseCleaner();
         set_error_handler([$this, 'errorHandler']);
+        $this->resetErrors();
     }
 
     public function testSimplestTag()
@@ -181,21 +182,33 @@ CODE;
     public function testCommentActionTag(): void
     {
         $code = <<<'CODE'
-// TRAINING EXERCISE START STEP 1 COMMENT
+TRAINING EXERCISE START STEP 1 COMMENT
   Step 1
-// TRAINING EXERCISE STOP STEP 1
-// TRAINING EXERCISE START STEP 2
+TRAINING EXERCISE STOP STEP 1
+TRAINING EXERCISE START STEP 2
   Step 2+
-// TRAINING EXERCISE STOP STEP 2
+TRAINING EXERCISE STOP STEP 2
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $this->assertCount(0, $this->exerciseCleaner->cleanCodeLines($codeLines, 1));
         $this->assertEquals(['  Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
+
+        // Slashes Style
         $this->assertEquals(['  // Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
         $this->assertEquals(['  // Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
-        $this->assertEquals(['  // Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, false, false, '.php'));
-        $this->assertEquals(['  // Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, true, false, '.php'));
+
+        // Sharp Style
+        $this->assertEquals(['  # Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.sh'));
+        $this->assertEquals(['  # Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.yaml'));
+
+        // Twig Style
+        $this->assertEquals(['  {# Step 1 #}'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.twig'));
+        $this->assertEquals(['  {# Step 1 #}', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.twig'));
+
+        // Unsupported
+        $this->assertEquals([], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.json'));
+        $this->assertEquals(['  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.json'));
     }
 
     public function testThresholdActionTag(): void
@@ -344,21 +357,55 @@ CODE;
         $this->assertEquals(E_USER_WARNING, $this->getLastErrorNumber());
     }
 
-    /** @var string */
-    private $lastError;
+    public function testUnsupportedCommentWarning(): void
+    {
+        $code = <<<'CODE'
+0 # TRAINING EXERCISE START STEP 1 COMMENT
+1 Whatever
+2 # TRAINING EXERCISE STOP STEP 1
+3 # TRAINING EXERCISE START STEP 1 KEEP UNTIL 2 THEN COMMENT
+4 Whatever
+5 # TRAINING EXERCISE STOP STEP 1
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.json');
+
+        $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[0]['string']);
+        $this->assertStringContainsString('at line 0', $this->errors[0]['string']);
+        $this->assertEquals(E_USER_WARNING, $this->errors[0]['number']);
+
+        $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[1]['string']);
+        $this->assertStringContainsString('at line 3', $this->errors[1]['string']);
+        $this->assertEquals(E_USER_WARNING, $this->errors[1]['number']);
+    }
+
+    /** @var array[] */
+    private $errors = [];
 
     public function errorHandler($number, $string): void
     {
-        $this->lastError = compact('number', 'string');
+        $this->errors[] = compact('number', 'string');
     }
 
     private function getLastErrorString(): string
     {
-        return $this->lastError['string'];
+        if (count($this->errors)) {
+            return $this->errors[count($this->errors) - 1]['string'];
+        }
+        return null;
     }
 
-    private function getLastErrorNumber()
+    private function getLastErrorNumber(): int
     {
-        return $this->lastError['number'];
+        if (count($this->errors)) {
+            return $this->errors[count($this->errors) - 1]['number'];
+        }
+        return null;
+    }
+
+    private function resetErrors(): void
+    {
+        $this->errors = [];
     }
 }
