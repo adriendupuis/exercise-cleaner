@@ -1,14 +1,19 @@
 {* TRAINING EXERCISE START STEP 1 *}
 {% extends '@ezdesign/pagelayout.html.twig' %}
 {% block content %}
+    {* TRAINING EXERCISE START STEP 1 COMMENT *}
     <h1>{{ ez_content_name(content) }}</h1>
-    <div>{{ ez_render_field(content, 'body') }}</div>
+    {* TRAINING EXERCISE STOP STEP 1 *}
     {* TRAINING EXERCISE START STEP 2 *}
+    <div>{{ ez_render_field(content, 'title') }}</div>
+    <div>{{ ez_render_field(content, 'body') }}</div>
+    {* TRAINING EXERCISE STOP STEP 2 *}
+    {* TRAINING EXERCISE START STEP 3 *}
     <ul>
         {% for child in children %}
-            <li>{{ ez_content_name(child) }}</li>
+            <li>{{ ez_render_field(child, 'title') }}</li>
         {% endfor %}
     </ul>
-    {* TRAINING EXERCISE STOP STEP 2 *}
+    {* TRAINING EXERCISE STOP STEP 3 *}
 {% endblock %}
 {* TRAINING EXERCISE STOP STEP 1 *}
