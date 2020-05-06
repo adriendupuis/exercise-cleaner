@@ -16,13 +16,13 @@ Exercise Cleaner
 Usage
 -----
 
-The Exercise Cleaner is used to prepare exercises (code templates with missing parts that trainees must fill) and their solutions.
+The Exercise Cleaner is used to prepare exercises' worksheet (code with missing parts that trainees must fill) and their solutions.
 
 The Exercise Cleaner mainly cleans code between tags which number is equal or greater than a desired exercise step.
 
 ### Tags
 
-Tags can be added as comments in exercises' files and the cleaner will treat what's inside.
+Tags can be added in exercises' files and the cleaner will treat what's inside.
 
 The tags include a step number as an integer or a float.
 
@@ -30,7 +30,7 @@ The command get a step as an argument and will remove content inside tags having
 
 The command get paths as arguments; for each given folder, the script will first search recursively for files containing `TRAINING EXERCISE START STEP`, the core part of a starting tag.
 
-A tag doesn't care if is embed in a comment or something else. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma.
+A tag doesn't care if is embed in a comment or something else. When matching, the whole line containing the tag becomes the tag. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma.
 
 #### Simple Tag
 
@@ -82,11 +82,13 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 #### Examples
 
-Note: See [examples/](examples) folder and *[Run Examples](#run-examples)* section for more.
+Notes:
+- See [examples/](examples) folder and *[About/Run Examples](#run-examples)* section for more.
+- [tests/ExerciseCleanerTest.php](tests/ExerciseCleanerTest.php) also contains some (harder to read) usage examples
 
 ##### JSON Example
 
-Tagged Reference:
+Exercise's Tagged Reference:
 ```json
 {
   "TRAINING EXERCISE START STEP 1": "Step 1's needs",
@@ -100,14 +102,14 @@ Tagged Reference:
 }
 ```
 
-Step 1's Exercise:
+Step 1's worksheet:
 ```json
 {
   "key4": "value4"
 }
 ```
 
-Step 2:
+Step 1's solution & step 2's worksheet:
 ```json
 {
   "key1": "value1",
@@ -116,7 +118,7 @@ Step 2:
 }
 ```
 
-Step 3:
+Step 2's solution:
 ```json
 {
   "key1": "value1",
@@ -125,6 +127,8 @@ Step 3:
   "key4": "value4"
 }
 ```
+
+#### PHP Examples w/ Nested Tags & Action Tag
 
 Tagged Reference:
 ```php
@@ -143,14 +147,24 @@ protected function configure()
 }
 ```
 
-Step 1:
+Step 1's worksheet:
 ```php
 protected function configure()
 {
 }
 ```
 
-Step 2:
+Step 1's solution:
+```php
+protected function configure()
+{
+    $this
+        ->setDescription('Step 1')
+        ->setHelp('Just an example');
+}
+```
+
+Step 2's worksheet:
 ```php
     protected function configure()
     {
@@ -159,29 +173,26 @@ Step 2:
             ->setHelp('Just an example');
     }
 ```
-
-Step 3:
+Step 2's solution (and both step 3's worksheet and solution):
 ```php
     protected function configure()
     {
         $this
-//            ->setDescription('Step 1')
+//             ->setDescription('Step 1')
             ->setDescription('Step 2+')
             ->setHelp('Just an example');
     }
 ```
 
-Note: [tests/ExerciseCleanerTest.php](tests/ExerciseCleanerTest.php) also contains some (harder to read) usage examples
-
 ### Command
 
-`php exercise-cleaner [--keep-orig] [--keep-tag] <step> [folder [folder...]]`
+`./exercise-cleaner.phar [--keep-orig] [--keep-tag] <step> [folder [folder...]]`
 
 Options:
 * `--help`: Display usage help
 * `--keep-orig`: Instead of replacing content in file, write a new file with extension .step<step_number>.<exercise|solution>.
 * `--keep-tag`: Do not remove tags
-* `--solution`: Compile exercise's solution (by default, it compile the exercise itself)
+* `--solution`: Compile exercise's solution (by default, it compile the exercise's worksheet)
 * `--config YAML_CONFIG_FILE`: associate a config file
 * `--verbose`: Display information about found tags
 * `--quiet`: Do not display information about found files
@@ -222,7 +233,7 @@ Note: A `composer install --dev` (or alike) must have been previously executed.
 
 ### Run Examples
 
-Treat examples without compiling:
+Treat examples with the source code (without compiling):
 ```shell
 find examples -name *.step*.exercise -o -name *.step*.solution | xargs rm -f; # Clean previous runs
 for step in 1 2 3; do
@@ -235,7 +246,7 @@ Treat examples after compiling and with verbosity:
 ```shell
 php -d phar.readonly=0 compile-phar.php;
 ./exercise-cleaner.phar --version;
-rm -f examples/*.step*.*;
+rm -f examples/*.step*.*; # Clean previous runs
 for step in 1 2 3; do
     ./exercise-cleaner.phar --config examples/config2.yml --verbose --keep-orig $step examples;
     ./exercise-cleaner.phar --config examples/config2.yml --verbose --keep-orig --solution $step examples;
