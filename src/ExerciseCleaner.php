@@ -58,9 +58,10 @@ class ExerciseCleaner
         $keptLines = [];
         $nestedTags = [];
         $step = 0;
+        $commentPattern = null;
         switch ($fileType) {
             case 'json':
-                $commentPattern = ''; // There is no comment in JSON
+                $commentPattern = null; // There is no comment in JSON
                 break;
             case 'twig':
                 $commentPattern = '{# %CODE% #}';
@@ -101,6 +102,10 @@ class ExerciseCleaner
                 preg_match($this->startTagRegex, $line, $matches);
                 $step = (float) $matches['step'];
                 $action = strtoupper(trim($matches['action']));
+                var_dump($action);
+                if (null === $commentPattern && false !== strpos($action, 'COMMENT')) {
+                    trigger_error("Unsupported COMMENT action at line $lineIndex", E_USER_WARNING);
+                }
 
                 $startedTag = [
                     'step' => $step,
@@ -140,8 +145,10 @@ class ExerciseCleaner
                     }
                     switch ($action) {
                         case 'COMMENT':
-                            preg_match('@^(?<indent> *)(?<code>.*)$@', $line, $matches);
-                            $keptLines[] = ($matches['indent'] ?? '').str_replace('%CODE%', $matches['code'] ?? '', $commentPattern);
+                            if (null !== $commentPattern) {
+                                preg_match('@^(?<indent> *)(?<code>.*)$@', $line, $matches);
+                                $keptLines[] = ($matches['indent'] ?? '') . str_replace('%CODE%', $matches['code'] ?? '', $commentPattern);
+                            }
                             break;
                         case 'REMOVE':
                             break;
