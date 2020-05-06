@@ -260,6 +260,56 @@ CODE;
         ], $cleanedCodeLines);
     }
 
+    public function testPlaceholderTags(): void
+    {
+        $code = <<<'CODE'
+line#0
+line#1 TRAINING EXERCISE START STEP 1
+line#2 // TRAINING EXERCISE STEP PLACEHOLDER First instruction
+line#3
+line#4 TRAINING EXERCISE START STEP 2
+line#5 // Second instruction TRAINING EXERCISE STEP PLACEHOLDER
+line#6
+line#7 TRAINING EXERCISE STOP STEP 2
+line#8
+line#9 TRAINING EXERCISE STOP STEP 1
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1);
+        $this->assertCount(2, $cleanedCodeLines);
+        $this->assertEquals([
+            'line#0',
+            'line#2 // First instruction',
+        ], $cleanedCodeLines);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true);
+        $this->assertCount(3, $cleanedCodeLines);
+        $this->assertEquals([
+            'line#0',
+            'line#3',
+            'line#8',
+        ], $cleanedCodeLines);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2);
+        $this->assertCount(4, $cleanedCodeLines);
+        $this->assertEquals([
+            'line#0',
+            'line#3',
+            'line#5 // Second instruction',
+            'line#8',
+        ], $cleanedCodeLines);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true);
+        $this->assertCount(4, $cleanedCodeLines);
+        $this->assertEquals([
+            'line#0',
+            'line#3',
+            'line#6',
+            'line#8',
+        ], $cleanedCodeLines);
+    }
+
     public function testParseError(): void
     {
         $code = <<<'CODE'
