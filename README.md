@@ -269,7 +269,6 @@ done;
 
 ### TODO
 
-* Document solution treatment
 * Increase verbosity
 * Version string as step numbers
 * Config file to name and describe steps
