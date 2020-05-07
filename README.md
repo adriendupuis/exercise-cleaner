@@ -92,18 +92,18 @@ Notes:
 - See [examples/](examples) folder and *[About/Run Examples](#run-examples)* section for more.
 - [tests/ExerciseCleanerTest.php](tests/ExerciseCleanerTest.php) also contains some (harder to read) usage examples
 
-##### JSON Example
+##### JSON Example w/ Simple Tag
 
 Exercise's Tagged Reference:
 ```json
 {
   "TRAINING EXERCISE START STEP 1": "Step 1's needs",
   "key1": "value1",
-  "Step 2' need": "TRAINING EXERCISE START STEP 2",
+  "Step 2's begin": "TRAINING EXERCISE START STEP 2",
   "key2": "value2",
-  "TRAINING EXERCISE STOP STEP 2": ~,
+  "Step 2's end": "TRAINING EXERCISE STOP STEP 2",
   "key3": "value3",
-  "TRAINING EXERCISE STOP STEP 1": ~,
+  "TRAINING EXERCISE STOP STEP 1": null,
   "key4": "value4"
 }
 ```
@@ -145,7 +145,7 @@ protected function configure()
     $this
         ->setDescription('Just an example')
         // TRAINING EXERCISE START STEP 1 COMMENT
-        ->setHelp("Step 1 feature");
+        ->setHelp('Step 1 feature');
         // TRAINING EXERCISE STOP STEP 1
         // TRAINING EXERCISE START STEP 2
         // TRAINING EXERCISE STEP PLACEHOLDER TODO: Update the description
