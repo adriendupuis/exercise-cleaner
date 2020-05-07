@@ -13,6 +13,7 @@ Exercise Cleaner
   - [Run Examples](#run-examples)
   - [To Do](#todo)  
 
+
 Usage
 -----
 
@@ -235,8 +236,6 @@ steps:
         - 'Second Step'
 ```
 Note: If floats are finally used, a conversion to object list will be needed; So, using the previous format even if there is only integers could be recommended.
-
-
 
 
 About
