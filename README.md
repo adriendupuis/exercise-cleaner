@@ -80,6 +80,12 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 `<threshold_step_number>` must be greater than `<step_number>`.
 
+#### Placeholder Tag
+
+- `TRAINING EXERCISE STEP PLACEHOLDER`
+
+A line containing this tag will be kept with this tag removed if found between step tags which's step number equals to the wanted step number.
+
 #### Examples
 
 Notes:
@@ -135,22 +141,25 @@ Tagged Reference:
 protected function configure()
 {
     // TRAINING EXERCISE START STEP 1
+    // TRAINING EXERCISE STEP PLACEHOLDER TODO: Set the description and the help
     $this
+        ->setDescription('Just an example')
         // TRAINING EXERCISE START STEP 1 COMMENT
-        ->setDescription('Step 1')
+        ->setHelp("Step 1 feature");
         // TRAINING EXERCISE STOP STEP 1
         // TRAINING EXERCISE START STEP 2
-        ->setDescription('Step 2+')
+        // TRAINING EXERCISE STEP PLACEHOLDER TODO: Update the description
+        ->setHelp("Step 1 feature\nStep 2 feature");
         // TRAINING EXERCISE STOP STEP 2
-        ->setHelp('Just an example');
     // TRAINING EXERCISE STOP STEP 1
 }
 ```
-
+TODO: Update the following results
 Step 1's worksheet:
 ```php
 protected function configure()
 {
+    // TODO: Set the description and the help
 }
 ```
 
@@ -159,29 +168,30 @@ Step 1's solution:
 protected function configure()
 {
     $this
-        ->setDescription('Step 1')
-        ->setHelp('Just an example');
+        ->setDescription('Just an example')
+        ->setHelp('Step 1 feature');
 }
 ```
 
 Step 2's worksheet:
 ```php
-    protected function configure()
-    {
-        $this
-//            ->setDescription('Step 1')
-            ->setHelp('Just an example');
-    }
+protected function configure()
+{
+    $this
+        ->setDescription('Just an example')
+        // ->setHelp('Step 1 feature');
+        // TODO: Update the description
+}
 ```
-Step 2's solution (and both step 3's worksheet and solution):
+Step 2's solution (and nex steps' worksheets and solutions):
 ```php
-    protected function configure()
-    {
-        $this
-//             ->setDescription('Step 1')
-            ->setDescription('Step 2+')
-            ->setHelp('Just an example');
-    }
+protected function configure()
+{
+    $this
+        ->setDescription('Just an example')
+        // ->setHelp('Step 1 feature');
+        ->setHelp("Step 1 feature\nStep 2 feature");
+}
 ```
 
 ### Command

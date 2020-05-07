@@ -12,6 +12,7 @@ class ExerciseCleaner
     public $stopTagConstant = 'TRAINING EXERCISE STOP STEP';
     public $stopTagRegex;
     public $thresholdActionRegex = '@(?<action_before>[A-Z]+) UNTIL (?<threshold_step>[\.0-9]+) THEN (?<action_after>[A-Z]+)@';
+    public $placeHolderTagConstant = 'TRAINING EXERCISE STEP PLACEHOLDER';
 
     /** @var bool */
     private $isPhar;
@@ -133,7 +134,7 @@ class ExerciseCleaner
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 $step = (float) $currentTag['step'];
-                if ($step < $targetStep) {
+                if ($step < $targetStep && false === strpos($line, $this->placeHolderTagConstant)) {
                     $action = $currentTag['action'];
                     if (array_key_exists('threshold', $currentTag)) {
                         if ($currentTag['threshold'] >= $targetStep) {
@@ -156,10 +157,14 @@ class ExerciseCleaner
                         default:
                             $keptLines[] = $line;
                     }
-                } elseif ($solution && $step === $targetStep) {
-                    $keptLines[] = $line;
+                } elseif ($step === $targetStep) {
+                    if ($solution && false === strpos($line, $this->placeHolderTagConstant)) {
+                        $keptLines[] = $line;
+                    } else if (!$solution && false !== strpos($line, $this->placeHolderTagConstant)) {
+                        $keptLines[] = preg_replace("@ *{$this->placeHolderTagConstant}@", '', $line);
+                    }
                 }
-            } else {
+            } else if (false === strpos($line, $this->placeHolderTagConstant)) {
                 $keptLines[] = $line;
             }
         }
@@ -204,7 +209,7 @@ class ExerciseCleaner
         }
     }
 
-    private function getActionVerb(array $tag, float $targetStep)
+    private function getActionVerb(array $tag, float $targetStep): string
     {
         if ($tag['step'] < $targetStep) {
             if (array_key_exists('threshold', $tag)) {
@@ -239,7 +244,7 @@ class ExerciseCleaner
 
     private function outputWrite($messages, $verbosity = OutputInterface::VERBOSITY_QUIET)
     {
-        if (!is_null($this->output)) {
+        if (null !== $this->output) {
             $this->output->writeln($messages, $verbosity);
         }
     }
