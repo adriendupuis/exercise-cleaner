@@ -217,6 +217,7 @@ Arguments:
 
 Step naming is used by `--verbose` option.
 
+Using floats:
 ```yaml
 steps:
     names:
@@ -224,6 +225,19 @@ steps:
         - { n: 1.2, name: 'First Step: Exercise 2' }
         - { n: 2, name: 'Second Step' }
 ```
+Note: `n` is a shorthand for `number`, they are strictly equivalents.
+
+Using only integers:
+```yaml
+steps:
+    names:
+        - 'First Step'
+        - 'Second Step'
+```
+Note: If floats are finally used, a conversion to object list will be needed; So, using the previous format even if there is only integers could be recommended.
+
+
+
 
 About
 -----
