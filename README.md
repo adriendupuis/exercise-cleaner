@@ -84,7 +84,7 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 - `TRAINING EXERCISE STEP PLACEHOLDER`
 
-A line containing this tag will be kept with this tag removed when found in a tag equal to the wanted step.
+A line containing this tag will be kept with this tag removed if found between step tags which's step number equals to the wanted step number.
 
 #### Examples
 
