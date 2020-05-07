@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use ExerciseCleaner\ExerciseCleaner;
 use PHPUnit\Framework\TestCase;
@@ -393,6 +393,7 @@ CODE;
         if (count($this->errors)) {
             return $this->errors[count($this->errors) - 1]['string'];
         }
+
         return null;
     }
 
@@ -401,6 +402,7 @@ CODE;
         if (count($this->errors)) {
             return $this->errors[count($this->errors) - 1]['number'];
         }
+
         return null;
     }
 

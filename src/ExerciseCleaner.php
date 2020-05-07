@@ -147,7 +147,7 @@ class ExerciseCleaner
                         case 'COMMENT':
                             if (null !== $commentPattern) {
                                 preg_match('@^(?<indent> *)(?<code>.*)$@', $line, $matches);
-                                $keptLines[] = ($matches['indent'] ?? '') . str_replace('%CODE%', $matches['code'] ?? '', $commentPattern);
+                                $keptLines[] = ($matches['indent'] ?? '').str_replace('%CODE%', $matches['code'] ?? '', $commentPattern);
                             }
                             break;
                         case 'REMOVE':
@@ -160,11 +160,11 @@ class ExerciseCleaner
                 } elseif ($step === $targetStep) {
                     if ($solution && false === strpos($line, $this->placeHolderTagConstant)) {
                         $keptLines[] = $line;
-                    } else if (!$solution && false !== strpos($line, $this->placeHolderTagConstant)) {
+                    } elseif (!$solution && false !== strpos($line, $this->placeHolderTagConstant)) {
                         $keptLines[] = preg_replace("@ *{$this->placeHolderTagConstant}@", '', $line);
                     }
                 }
-            } else if (false === strpos($line, $this->placeHolderTagConstant)) {
+            } elseif (false === strpos($line, $this->placeHolderTagConstant)) {
                 $keptLines[] = $line;
             }
         }
