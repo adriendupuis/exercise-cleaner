@@ -186,8 +186,11 @@ class ExerciseCleaner
                     // Avoid double slashes in grep result
                     $path = substr($path, 0, -1);
                 }
-                $cmd = "grep '{$this->startTagConstant}' -Rl $path | grep -v '$suffix$';";
-                $fileList = Utils::getFileListFromShellCmd($cmd);
+                $cmd = "grep '{$this->startTagConstant}' -Rl $path";
+                if ($suffix) {
+                    $cmd .= " | grep -v '$suffix$'";
+                }
+                $fileList = Utils::getFileListFromShellCmd("$cmd;");
             } elseif (is_file($path)) {
                 $fileList = [$path];
             } else {
