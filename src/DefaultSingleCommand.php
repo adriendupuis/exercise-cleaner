@@ -3,6 +3,7 @@
 namespace ExerciseCleaner;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,7 +21,7 @@ class DefaultSingleCommand extends Command
     {
         $this
             ->setDescription('Prepare files for an exercise or its solution at a given step')
-            ->setHelp('TODO')
+            ->setHelp('https://github.com/adriendupuis/exercise-cleaner/blob/develop/README.md') // Updated by Application according to version
             ->addOption('keep-orig', 'o', InputOption::VALUE_NONE, 'Do not rewrite files but write a new one adding an extension which includes step number and if it\'s an exercise or a solution')
             ->addOption('keep-tags', 't', InputOption::VALUE_NONE, 'Do not remove start/stop tags')
             ->addOption('exercise', 'e', InputOption::VALUE_NONE, 'Write exercise\'s worksheet (default)')
@@ -41,6 +42,8 @@ class DefaultSingleCommand extends Command
         $solution = $input->getOption('solution');
         $keepTags = $input->getOption('keep-tags');
         $suffix = $input->getOption('keep-orig') ? ".step$targetStep.".($solution ? 'solution' : 'exercise') : '';
+
+        $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('yellow'));
 
         $config = null;
         if ($this->getDefinition()->hasOption('config')) {

@@ -110,7 +110,7 @@ class ExerciseCleaner
                 $startedTag = [
                     'step' => $step,
                     'action' => $action,
-                    'name' => $this->config['steps']['names']["step_$step"] ?? '',
+                    'name' => $this->getStepName($step) ?? '',
                 ];
                 if ('' !== trim($action) && false !== strpos($action, ' ')) {
                     $matches = [];
@@ -174,6 +174,9 @@ class ExerciseCleaner
 
     public function cleanFiles(array $pathList, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $suffix = ''): void
     {
+        $targetStepName = $this->getStepName($targetStep);
+        $targetStepName = null === $targetStepName ? '' : " “{$targetStepName}”";
+        $this->outputWrite("<comment>Get step $targetStep{$targetStepName} in {$this->getStateName($solution)} state…</comment>", OutputInterface::VERBOSITY_NORMAL);
         foreach ($pathList as $path) {
             if ('' === $path) {
                 continue;
@@ -210,6 +213,16 @@ class ExerciseCleaner
                 }
             }
         }
+    }
+
+    public function getStepName(float $step): ?string
+    {
+        return $this->config['steps']['names']["step_$step"] ?? null;
+    }
+
+    public function getStateName(bool $solution): string
+    {
+        return $solution ? 'solution' : 'exercise';
     }
 
     private function getActionVerb(array $tag, float $targetStep): string
