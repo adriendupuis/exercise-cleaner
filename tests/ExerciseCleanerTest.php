@@ -74,100 +74,100 @@ CODE;
     public function testNestedSimpleTags(): void
     {
         $code = <<<'CODE'
-line#0
-line#1 TRAINING EXERCISE START STEP 1
-line#2
-line#3 TRAINING EXERCISE START STEP 2
-line#4
-line#5 TRAINING EXERCISE STOP STEP 2
-line#6
-line#7 TRAINING EXERCISE STOP STEP 1
-line#8
+line#1
+line#2 TRAINING EXERCISE START STEP 1
+line#3
+line#4 TRAINING EXERCISE START STEP 2
+line#5
+line#6 TRAINING EXERCISE STOP STEP 2
+line#7
+line#8 TRAINING EXERCISE STOP STEP 1
+line#9
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1);
         $this->assertCount(2, $cleanedCodeLines);
-        $this->assertEquals('line#0', $cleanedCodeLines[0]);
-        $this->assertEquals('line#8', $cleanedCodeLines[1]);
+        $this->assertEquals('line#1', $cleanedCodeLines[0]);
+        $this->assertEquals('line#9', $cleanedCodeLines[1]);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2);
         $this->assertCount(4, $cleanedCodeLines);
-        $this->assertEquals('line#0', $cleanedCodeLines[0]);
-        $this->assertEquals('line#2', $cleanedCodeLines[1]);
-        $this->assertEquals('line#6', $cleanedCodeLines[2]);
-        $this->assertEquals('line#8', $cleanedCodeLines[3]);
+        $this->assertEquals('line#1', $cleanedCodeLines[0]);
+        $this->assertEquals('line#3', $cleanedCodeLines[1]);
+        $this->assertEquals('line#7', $cleanedCodeLines[2]);
+        $this->assertEquals('line#9', $cleanedCodeLines[3]);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 3);
         $this->assertCount(5, $cleanedCodeLines);
-        $this->assertEquals('line#0', $cleanedCodeLines[0]);
-        $this->assertEquals('line#2', $cleanedCodeLines[1]);
-        $this->assertEquals('line#4', $cleanedCodeLines[2]);
-        $this->assertEquals('line#6', $cleanedCodeLines[3]);
-        $this->assertEquals('line#8', $cleanedCodeLines[4]);
+        $this->assertEquals('line#1', $cleanedCodeLines[0]);
+        $this->assertEquals('line#3', $cleanedCodeLines[1]);
+        $this->assertEquals('line#5', $cleanedCodeLines[2]);
+        $this->assertEquals('line#7', $cleanedCodeLines[3]);
+        $this->assertEquals('line#9', $cleanedCodeLines[4]);
     }
 
     public function testNestedSimpleTagsWithFloats(): void
     {
         $code = <<<'CODE'
-line#0
-line#1 TRAINING EXERCISE START STEP 1.1
-line#2
-line#3 TRAINING EXERCISE START STEP 1.2
-line#4
-line#5 TRAINING EXERCISE STOP STEP 1.2
-line#6
-line#7 TRAINING EXERCISE STOP STEP 1.1
-line#8
+line#1
+line#2 TRAINING EXERCISE START STEP 1.1
+line#3
+line#4 TRAINING EXERCISE START STEP 1.2
+line#5
+line#6 TRAINING EXERCISE STOP STEP 1.2
+line#7
+line#8 TRAINING EXERCISE STOP STEP 1.1
+line#9
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1.1);
         $this->assertCount(2, $cleanedCodeLines);
-        $this->assertEquals('line#0', $cleanedCodeLines[0]);
-        $this->assertEquals('line#8', $cleanedCodeLines[1]);
+        $this->assertEquals('line#1', $cleanedCodeLines[0]);
+        $this->assertEquals('line#9', $cleanedCodeLines[1]);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1.2);
         $this->assertCount(4, $cleanedCodeLines);
-        $this->assertEquals('line#0', $cleanedCodeLines[0]);
-        $this->assertEquals('line#2', $cleanedCodeLines[1]);
-        $this->assertEquals('line#6', $cleanedCodeLines[2]);
-        $this->assertEquals('line#8', $cleanedCodeLines[3]);
+        $this->assertEquals('line#1', $cleanedCodeLines[0]);
+        $this->assertEquals('line#3', $cleanedCodeLines[1]);
+        $this->assertEquals('line#7', $cleanedCodeLines[2]);
+        $this->assertEquals('line#9', $cleanedCodeLines[3]);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1.3);
         $this->assertCount(5, $cleanedCodeLines);
-        $this->assertEquals('line#0', $cleanedCodeLines[0]);
-        $this->assertEquals('line#2', $cleanedCodeLines[1]);
-        $this->assertEquals('line#4', $cleanedCodeLines[2]);
-        $this->assertEquals('line#6', $cleanedCodeLines[3]);
-        $this->assertEquals('line#8', $cleanedCodeLines[4]);
+        $this->assertEquals('line#1', $cleanedCodeLines[0]);
+        $this->assertEquals('line#3', $cleanedCodeLines[1]);
+        $this->assertEquals('line#5', $cleanedCodeLines[2]);
+        $this->assertEquals('line#7', $cleanedCodeLines[3]);
+        $this->assertEquals('line#9', $cleanedCodeLines[4]);
     }
 
     public function testKeptNestedSimpleTags(): void
     {
         //Same as testNestedSimpleTags but with $keepTags=true
         $code = <<<'CODE'
-line#0
-line#1 TRAINING EXERCISE START STEP 1
-line#2
-line#3 TRAINING EXERCISE START STEP 2
-line#4
-line#5 TRAINING EXERCISE STOP STEP 2
-line#6
-line#7 TRAINING EXERCISE STOP STEP 1
-line#8
+line#1
+line#2 TRAINING EXERCISE START STEP 1
+line#3
+line#4 TRAINING EXERCISE START STEP 2
+line#5
+line#6 TRAINING EXERCISE STOP STEP 2
+line#7
+line#8 TRAINING EXERCISE STOP STEP 1
+line#9
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false, true);
         $this->assertCount(4, $cleanedCodeLines);
-        $this->assertEquals('line#0', $cleanedCodeLines[0]);
+        $this->assertEquals('line#1', $cleanedCodeLines[0]);
         $this->assertEquals($codeLines[0], $cleanedCodeLines[0]);
-        $this->assertStringStartsWith('line#1', $cleanedCodeLines[1]);
+        $this->assertStringStartsWith('line#2', $cleanedCodeLines[1]);
         $this->assertEquals($codeLines[1], $cleanedCodeLines[1]);
-        $this->assertStringStartsWith('line#7', $cleanedCodeLines[2]);
+        $this->assertStringStartsWith('line#8', $cleanedCodeLines[2]);
         $this->assertEquals($codeLines[7], $cleanedCodeLines[2]);
-        $this->assertEquals('line#8', $cleanedCodeLines[3]);
+        $this->assertEquals('line#9', $cleanedCodeLines[3]);
         $this->assertEquals($codeLines[8], $cleanedCodeLines[3]);
 
         $slicedCodeLines = array_values($codeLines);
@@ -276,107 +276,107 @@ CODE;
     public function testPlaceholderTags(): void
     {
         $code = <<<'CODE'
-line#0
-line#1 TRAINING EXERCISE START STEP 1
-line#2 // TRAINING EXERCISE STEP PLACEHOLDER First instruction
-line#3
-line#4 TRAINING EXERCISE START STEP 2
-line#5 // Second instruction TRAINING EXERCISE STEP PLACEHOLDER
-line#6
-line#7 TRAINING EXERCISE STOP STEP 2
-line#8
-line#9 TRAINING EXERCISE STOP STEP 1
+line#1
+line#2 TRAINING EXERCISE START STEP 1
+line#3 // TRAINING EXERCISE STEP PLACEHOLDER First instruction
+line#4
+line#5 TRAINING EXERCISE START STEP 2
+line#6 // Second instruction TRAINING EXERCISE STEP PLACEHOLDER
+line#7
+line#8 TRAINING EXERCISE STOP STEP 2
+line#9
+line#10 TRAINING EXERCISE STOP STEP 1
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1);
         $this->assertCount(2, $cleanedCodeLines);
         $this->assertEquals([
-            'line#0',
-            'line#2 // First instruction',
+            'line#1',
+            'line#3 // First instruction',
         ], $cleanedCodeLines);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true);
         $this->assertCount(3, $cleanedCodeLines);
         $this->assertEquals([
-            'line#0',
-            'line#3',
-            'line#8',
+            'line#1',
+            'line#4',
+            'line#9',
         ], $cleanedCodeLines);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2);
         $this->assertCount(4, $cleanedCodeLines);
         $this->assertEquals([
-            'line#0',
-            'line#3',
-            'line#5 // Second instruction',
-            'line#8',
+            'line#1',
+            'line#4',
+            'line#6 // Second instruction',
+            'line#9',
         ], $cleanedCodeLines);
 
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true);
         $this->assertCount(4, $cleanedCodeLines);
         $this->assertEquals([
-            'line#0',
-            'line#3',
-            'line#6',
-            'line#8',
+            'line#1',
+            'line#4',
+            'line#7',
+            'line#9',
         ], $cleanedCodeLines);
     }
 
     public function testParseError(): void
     {
         $code = <<<'CODE'
-0 # TRAINING EXERCISE START STEP 1
-1 # TRAINING EXERCISE START STEP 2
-2 Whatever
-3 # TRAINING EXERCISE STOP STEP 1
+1 # TRAINING EXERCISE START STEP 1
+2 # TRAINING EXERCISE START STEP 2
+3 Whatever
 4 # TRAINING EXERCISE STOP STEP 1
+5 # TRAINING EXERCISE STOP STEP 1
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $this->exerciseCleaner->cleanCodeLines($codeLines);
 
         $this->assertStringContainsString('Parse Error', $this->getLastErrorString());
-        $this->assertStringContainsString('at line 3', $this->getLastErrorString());
+        $this->assertStringContainsString('at line 4', $this->getLastErrorString());
         $this->assertEquals(E_USER_ERROR, $this->getLastErrorNumber());
     }
 
     public function testThresholdWarning(): void
     {
         $code = <<<'CODE'
-0 # TRAINING EXERCISE START STEP 1 KEEP UNTIL 1 THEN COMMENT
-1 Whatever
-2 # TRAINING EXERCISE STOP STEP 1
+1 # TRAINING EXERCISE START STEP 1 KEEP UNTIL 1 THEN COMMENT
+2 Whatever
+3 # TRAINING EXERCISE STOP STEP 1
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $this->exerciseCleaner->cleanCodeLines($codeLines);
 
         $this->assertStringContainsString('Threshold less or equals to step', $this->getLastErrorString());
-        $this->assertStringContainsString('at line 0', $this->getLastErrorString());
+        $this->assertStringContainsString('at line 1', $this->getLastErrorString());
         $this->assertEquals(E_USER_WARNING, $this->getLastErrorNumber());
     }
 
     public function testUnsupportedCommentWarning(): void
     {
         $code = <<<'CODE'
-0 # TRAINING EXERCISE START STEP 1 COMMENT
-1 Whatever
-2 # TRAINING EXERCISE STOP STEP 1
-3 # TRAINING EXERCISE START STEP 1 KEEP UNTIL 2 THEN COMMENT
-4 Whatever
-5 # TRAINING EXERCISE STOP STEP 1
+1 # TRAINING EXERCISE START STEP 1 COMMENT
+2 Whatever
+3 # TRAINING EXERCISE STOP STEP 1
+4 # TRAINING EXERCISE START STEP 1 KEEP UNTIL 2 THEN COMMENT
+5 Whatever
+6 # TRAINING EXERCISE STOP STEP 1
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
         $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.json');
 
         $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[0]['string']);
-        $this->assertStringContainsString('at line 0', $this->errors[0]['string']);
+        $this->assertStringContainsString('at line 1', $this->errors[0]['string']);
         $this->assertEquals(E_USER_WARNING, $this->errors[0]['number']);
 
         $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[1]['string']);
-        $this->assertStringContainsString('at line 3', $this->errors[1]['string']);
+        $this->assertStringContainsString('at line 4', $this->errors[1]['string']);
         $this->assertEquals(E_USER_WARNING, $this->errors[1]['number']);
     }
 

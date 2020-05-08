@@ -79,23 +79,24 @@ class ExerciseCleaner
                 $commentPattern = '# %CODE%';
         }
         foreach ($lines as $lineIndex => $line) {
+            $lineNumber = 1 + $lineIndex;
             if (false !== strpos($line, $this->stopTagConstant)) {
                 $matches = [];
                 preg_match($this->stopTagRegex, $line, $matches);
                 $step = (float) $matches['step'];
                 $stoppedTag = array_pop($nestedTags);
                 if ($step !== $stoppedTag['step']) {
-                    trigger_error('Parse Error: STOP tag not matching START tag'.($file ? " in file $file" : '')." at line $lineIndex", E_USER_ERROR);
+                    trigger_error('Parse Error: STOP tag not matching START tag'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_ERROR);
                 }
 
                 if ($keepTags && $step <= $targetStep) {
                     $keptLines[] = $line;
                 }
 
-                $this->outputWrite("Stop step $step".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineIndex.", OutputInterface::VERBOSITY_VERBOSE);
+                $this->outputWrite("Stop step $step".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineNumber.", OutputInterface::VERBOSITY_VERBOSE);
                 if (count($nestedTags)) {
                     $currentTag = $nestedTags[count($nestedTags) - 1];
-                    $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineIndex:", OutputInterface::VERBOSITY_VERBOSE);
+                    $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERBOSE);
                     $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERBOSE);
                 }
             } elseif (false !== strpos($line, $this->startTagConstant)) {
@@ -104,7 +105,7 @@ class ExerciseCleaner
                 $step = (float) $matches['step'];
                 $action = strtoupper(trim($matches['action']));
                 if (null === $commentPattern && false !== strpos($action, 'COMMENT')) {
-                    trigger_error("Unsupported COMMENT action at line $lineIndex", E_USER_WARNING);
+                    trigger_error("Unsupported COMMENT action at line $lineNumber", E_USER_WARNING);
                 }
 
                 $startedTag = [
@@ -120,7 +121,7 @@ class ExerciseCleaner
                         $startedTag['after'] = strtoupper(trim($matches['action_after']));
                     }
                     if ($matches['threshold_step'] <= $step) {
-                        trigger_error('Threshold less or equals to step'.($file ? " in file $file" : '')." at line $lineIndex", E_USER_WARNING);
+                        trigger_error('Threshold less or equals to step'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_WARNING);
                     }
                 }
                 $nestedTags[] = $startedTag;
@@ -129,7 +130,7 @@ class ExerciseCleaner
                     $keptLines[] = $line;
                 }
 
-                $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineIndex:", OutputInterface::VERBOSITY_VERBOSE);
+                $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERBOSE);
                 $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…', OutputInterface::VERBOSITY_VERBOSE);
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
