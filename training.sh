@@ -5,8 +5,8 @@ remote_training_repository='git@github.com:adriendupuis/training.git';
 remote_training_branch='master';
 
 # Reference repository config:
-#reference_repository='git@gitlab.com:ez-ps/training/v3/ezplatform.git';
-#reference_branch='exercise-cleaner';
+#remote_reference_repository='git@gitlab.com:ez-ps/training/v3/ezplatform.git';
+#remote_reference_branch='exercise-cleaner';
 remote_reference_repository='https://github.com/adriendupuis/exercise-cleaner';
 remote_reference_branch='develop';
 
