@@ -19,11 +19,11 @@ local_reference_branch=$remote_reference_branch; # TODO: Make this variable cust
 #local_reference_branch='reference';
 
 # Exercises config:
-#paths='webpack.config.js config/ src/ templates/';
-#exercise_cleaner='bin/exercise-cleaner.phar';
-#step_list=('TODO');
-paths='examples/';
-exercise_cleaner='php src/Application.php';
+#exercise_cleaner='bin/exercise-cleaner.phar --config config/packages/app/exercise_cleaner.yaml';
+#path_list=(webpack.config.js config/ src/ templates/);
+#step_list=(TODO);
+exercise_cleaner='php src/Application.php --config examples/config2.yaml';
+path_list=(examples/);
 step_list=(1 1.1 1.2 2 3);
 state_list=('exercise' 'solution');
 
@@ -38,7 +38,7 @@ set -e;
 echo 'Initialization: Clone reference branch';
 git clone --single-branch --depth 1 --origin $local_reference_repository $remote_reference_repository --branch $remote_reference_branch $local_working_directory;
 cd $local_working_directory;
-if [[ $exercise_cleaner =~ '.php$' ]]; then
+if [[ $exercise_cleaner == *'Application.php'* ]]; then
   echo 'Notice: Running source code (instead of phar archive); Composer install is needed.';
   composer install --no-dev;
 fi
@@ -48,8 +48,8 @@ git remote add $local_training_repository $remote_training_repository;
 git remote -v;
 echo 'Initialization: Push step 0 on training branch';
 git checkout --orphan $local_training_branch;
-eval "$exercise_cleaner 0 $paths";
-git add $paths;
+eval "$exercise_cleaner 0 $path_list";
+git add $path_list;
 git commit --message "Initialization";
 git push --set-upstream $local_training_repository $local_training_branch:$remote_training_branch;
 git branch -vv;
@@ -58,15 +58,19 @@ echo "\nTraining: Entering steps' loop\n";
 for step in $step_list; do
   for state in $state_list; do
     echo "Prepare step $step $state…";
-    git checkout $local_reference_branch -- $paths;
-    eval "$exercise_cleaner --quiet $step --$state $paths";
-    git add $paths;
-    git status --short;
-    git commit --quiet --message "Step $step $state";
-    echo "Step $step $state ready: Press 'enter' key to push it to training's remote repository…";
-    read -r -n 0;
-    echo "Push step $step $state…\n";
-    git push --quiet $local_training_repository $local_training_branch:$remote_training_branch;
+    git checkout $local_reference_branch -- $path_list;
+    eval "$exercise_cleaner --quiet $step --$state $path_list";
+    git add $path_list;
+    git_status=$(git status --short;);
+    if [[ -n "$git_status" ]]; then
+      git commit --quiet --message "Step $step $state";
+      echo "Step $step $state ready: Press 'enter' key to push it to training's remote repository…";
+      read -r -n 0;
+      echo "Push step $step $state…\n";
+      git push --quiet $local_training_repository $local_training_branch:$remote_training_branch;
+    else
+      echo "Nothing to update for this step and state.\n"
+    fi
   done;
 done;
 
