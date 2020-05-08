@@ -3,6 +3,7 @@
 namespace ExerciseCleaner;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -41,6 +42,8 @@ class DefaultSingleCommand extends Command
         $solution = $input->getOption('solution');
         $keepTags = $input->getOption('keep-tags');
         $suffix = $input->getOption('keep-orig') ? ".step$targetStep.".($solution ? 'solution' : 'exercise') : '';
+
+        $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('yellow'));
 
         $config = null;
         if ($this->getDefinition()->hasOption('config')) {
