@@ -271,8 +271,8 @@ php -d phar.readonly=0 compile-phar.php;
 ./exercise-cleaner.phar --version;
 rm -f examples/*.step*.*; # Clean previous runs
 for step in 1 1.1 1.2 2 3; do
-    ./exercise-cleaner.phar --config examples/config2.yml --verbose --keep-orig $step examples;
-    ./exercise-cleaner.phar --config examples/config2.yml --verbose --keep-orig --solution $step examples;
+    ./exercise-cleaner.phar --config examples/config2.yaml --verbose --keep-orig $step examples;
+    ./exercise-cleaner.phar --config examples/config2.yaml --verbose --keep-orig --solution $step examples;
 done;
 ```
 
