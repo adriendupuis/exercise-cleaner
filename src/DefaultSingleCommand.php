@@ -21,7 +21,7 @@ class DefaultSingleCommand extends Command
     {
         $this
             ->setDescription('Prepare files for an exercise or its solution at a given step')
-            ->setHelp('TODO')
+            ->setHelp('https://github.com/adriendupuis/exercise-cleaner/blob/develop/README.md') // Updated by Application according to version
             ->addOption('keep-orig', 'o', InputOption::VALUE_NONE, 'Do not rewrite files but write a new one adding an extension which includes step number and if it\'s an exercise or a solution')
             ->addOption('keep-tags', 't', InputOption::VALUE_NONE, 'Do not remove start/stop tags')
             ->addOption('exercise', 'e', InputOption::VALUE_NONE, 'Write exercise\'s worksheet (default)')
