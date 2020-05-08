@@ -19,7 +19,7 @@ Usage
 
 The Exercise Cleaner is used to prepare exercises' worksheets (code with missing parts that trainees must fill, the exercise itself) or their solutions.
 
-The Exercise Cleaner mainly cleans code between tags of current and next steps. It can execute several actions on previous steps code (keep it, comment it, remove it). When preparing an exercise's worksheets, code can be replaced by placeholders (instruction, references, clues, etc.).
+The Exercise Cleaner mainly cleans code between tags of current and next steps. The Exercise Cleaner can execute several actions on previous steps' code (keep it, comment it, remove it). When preparing an exercise's worksheets, code can be replaced by placeholders (instruction, references, clues, etc.).
 
 ### Tags
 
