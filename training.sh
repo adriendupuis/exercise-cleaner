@@ -1,12 +1,13 @@
 #!/usr/bin/env zsh
 
+# USAGE:
+# Set remote_*, local_working_directory, exercise_cleaner, path_list and step_list variables according to your needs
+
 # Training repository config:
 remote_training_repository='git@github.com:adriendupuis/training.git';
 remote_training_branch='master';
 
 # Reference repository config:
-#remote_reference_repository='git@gitlab.com:ez-ps/training/v3/ezplatform.git';
-#remote_reference_branch='exercise-cleaner';
 remote_reference_repository='https://github.com/adriendupuis/exercise-cleaner';
 remote_reference_branch='develop';
 
@@ -19,9 +20,7 @@ local_reference_branch=$remote_reference_branch; # TODO: Make this variable cust
 #local_reference_branch='reference';
 
 # Exercises config:
-#exercise_cleaner='bin/exercise-cleaner.phar --config config/packages/app/exercise_cleaner.yaml';
-#path_list=(webpack.config.js config/ src/ templates/);
-#step_list=(TODO);
+#exercise_cleaner='bin/exercise-cleaner.phar --config config/packages/exercise_cleaner.yaml';
 exercise_cleaner='php src/Application.php --config examples/config2.yaml';
 path_list=(examples/);
 step_list=(1 1.1 1.2 2 3);
