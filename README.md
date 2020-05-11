@@ -256,11 +256,15 @@ php -d phar.readonly=Off compile-phar.php;
 ./exercise-cleaner.phar --version;
 ```
 
+Note: When a release is created, an asset is automatically compiled and attached to it (see [*Release Asset* workflow](.github/workflows/release.yml))
+
 ### Run Unit Tests
 
 Note: A `composer install --dev` (or alike) must have been previously executed.
 
 `./vendor/bin/phpunit --colors tests;`
+
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/php.yml))
 
 ### Run Examples
 
