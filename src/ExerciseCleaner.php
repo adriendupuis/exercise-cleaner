@@ -109,7 +109,7 @@ class ExerciseCleaner
                 }
                 $intro = false !== strpos($action, 'INTRO');
                 if ($intro) {
-                    $action = trim(str_replace('INTRO', '', $action));
+                    $action = trim(str_replace('  ', ' ', str_replace('INTRO', '', $action)));
                 }
 
                 $startedTag = [
