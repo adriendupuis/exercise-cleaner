@@ -3,6 +3,7 @@ Exercise Cleaner
 
 *Training exercises' steps manager and cleaner*
 
+* [Install](#install)
 * [Usage](#usage)
   - [Tags](#tags)
   - [Command](#command)
@@ -13,6 +14,13 @@ Exercise Cleaner
   - [Run Examples](#run-examples)
   - [To Do](#todo)  
 
+Install
+-------
+
+To quickly install Exercise Cleaner's phar asset:
+- Download last release's asset *exercise-cleaner.phar* from [Releases page](https://github.com/adriendupuis/exercise-cleaner/releases) to your project;
+- Make it executable for yourself with `chmod u+x exercise-cleaner.phar`;
+- Check executability, for example from same directory, with `./exercise-cleaner.phar --version`.
 
 Usage
 -----
@@ -23,7 +31,7 @@ The Exercise Cleaner mainly cleans code between tags of current and next steps. 
 
 ### Tags
 
-Tags can be added in exercises' files and the cleaner will treat what's inside.
+Tags can be added in exercises' files and the Exercise Cleaner will treat what's inside.
 
 The tags include a step number as an integer or a float.
 
