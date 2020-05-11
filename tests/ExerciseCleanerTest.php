@@ -273,6 +273,40 @@ CODE;
         ], $cleanedCodeLines);
     }
 
+    public function testIntroKeyword(): void
+    {
+        $code = <<<'CODE'
+TRAINING EXERCISE START STEP 1 INTRO REMOVE
+Step 1 Introduction
+TRAINING EXERCISE STOP STEP 1
+TRAINING EXERCISE START STEP 1 KEEP INTRO UNTIL 2 THEN REMOVE
+Steps 1 & 2 Introduction
+TRAINING EXERCISE STOP STEP 1
+TRAINING EXERCISE START STEP 1 REMOVE
+Step 1 Solution
+TRAINING EXERCISE STOP STEP 1
+TRAINING EXERCISE START STEP 2 INTRO
+Step 2+ Introduction
+TRAINING EXERCISE STOP STEP 2
+TRAINING EXERCISE START STEP 2
+Step 2+ Solution
+TRAINING EXERCISE STOP STEP 2
+TRAINING EXERCISE START STEP 3
+Step 3 Solution
+TRAINING EXERCISE STOP STEP 3
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false));
+        $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction', 'Step 1 Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
+
+        $this->assertEquals(['Steps 1 & 2 Introduction', 'Step 2+ Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
+        $this->assertEquals(['Steps 1 & 2 Introduction', 'Step 2+ Introduction', 'Step 2+ Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
+
+        $this->assertEquals(['Step 2+ Introduction', 'Step 2+ Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, false));
+        $this->assertEquals(['Step 2+ Introduction', 'Step 2+ Solution', 'Step 3 Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, true));
+    }
+
     public function testPlaceholderTags(): void
     {
         $code = <<<'CODE'

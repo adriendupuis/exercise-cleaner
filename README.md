@@ -3,6 +3,7 @@ Exercise Cleaner
 
 *Training exercises' steps manager and cleaner*
 
+* [Install](#install)
 * [Usage](#usage)
   - [Tags](#tags)
   - [Command](#command)
@@ -13,6 +14,13 @@ Exercise Cleaner
   - [Run Examples](#run-examples)
   - [To Do](#todo)  
 
+Install
+-------
+
+To quickly install Exercise Cleaner's phar asset:
+- Download last release's asset *exercise-cleaner.phar* from [Releases page](https://github.com/adriendupuis/exercise-cleaner/releases) to your project;
+- Make it executable for yourself with `chmod u+x exercise-cleaner.phar`;
+- Check executability, for example from same directory, with `./exercise-cleaner.phar --version`.
 
 Usage
 -----
@@ -23,7 +31,7 @@ The Exercise Cleaner mainly cleans code between tags of current and next steps. 
 
 ### Tags
 
-Tags can be added in exercises' files and the cleaner will treat what's inside.
+Tags can be added in exercises' files and the Exercise Cleaner's command will treat what's inside.
 
 The tags include a step number as an integer or a float.
 
@@ -81,11 +89,21 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 `<threshold_step_number>` must be greater than `<step_number>`.
 
+#### Intro Keyword
+
+Previous tags can contain keyword `INTRO` anywhere after their step number.
+
+- `TRAINING EXERCISE STOP STEP <step_number> INTRO [...]`
+
+With `INTRO`, when `<step_number>` is **equal to** the wanted step number, **keep** inside content in both **exercise and solution**.
+
 #### Placeholder Tag
 
 - `TRAINING EXERCISE STEP PLACEHOLDER`
 
-A line containing this tag will be kept with this tag removed if found between step tags which's step number equals to the wanted step number.
+When `<step_number>` is **equal to** the wanted step number:
+* **keep** line containing this tag into **exercise** with this tag removed
+* **remove** line containing this tag from **solution
 
 #### Examples
 
@@ -248,11 +266,15 @@ php -d phar.readonly=Off compile-phar.php;
 ./exercise-cleaner.phar --version;
 ```
 
+Note: When a release is created, an asset is automatically compiled and attached to it (see [*Release Asset* workflow](.github/workflows/release.yml))
+
 ### Run Unit Tests
 
 Note: A `composer install --dev` (or alike) must have been previously executed.
 
 `./vendor/bin/phpunit --colors tests;`
+
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/php.yml))
 
 ### Run Examples
 
@@ -296,7 +318,7 @@ done;
 * Version string as step numbers
 * Config file to name and describe steps
 * Dedicated file extension for original files
-* Placeholder: When $step === $targetStep, have an optional placeholder (to give instructions, clues, resources, etc.)
+* Find a better mechanism and wording for `INTRO` and `PLACEHOLDER` (more understandable, more consistent)
 * Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
 * Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)
 * More unit tests
