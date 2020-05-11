@@ -3,6 +3,7 @@ Exercise Cleaner
 
 *Training exercises' steps manager and cleaner*
 
+* [Install](#install)
 * [Usage](#usage)
   - [Tags](#tags)
   - [Command](#command)
@@ -13,6 +14,13 @@ Exercise Cleaner
   - [Run Examples](#run-examples)
   - [To Do](#todo)  
 
+Install
+-------
+
+To quickly install phar asset:
+- Download last release's asset *exercise-cleaner.phar* from [Releases page](https://github.com/adriendupuis/exercise-cleaner/releases) to your project;
+- Make it executable for yourself with `chmod u+x exercise-cleaner.phar`;
+- Check executability with `./exercise-cleaner.phar --version` (from same directory in this example).
 
 Usage
 -----
@@ -211,11 +219,6 @@ Options:
 Arguments:
 * first argument: step number: clean inside this and higher tags; By default, step 1
 * following arguments: folder to search in; By default, it looks inside app/ and src/
-
-#### Quick Install
-
-- Download last release's asset *exercise-cleaner.phar* from [Releases page](https://github.com/adriendupuis/exercise-cleaner/releases)
-- Make it executable: `chmod u+x exercise-cleaner.phar;`
 
 ### Config File
 
