@@ -31,7 +31,7 @@ The Exercise Cleaner mainly cleans code between tags of current and next steps. 
 
 ### Tags
 
-Tags can be added in exercises' files and the Exercise Cleaner will treat what's inside.
+Tags can be added in exercises' files and the Exercise Cleaner's command will treat what's inside.
 
 The tags include a step number as an integer or a float.
 
