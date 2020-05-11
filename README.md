@@ -93,13 +93,17 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 Previous tags can contain keyword `INTRO` anywhere after their step number.
 
+- `TRAINING EXERCISE STOP STEP <step_number> INTRO [...]`
+
 With `INTRO`, when `<step_number>` is **equal to** the wanted step number, **keep** inside content in both **exercise and solution**.
 
 #### Placeholder Tag
 
 - `TRAINING EXERCISE STEP PLACEHOLDER`
 
-A line containing this tag will be kept with this tag removed if found between step tags which's step number equals to the wanted step number.
+When `<step_number>` is **equal to** the wanted step number:
+* **keep** line containing this tag into **exercise** with this tag removed
+* **remove** line containing this tag from **solution
 
 #### Examples
 
