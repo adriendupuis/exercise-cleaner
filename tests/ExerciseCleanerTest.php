@@ -211,6 +211,34 @@ CODE;
         $this->assertEquals(['  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.json'));
     }
 
+    public function testIntroActionTag(): void
+    {
+        $code = <<<'CODE'
+TRAINING EXERCISE START STEP 1 INTRO REMOVE
+Step 1 introduction
+TRAINING EXERCISE STOP STEP 1
+TRAINING EXERCISE START STEP 1 REMOVE
+Step 1 solution
+TRAINING EXERCISE STOP STEP 1
+TRAINING EXERCISE START STEP 2 INTRO
+Step 2+ introduction
+TRAINING EXERCISE STOP STEP 2
+TRAINING EXERCISE START STEP 2
+Step 2+ solution
+TRAINING EXERCISE STOP STEP 2
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        $this->assertEquals(['Step 1 introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false));
+        $this->assertEquals(['Step 1 introduction', 'Step 1 solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
+
+        $this->assertEquals(['Step 2+ introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
+        $this->assertEquals(['Step 2+ introduction', 'Step 2+ solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
+
+        $this->assertEquals(['Step 2+ introduction', 'Step 2+ solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, false));
+        $this->assertEquals(['Step 2+ introduction', 'Step 2+ solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 3, true));
+    }
+
     public function testThresholdActionTag(): void
     {
         $code = <<<'CODE'

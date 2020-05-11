@@ -107,11 +107,16 @@ class ExerciseCleaner
                 if (null === $commentPattern && false !== strpos($action, 'COMMENT')) {
                     trigger_error("Unsupported COMMENT action at line $lineNumber", E_USER_WARNING);
                 }
+                $intro = false !== strpos($action, 'INTRO');
+                if ($intro) {
+                    $action = trim(str_replace('INTRO', '', $action));
+                }
 
                 $startedTag = [
                     'step' => $step,
                     'action' => $action,
                     'name' => $this->getStepName($step) ?? '',
+                    'intro' => $intro,
                 ];
                 if ('' !== trim($action) && false !== strpos($action, ' ')) {
                     $matches = [];
@@ -159,9 +164,10 @@ class ExerciseCleaner
                             $keptLines[] = $line;
                     }
                 } elseif ($step === $targetStep) {
-                    if ($solution && false === strpos($line, $this->placeHolderTagConstant)) {
+                    $intro = $currentTag['intro'];
+                    if (($solution || $intro) && false === strpos($line, $this->placeHolderTagConstant)) {
                         $keptLines[] = $line;
-                    } elseif (!$solution && false !== strpos($line, $this->placeHolderTagConstant)) {
+                    } elseif ((!$solution || $intro) && false !== strpos($line, $this->placeHolderTagConstant)) {
                         $keptLines[] = preg_replace("@ *{$this->placeHolderTagConstant}@", '', $line);
                     }
                 }

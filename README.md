@@ -89,6 +89,12 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 `<threshold_step_number>` must be greater than `<step_number>`.
 
+#### Intro Keyword
+
+Previous tags can contain keyword `INTRO` anywhere after their step number.
+
+With `INTRO`, when `<step_number>` is **equal to** the wanted step number, **keep** inside content in both **exercise and solution**.
+
 #### Placeholder Tag
 
 - `TRAINING EXERCISE STEP PLACEHOLDER`
