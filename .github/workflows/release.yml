@@ -22,5 +22,5 @@ jobs:
               with:
                 upload_url: ${{ github.event.release.upload_url }}
                 asset_path: ./exercise-cleaner.phar
-                #asset_name: exercise-cleaner
+                asset_name: exercise-cleaner
                 asset_content_type: application/octet-stream
