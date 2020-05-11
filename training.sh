@@ -51,7 +51,7 @@ git checkout --orphan $local_training_branch;
 eval "$exercise_cleaner 0 $path_list";
 git add $path_list;
 git commit --message "Initialization";
-git push --set-upstream $local_training_repository $local_training_branch:$remote_training_branch;
+git push --force --set-upstream $local_training_repository $local_training_branch:$remote_training_branch;
 git branch -vv;
 
 echo "\nTraining: Entering steps' loop\n";
