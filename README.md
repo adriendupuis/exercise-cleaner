@@ -17,10 +17,10 @@ Exercise Cleaner
 Install
 -------
 
-To quickly install phar asset:
+To quickly install Exercise Cleaner's phar asset:
 - Download last release's asset *exercise-cleaner.phar* from [Releases page](https://github.com/adriendupuis/exercise-cleaner/releases) to your project;
 - Make it executable for yourself with `chmod u+x exercise-cleaner.phar`;
-- Check executability with `./exercise-cleaner.phar --version` (from same directory in this example).
+- Check executability, for example from same directory, with `./exercise-cleaner.phar --version`.
 
 Usage
 -----
@@ -31,7 +31,7 @@ The Exercise Cleaner mainly cleans code between tags of current and next steps. 
 
 ### Tags
 
-Tags can be added in exercises' files and the cleaner will treat what's inside.
+Tags can be added in exercises' files and the Exercise Cleaner will treat what's inside.
 
 The tags include a step number as an integer or a float.
 
