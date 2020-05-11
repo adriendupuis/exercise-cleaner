@@ -318,7 +318,7 @@ done;
 * Version string as step numbers
 * Config file to name and describe steps
 * Dedicated file extension for original files
-* Placeholder: When $step === $targetStep, have an optional placeholder (to give instructions, clues, resources, etc.)
+* Find a better mechanism and wording for `INTRO` and `PLACEHOLDER` (more understandable, more consistent)
 * Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
 * Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)
 * More unit tests
