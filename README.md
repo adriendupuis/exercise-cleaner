@@ -223,8 +223,9 @@ Options:
 * `--keep-tag`: Do not remove tags
 * `--solution`: Compile exercise's solution (by default, it compile the exercise's worksheet)
 * `--config YAML_CONFIG_FILE`: associate a config file
-* `--verbose`: Display information about found tags
-* `--quiet`: Do not display information about found files
+* `-v`: Display information about treated files
+* `-vv`: Also display information about found tags
+* `--quiet`: Do not display information about steps
 
 Arguments:
 * first argument: step number: clean inside this and higher tags; By default, step 1
@@ -234,14 +235,14 @@ Arguments:
 
 #### Step Naming
 
-Step naming is used by `--verbose` option.
+Step naming enhance output.
 
 Using floats:
 ```yaml
 steps:
     names:
-        - { number: 1.1, name: 'First Step: Exercise 1' }
-        - { n: 1.2, name: 'First Step: Exercise 2' }
+        - { number: 1.1, name: 'First Step: First Part' }
+        - { n: 1.2, name: 'First Step: Second Part' }
         - { n: 2, name: 'Second Step' }
 ```
 Note: `n` is a shorthand for `number`, they are strictly equivalents.

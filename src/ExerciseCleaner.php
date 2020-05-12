@@ -93,11 +93,11 @@ class ExerciseCleaner
                     $keptLines[] = $line;
                 }
 
-                $this->outputWrite("Stop step $step".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineNumber.", OutputInterface::VERBOSITY_VERBOSE);
+                $this->outputWrite("Stop step $step".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineNumber.", OutputInterface::VERBOSITY_VERY_VERBOSE);
                 if (count($nestedTags)) {
                     $currentTag = $nestedTags[count($nestedTags) - 1];
-                    $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERBOSE);
-                    $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERBOSE);
+                    $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                    $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
                 }
             } elseif (false !== strpos($line, $this->startTagConstant)) {
                 $matches = [];
@@ -135,8 +135,8 @@ class ExerciseCleaner
                     $keptLines[] = $line;
                 }
 
-                $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERBOSE);
-                $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…', OutputInterface::VERBOSITY_VERBOSE);
+                $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 $step = (float) $currentTag['step'];
@@ -208,13 +208,13 @@ class ExerciseCleaner
                 continue;
             }
             foreach ($fileList as $file) {
-                $this->outputWrite("<info>Treat {$file}…</info>", OutputInterface::VERBOSITY_NORMAL);
+                $this->outputWrite("<info>Treat {$file}…</info>", OutputInterface::VERBOSITY_VERBOSE);
                 if (!is_file($file)) {
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
                 if (false !== file_put_contents($file.$suffix, implode(PHP_EOL, $this->cleanCodeLines(file($file, FILE_IGNORE_NEW_LINES), $targetStep, $solution, $keepTags, $file)))) {
-                    $this->outputWrite("<info>…{$file}{$suffix} written.</info>", OutputInterface::VERBOSITY_NORMAL);
+                    $this->outputWrite("<info>…{$file}{$suffix} written.</info>", OutputInterface::VERBOSITY_VERBOSE);
                 } else {
                     trigger_error("$file$suffix couldn't be written", E_USER_ERROR);
                 }
@@ -265,7 +265,7 @@ class ExerciseCleaner
         return 'Remove unknown step line(s)';
     }
 
-    private function outputWrite($messages, $verbosity = OutputInterface::VERBOSITY_QUIET)
+    private function outputWrite($messages, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
         if (null !== $this->output) {
             $this->output->writeln($messages, $verbosity);
