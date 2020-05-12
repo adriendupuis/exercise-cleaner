@@ -315,7 +315,6 @@ done;
 
 ### TODO
 
-* Increase verbosity
 * Version string as step numbers
 * Config file to name and describe steps
 * Dedicated file extension for original files
@@ -325,5 +324,5 @@ done;
 * More unit tests
 * Test with / Update for eZ Platform v3
 * How to easily distribute the .phar?
-* Define an license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
+* Define a license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
 * Stop writing "exercise" with two 'c'
