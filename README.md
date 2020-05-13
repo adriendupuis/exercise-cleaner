@@ -255,6 +255,17 @@ steps:
 ```
 Note: If floats are finally used, a conversion to object list will be needed; So, using the previous format even if there is only integers could be recommended.
 
+### Training
+
+To run a training, training.sh script can be used as a base. Feel free to copy to your project and adapt to your needs.
+
+The distributed training.sh is actually configured to run a training example from Exercise Cleaner repository itself.
+
+```
+rm -rf ~/training;
+./training.sh;
+```
+
 
 About
 -----
