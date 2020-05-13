@@ -20,15 +20,32 @@ local_reference_branch=$remote_reference_branch; # TODO: Make this variable cust
 #local_reference_branch='reference';
 
 # Exercises config:
-#exercise_cleaner='bin/exercise-cleaner.phar --config config/packages/exercise_cleaner.yaml';
-exercise_cleaner='php src/Application.php --config examples/config2.yaml';
+exercise_cleaner_bin='php src/Application.php';
+#exercise_cleaner_bin='exercise-cleaner.phar';
+exercise_cleaner_config='examples/config2.yaml';
 path_list=(examples/);
 step_list=(1 1.1 1.2 2 3);
 state_list=('exercise' 'solution');
 
 if [ -e $local_working_directory ]; then
-  echo "$local_working_directory already exists.";
+  echo "Error: $local_working_directory already exists.";
   exit 1;
+fi;
+
+if [ ! -f $exercise_cleaner_bin ]; then
+  echo "Error: $exercise_cleaner_bin not found.";
+  exit 2;
+fi;
+
+if [ -n "$exercise_cleaner_config" ]; then
+  if [ -f $exercise_cleaner_config ]; then
+    exercise_cleaner="$exercise_cleaner_bin --config $exercise_cleaner_config";
+  else
+    echo "Error: $exercise_cleaner_config not found.";
+    exit 3;
+  fi;
+else
+  exercise_cleaner="$exercise_cleaner_bin"
 fi;
 
 # Stop on error
@@ -42,14 +59,28 @@ if [[ $exercise_cleaner == *'Application.php'* ]]; then
   composer install --no-dev;
 fi
 eval "$exercise_cleaner --version;";
-echo 'Initialization: Add training repository';
+echo 'Initialization: Add remote training repository';
 git remote add $local_training_repository $remote_training_repository;
 git remote -v;
-echo 'Initialization: Push step 0 on training branch';
+echo 'Initialization: Create local training branch';
 git checkout --orphan $local_training_branch;
+echo 'Initialization: Ignore Exercise Cleaner';
+{
+  echo "###> training ###";
+  echo "$0"
+  echo "$exercise_cleaner_bin"
+} >> .gitignore;
+if [ -n "$exercise_cleaner_config" ]; then
+  echo "$exercise_cleaner_config" >> .gitignore;
+fi
+echo "###< training ###" >> .gitignore;
+git rm --cached $0 $exercise_cleaner_bin $exercise_cleaner_config;
+git add .gitignore;
+echo 'Initialization: Apply and commit step 0';
 eval "$exercise_cleaner 0 $path_list";
 git add $path_list;
 git commit --message "Initialization";
+echo 'Initialization: Force push step 0 on remote training branch (replace possible previous content)';
 git push --force --set-upstream $local_training_repository $local_training_branch:$remote_training_branch;
 git branch -vv;
 
@@ -58,10 +89,9 @@ for step in $step_list; do
   for state in $state_list; do
     echo "Prepare step $step $state…";
     git checkout $local_reference_branch -- $path_list;
-    eval "$exercise_cleaner --quiet $step --$state $path_list";
+    eval "$exercise_cleaner $step --$state $path_list";
     git add $path_list;
-    git_status=$(git status --short;);
-    if [[ -n "$git_status" ]]; then
+    if [[ -n "$(git status --short;)" ]]; then
       git commit --quiet --message "Step $step $state";
       echo "Step $step $state ready: Press 'enter' key to push it to training's remote repository…";
       read -r -n 0;
