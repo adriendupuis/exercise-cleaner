@@ -12,7 +12,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class DefaultSingleCommand extends Command
 {
-    protected static $defaultName = 'default:single:command';
+    protected static $defaultName = 'exercise-cleaner.phar';
 
     /** @var bool */
     private $isPhar;
