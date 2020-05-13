@@ -9,7 +9,8 @@ remote_training_branch='master';
 
 # Reference repository config:
 remote_reference_repository='https://github.com/adriendupuis/exercise-cleaner';
-remote_reference_branch='develop';
+remote_reference_branch='feature/automation';
+#remote_reference_branch='develop';
 
 # Local repositories config:
 local_working_directory=~/training;
@@ -20,8 +21,8 @@ local_reference_branch=$remote_reference_branch; # TODO: Make this variable cust
 #local_reference_branch='reference';
 
 # Exercises config:
-exercise_cleaner_bin='php src/Application.php';
-#exercise_cleaner_bin='exercise-cleaner.phar';
+exercise_cleaner_bin='src/Application.php';
+#exercise_cleaner_bin='./exercise-cleaner.phar';
 exercise_cleaner_config='examples/config2.yaml';
 path_list=(examples/);
 step_list=(1 1.1 1.2 2 3);
@@ -54,9 +55,10 @@ set -e;
 echo 'Initialization: Clone reference branch';
 git clone --single-branch --depth 1 --origin $local_reference_repository $remote_reference_repository --branch $remote_reference_branch $local_working_directory;
 cd $local_working_directory;
-if [[ $exercise_cleaner == *'Application.php'* ]]; then
+if [[ $exercise_cleaner_bin == *'Application.php'* ]]; then
   echo 'Notice: Running source code (instead of phar archive); Composer install is needed.';
   composer install --no-dev;
+  exercise_cleaner="php $exercise_cleaner";
 fi
 eval "$exercise_cleaner --version;";
 echo 'Initialization: Add remote training repository';
@@ -67,15 +69,20 @@ git checkout --orphan $local_training_branch;
 echo 'Initialization: Ignore Exercise Cleaner';
 {
   echo "###> training ###";
-  echo "$0"
-  echo "$exercise_cleaner_bin"
+  echo "$0";
+  if [[ $exercise_cleaner_bin != *'Application.php'* ]]; then
+    echo "$exercise_cleaner_bin";
+  fi;
+  if [ -n "$exercise_cleaner_config" ]; then
+    echo "$exercise_cleaner_config";
+  fi
+  echo "###< training ###"
 } >> .gitignore;
-if [ -n "$exercise_cleaner_config" ]; then
-  echo "$exercise_cleaner_config" >> .gitignore;
-fi
-echo "###< training ###" >> .gitignore;
-git rm --cached $0 $exercise_cleaner_bin $exercise_cleaner_config;
 git add .gitignore;
+git rm --cached $0 $exercise_cleaner_config;
+if [[ $exercise_cleaner_bin != *'Application.php'* ]]; then
+  git rm --cached $exercise_cleaner_bin;
+fi;
 echo 'Initialization: Apply and commit step 0';
 eval "$exercise_cleaner 0 $path_list";
 git add $path_list;
