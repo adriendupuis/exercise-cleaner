@@ -208,7 +208,7 @@ class ExerciseCleaner
                     $path = substr($path, 0, -1);
                 }
                 if ($inputExtension) {
-                    $cmd = "find $path -name *$inputExtension";
+                    $cmd = "find $path -name '*$inputExtension'";
                 } else {
                     $cmd = "grep '{$this->startTagConstant}' -Rl $path";
                     if ($outputExtension) {
