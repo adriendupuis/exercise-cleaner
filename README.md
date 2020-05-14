@@ -219,7 +219,8 @@ protected function configure()
 
 Options:
 * `--help`: Display usage help
-* `--keep-orig`: Instead of replacing content in file, write a new file with extension .step<step_number>.<exercise|solution>.
+* `--input-ext`: Treat only file having this extension and remove this extension before saving.
+* `--output-ext`: Instead of replacing content in file, write a new file with extension .step<step_number>.<exercise|solution>.
 * `--keep-tag`: Do not remove tags
 * `--solution`: Compile exercise's solution (by default, it compile the exercise's worksheet)
 * `--config YAML_CONFIG_FILE`: associate a config file
@@ -230,6 +231,13 @@ Options:
 Arguments:
 * first argument: step number: clean inside this and higher tags; By default, step 1
 * following arguments: folder to search in; By default, it looks inside app/ and src/
+
+#### File Extensions
+
+* `./exercise.phar 1 exercise.php;` will clean for first step's exercise and **replace _exercise.php_**
+* `./exercise.phar 1 exercise.php --output-ext;` will clean _exercise.php_ for first step's exercise and **save into file _exercise.php.step1.exercise_**
+* `./exercise.phar 1 exercise.php.ec --input-ext ec;` will clean _exercise.php.ec_ for first step's exercise and **save into _exercise.php_**
+* `./exercise.phar 1 exercise.php.ec --input-ext ec --output-ext;` will clean _exercise.php.ec_ for first step's exercise and **save into _exercise.php.step1.exercise_**
 
 ### Config File
 
@@ -316,8 +324,6 @@ done;
 ### TODO
 
 * Version string as step numbers
-* Config file to name and describe steps
-* Dedicated file extension for original files
 * Find a better mechanism and wording for `INTRO` and `PLACEHOLDER` (more understandable, more consistent)
 * Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
 * Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)

@@ -21,12 +21,12 @@ class DefaultSingleCommandTest extends TestCase
     {
         $this->defaultSingleCommand = new DefaultSingleCommand();
 
-        // Avoid a bug where option --config become mandatory while testing.
+        // Avoid a bug where "optional options" with mandatory value become "mandatory options".
         $definition = new InputDefinition();
         $definition->setArguments($this->defaultSingleCommand->getDefinition()->getArguments());
         /** @var InputOption $option */
         foreach ($options = $this->defaultSingleCommand->getDefinition()->getOptions() as $option) {
-            if ('config' !== $option->getName()) {
+            if ('config' !== $option->getName() && 'input-ext' !== $option->getName()) {
                 $definition->addOption($option);
             }
         }
