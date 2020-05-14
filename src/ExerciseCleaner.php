@@ -83,6 +83,9 @@ class ExerciseCleaner
             if (false !== strpos($line, $this->stopTagConstant)) {
                 $matches = [];
                 preg_match($this->stopTagRegex, $line, $matches);
+                if (empty($matches['step'])) {
+                    trigger_error('Parse Error: Step number is missing'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_ERROR);
+                }
                 $step = (float) $matches['step'];
                 $stoppedTag = array_pop($nestedTags);
                 if ($step !== $stoppedTag['step']) {
@@ -102,6 +105,9 @@ class ExerciseCleaner
             } elseif (false !== strpos($line, $this->startTagConstant)) {
                 $matches = [];
                 preg_match($this->startTagRegex, $line, $matches);
+                if (empty($matches['step'])) {
+                    trigger_error('Parse Error: Step number is missing'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_ERROR);
+                }
                 $step = (float) $matches['step'];
                 $action = strtoupper(trim($matches['action']));
                 if (null === $commentPattern && false !== strpos($action, 'COMMENT')) {
