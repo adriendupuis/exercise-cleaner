@@ -37,13 +37,13 @@ class DefaultSingleCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('white', 'yellow'));
+
         $folders = $input->getArgument('folders');
         $targetStep = $input->getArgument('step');
         $solution = $input->getOption('solution');
         $keepTags = $input->getOption('keep-tags');
         $suffix = $input->getOption('keep-orig') ? ".step$targetStep.".($solution ? 'solution' : 'exercise') : '';
-
-        $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('yellow'));
 
         $config = null;
         if ($this->getDefinition()->hasOption('config')) {
