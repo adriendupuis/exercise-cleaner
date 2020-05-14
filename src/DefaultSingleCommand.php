@@ -39,6 +39,8 @@ class DefaultSingleCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('white', 'yellow'));
+
         $pathList = $input->getArgument('paths');
         $targetStep = $input->getArgument('step');
         $solution = $input->getOption('solution');
@@ -50,12 +52,11 @@ class DefaultSingleCommand extends Command
         }
         if ($input->getOption('keep-orig')/* && !$input->getOption('output-ext')*/) {
             // backward compatibility
-            trigger_error('--keep-orig is deprecated, use --output-ext instead', E_USER_DEPRECATED);
+            $output->writeln('<warning>--keep-orig is deprecated, use --output-ext instead</warning>');
             $input->setOption('output-ext', true);
         }
         $outputExtension = $input->getOption('output-ext') ? ".step$targetStep.".($solution ? 'solution' : 'exercise') : '';
 
-        $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('yellow'));
 
         $config = null;
         if ($this->getDefinition()->hasOption('config')) {
