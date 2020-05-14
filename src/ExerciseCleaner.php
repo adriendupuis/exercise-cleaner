@@ -179,11 +179,22 @@ class ExerciseCleaner
         return $keptLines;
     }
 
-    public function cleanFiles(array $pathList, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $suffix = ''): void
+    public function cleanFiles(array $pathList, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $outputExtension = null, string $inputExtension = null): void
     {
         $targetStepName = $this->getStepName($targetStep);
         $targetStepName = null === $targetStepName ? '' : " “{$targetStepName}”";
         $this->outputWrite("<comment>Get step $targetStep{$targetStepName} in {$this->getStateName($solution)} state…</comment>", OutputInterface::VERBOSITY_NORMAL);
+
+        if (!$inputExtension && !empty($this->config['files']['input']['extension'])) {
+            $inputExtension = $this->config['files']['input']['extension'];
+        }
+        if ($inputExtension && 0 !== strpos($inputExtension, '.')) {
+            $inputExtension = ".$inputExtension";
+        }
+        if ($outputExtension && 0 !== strpos($outputExtension, '.')) {
+            $outputExtension = ".$outputExtension";
+        }
+
         foreach ($pathList as $path) {
             if ('' === $path) {
                 continue;
@@ -193,12 +204,16 @@ class ExerciseCleaner
             }
             if (is_dir($path)) {
                 if ('/' === substr($path, -1)) {
-                    // Avoid double slashes in grep result
+                    // Avoid double slashes in find or grep result
                     $path = substr($path, 0, -1);
                 }
-                $cmd = "grep '{$this->startTagConstant}' -Rl $path";
-                if ($suffix) {
-                    $cmd .= " | grep -v '$suffix$'";
+                if ($inputExtension) {
+                    $cmd = "find $path -name '*$inputExtension'";
+                } else {
+                    $cmd = "grep '{$this->startTagConstant}' -Rl $path";
+                    if ($outputExtension) {
+                        $cmd .= " | grep -v '$outputExtension$'";
+                    }
                 }
                 $fileList = Utils::getFileListFromShellCmd("$cmd;");
             } elseif (is_file($path)) {
@@ -207,16 +222,23 @@ class ExerciseCleaner
                 trigger_error("$path is not a file nor a directory", E_USER_WARNING);
                 continue;
             }
-            foreach ($fileList as $file) {
-                $this->outputWrite("<info>Treat {$file}…</info>", OutputInterface::VERBOSITY_VERBOSE);
-                if (!is_file($file)) {
+            foreach ($fileList as $inputFile) {
+                $this->outputWrite("<info>Treat {$inputFile}…</info>", OutputInterface::VERBOSITY_VERBOSE);
+                if (!is_file($inputFile)) {
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
-                if (false !== file_put_contents($file.$suffix, implode(PHP_EOL, $this->cleanCodeLines(file($file, FILE_IGNORE_NEW_LINES), $targetStep, $solution, $keepTags, $file)))) {
-                    $this->outputWrite("<info>…{$file}{$suffix} written.</info>", OutputInterface::VERBOSITY_VERBOSE);
+                $outputFile = $inputFile;
+                if ($inputExtension) {
+                    $outputFile = str_replace($inputExtension, '', $outputFile);
+                }
+                if ($outputExtension) {
+                    $outputFile = "$outputFile$outputExtension";
+                }
+                if (false !== file_put_contents($outputFile, implode(PHP_EOL, $this->cleanCodeLines(file($inputFile, FILE_IGNORE_NEW_LINES), $targetStep, $solution, $keepTags, $inputFile)))) {
+                    $this->outputWrite("<info>…$outputFile written.</info>", OutputInterface::VERBOSITY_VERBOSE);
                 } else {
-                    trigger_error("$file$suffix couldn't be written", E_USER_ERROR);
+                    trigger_error("$outputFile couldn't be written", E_USER_ERROR);
                 }
             }
         }

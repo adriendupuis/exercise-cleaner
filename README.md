@@ -14,6 +14,7 @@ Exercise Cleaner
   - [Run Examples](#run-examples)
   - [To Do](#todo)  
 
+
 Install
 -------
 
@@ -21,6 +22,7 @@ To quickly install Exercise Cleaner's phar asset:
 - Download last release's asset *exercise-cleaner.phar* from [Releases page](https://github.com/adriendupuis/exercise-cleaner/releases) to your project;
 - Make it executable for yourself with `chmod u+x exercise-cleaner.phar`;
 - Check executability, for example from same directory, with `./exercise-cleaner.phar --version`.
+
 
 Usage
 -----
@@ -219,7 +221,8 @@ protected function configure()
 
 Options:
 * `--help`: Display usage help
-* `--keep-orig`: Instead of replacing content in file, write a new file with extension .step<step_number>.<exercise|solution>.
+* `--input-ext`: Treat only file having this extension and remove this extension before saving.
+* `--output-ext`: Instead of replacing content in file, write a new file with extension .step<step_number>.<exercise|solution>.
 * `--keep-tag`: Do not remove tags
 * `--solution`: Compile exercise's solution (by default, it compile the exercise's worksheet)
 * `--config YAML_CONFIG_FILE`: associate a config file
@@ -231,11 +234,31 @@ Arguments:
 * first argument: step number: clean inside this and higher tags; By default, step 1
 * following arguments: folder to search in; By default, it looks inside app/ and src/
 
+#### File Extensions
+
+* `./exercise-cleaner.phar 1 example.php;` will clean for first step's exercise and **replace _example.php_**
+* `./exercise-cleaner.phar 1 example.php --output-ext;` will clean _example.php_ for first step's exercise and **save into file _example.php.step1.exercise_**
+* `./exercise-cleaner.phar 1 example.php.ec --input-ext ec;` will clean _example.php.ec_ for first step's exercise and **save into _example.php_**
+* `./exercise-cleaner.phar 1 example.php.ec --input-ext ec --output-ext;` will clean _example.php.ec_ for first step's exercise and **save into _example.php.step1.exercise_**
+
+Using an extension can prevent the application to consider unstable files. When using an extension, some file associations could be added to IDE; like, for example, *.php.ec → PHP.
+
+To migrate from a no-extension to an extension structure, for example with `ec` extension:
+- `grep 'TRAINING EXERCISE START STEP' -Rl examples/ | xargs -I {} mv -v {} {}.ec;`
+
+To migrate from an extension to a no-extension structure, for example with `ec` extension, you can use one of this:
+- `grep 'TRAINING EXERCISE START STEP' -Rl examples/ | xargs -I {} mv -v {}.ec {};`
+- `find examples/ -name *.ec | while read file; do mv -v $file ${file%.ec}; done;`
+
+In those migration examples, `git mv` may be used instead of `mv`.
+
 ### Config File
 
 #### Step Naming
 
-Step naming enhance output.
+Step naming enhances output.
+
+##### Examples
 
 Using floats:
 ```yaml
@@ -256,6 +279,37 @@ steps:
 ```
 Note: If floats are finally used, a conversion to object list will be needed; So, using the previous format even if there is only integers could be recommended.
 
+#### File Extension
+
+Instead of using each time `--input-ext` with the command, the input file extension can be declared in config file.
+
+##### Examples
+
+The following sequence already using a config file to name steps can be simplified:
+```shell
+./exercise-cleaner.phar --config exercise-cleaner.yml --input-ext ec 1 examples/;
+./exercise-cleaner.phar --config exercise-cleaner.yml --input-ext ec 1 examples/ --solution;
+./exercise-cleaner.phar --config exercise-cleaner.yml --input-ext ec 2 examples/;
+./exercise-cleaner.phar --config exercise-cleaner.yml --input-ext ec 2 examples/ --solution;
+```
+
+Using the following config file:
+```yaml
+steps:
+    names:
+        - 'First Step'
+        - 'Second Step'
+
+files:
+    input:
+        extension: 'ec'
+```
+```shell
+./exercise-cleaner.phar --config exercise-cleaner.yml 1 examples/;
+./exercise-cleaner.phar --config exercise-cleaner.yml 1 examples/ --solution;
+./exercise-cleaner.phar --config exercise-cleaner.yml 2 examples/;
+./exercise-cleaner.phar --config exercise-cleaner.yml 2 examples/ --solution;
+```
 
 About
 -----
@@ -294,8 +348,8 @@ php -d phar.readonly=0 compile-phar.php;
 ./exercise-cleaner.phar --version;
 rm -f examples/*.step*.*; # Clean previous runs
 for step in 1 1.1 1.2 2 3; do
-    ./exercise-cleaner.phar --config examples/config2.yaml --verbose --keep-orig $step examples;
-    ./exercise-cleaner.phar --config examples/config2.yaml --verbose --keep-orig --solution $step examples;
+    ./exercise-cleaner.phar --config examples/config.yaml --verbose --keep-orig $step examples;
+    ./exercise-cleaner.phar --config examples/config.yaml --verbose --keep-orig --solution $step examples;
 done;
 ```
 
@@ -316,8 +370,6 @@ done;
 ### TODO
 
 * Version string as step numbers
-* Config file to name and describe steps
-* Dedicated file extension for original files
 * Find a better mechanism and wording for `INTRO` and `PLACEHOLDER` (more understandable, more consistent)
 * Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
 * Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)

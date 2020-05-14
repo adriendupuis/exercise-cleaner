@@ -21,18 +21,23 @@ class DefaultSingleCommandTest extends TestCase
     {
         $this->defaultSingleCommand = new DefaultSingleCommand();
 
-        // Avoid a bug where option --config become mandatory while testing.
+        // Avoid a bug where "optional options" with mandatory value become "mandatory options".
         $definition = new InputDefinition();
         $definition->setArguments($this->defaultSingleCommand->getDefinition()->getArguments());
         /** @var InputOption $option */
         foreach ($options = $this->defaultSingleCommand->getDefinition()->getOptions() as $option) {
-            if ('config' !== $option->getName()) {
+            if ('config' !== $option->getName() && 'input-ext' !== $option->getName()) {
                 $definition->addOption($option);
             }
         }
         $this->defaultSingleCommand->setDefinition($definition);
 
         $this->defaultSingleCommandTester = new CommandTester($this->defaultSingleCommand);
+    }
+
+    public function tearDown(): void
+    {
+        shell_exec('rm -f examples/*.step*.*');
     }
 
     public function testStepIsNotNumeric(): void
@@ -44,15 +49,13 @@ class DefaultSingleCommandTest extends TestCase
 
     public function testExamplesStep1(): void
     {
-        $this->defaultSingleCommandTester->execute($this->getInput('--keep-orig 1 examples/'));
+        $this->defaultSingleCommandTester->execute($this->getInput('--output-ext 1 examples/'));
         $this->assertStringNotContainsString('Step argument is missing or isn\'t numeric', $this->defaultSingleCommandTester->getDisplay());
         $this->assertEquals(0, $this->defaultSingleCommandTester->getStatusCode());
 
-        $this->defaultSingleCommandTester->execute($this->getInput('--keep-orig 1.0 examples/'));
+        $this->defaultSingleCommandTester->execute($this->getInput('--output-ext 1.0 examples/'));
         $this->assertStringNotContainsString('Step argument is missing or isn\'t numeric', $this->defaultSingleCommandTester->getDisplay());
         $this->assertEquals(0, $this->defaultSingleCommandTester->getStatusCode());
-
-        shell_exec('rm -f examples/*.step*.*');
     }
 
     private function getInput(string $inputString): array
