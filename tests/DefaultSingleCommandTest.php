@@ -35,6 +35,11 @@ class DefaultSingleCommandTest extends TestCase
         $this->defaultSingleCommandTester = new CommandTester($this->defaultSingleCommand);
     }
 
+    public function tearDown(): void
+    {
+        shell_exec('rm -f examples/*.step*.*');
+    }
+
     public function testStepIsNotNumeric(): void
     {
         $this->defaultSingleCommandTester->execute($this->getInput('examples/'));
@@ -51,8 +56,6 @@ class DefaultSingleCommandTest extends TestCase
         $this->defaultSingleCommandTester->execute($this->getInput('--output-ext 1.0 examples/'));
         $this->assertStringNotContainsString('Step argument is missing or isn\'t numeric', $this->defaultSingleCommandTester->getDisplay());
         $this->assertEquals(0, $this->defaultSingleCommandTester->getStatusCode());
-
-        shell_exec('rm -f examples/*.step*.*');
     }
 
     private function getInput(string $inputString): array
