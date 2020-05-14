@@ -199,7 +199,7 @@ class ExerciseCleaner
             }
             if (is_dir($path)) {
                 if ('/' === substr($path, -1)) {
-                    // Avoid double slashes in grep result
+                    // Avoid double slashes in find or grep result
                     $path = substr($path, 0, -1);
                 }
                 if ($inputExtension) {
