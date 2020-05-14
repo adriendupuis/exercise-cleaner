@@ -50,6 +50,7 @@ class DefaultSingleCommand extends Command
         }
         if ($input->getOption('keep-orig')/* && !$input->getOption('output-ext')*/) {
             // backward compatibility
+            trigger_error('--keep-orig is deprecated, use --output-ext instead', E_USER_DEPRECATED);
             $input->setOption('output-ext', true);
         }
         $outputExtension = $input->getOption('output-ext') ? ".step$targetStep.".($solution ? 'solution' : 'exercise') : '';
