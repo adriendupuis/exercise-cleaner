@@ -44,11 +44,11 @@ class DefaultSingleCommandTest extends TestCase
 
     public function testExamplesStep1(): void
     {
-        $this->defaultSingleCommandTester->execute($this->getInput('--keep-orig 1 examples/'));
+        $this->defaultSingleCommandTester->execute($this->getInput('--output-ext 1 examples/'));
         $this->assertStringNotContainsString('Step argument is missing or isn\'t numeric', $this->defaultSingleCommandTester->getDisplay());
         $this->assertEquals(0, $this->defaultSingleCommandTester->getStatusCode());
 
-        $this->defaultSingleCommandTester->execute($this->getInput('--keep-orig 1.0 examples/'));
+        $this->defaultSingleCommandTester->execute($this->getInput('--output-ext 1.0 examples/'));
         $this->assertStringNotContainsString('Step argument is missing or isn\'t numeric', $this->defaultSingleCommandTester->getDisplay());
         $this->assertEquals(0, $this->defaultSingleCommandTester->getStatusCode());
 
