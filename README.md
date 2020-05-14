@@ -239,6 +239,15 @@ Arguments:
 * `./exercise.phar 1 exercise.php.ec --input-ext ec;` will clean _exercise.php.ec_ for first step's exercise and **save into _exercise.php_**
 * `./exercise.phar 1 exercise.php.ec --input-ext ec --output-ext;` will clean _exercise.php.ec_ for first step's exercise and **save into _exercise.php.step1.exercise_**
 
+To migrate from a no-extension to an extension structure, for example with `ec` extension:
+- `grep 'TRAINING EXERCISE START STEP' -Rl examples/ | xargs -I {} mv -v {} {}.ec;`
+
+To migrate from an extension to a no-extension structure, for example with `ec` extension, you can use one of this:
+- `grep 'TRAINING EXERCISE START STEP' -Rl examples/ | xargs -I {} mv -v {}.ec {};`
+- `find examples/ -name *.ec | while read file; do mv -v $file ${file%.ec}; done;`
+
+In those migration examples, `git mv` may be used instead of `mv`.
+
 ### Config File
 
 #### Step Naming
