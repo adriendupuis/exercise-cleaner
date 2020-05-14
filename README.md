@@ -234,10 +234,12 @@ Arguments:
 
 #### File Extensions
 
-* `./exercise.phar 1 exercise.php;` will clean for first step's exercise and **replace _exercise.php_**
-* `./exercise.phar 1 exercise.php --output-ext;` will clean _exercise.php_ for first step's exercise and **save into file _exercise.php.step1.exercise_**
-* `./exercise.phar 1 exercise.php.ec --input-ext ec;` will clean _exercise.php.ec_ for first step's exercise and **save into _exercise.php_**
-* `./exercise.phar 1 exercise.php.ec --input-ext ec --output-ext;` will clean _exercise.php.ec_ for first step's exercise and **save into _exercise.php.step1.exercise_**
+* `./exercise-cleaner.phar 1 example.php;` will clean for first step's exercise and **replace _example.php_**
+* `./exercise-cleaner.phar 1 example.php --output-ext;` will clean _example.php_ for first step's exercise and **save into file _example.php.step1.exercise_**
+* `./exercise-cleaner.phar 1 example.php.ec --input-ext ec;` will clean _example.php.ec_ for first step's exercise and **save into _example.php_**
+* `./exercise-cleaner.phar 1 example.php.ec --input-ext ec --output-ext;` will clean _example.php.ec_ for first step's exercise and **save into _example.php.step1.exercise_**
+
+Using an extension can prevent the application to consider unstable files. When using an extension, some file associations could be added to IDE; like, for example, *.php.ec → PHP.
 
 To migrate from a no-extension to an extension structure, for example with `ec` extension:
 - `grep 'TRAINING EXERCISE START STEP' -Rl examples/ | xargs -I {} mv -v {} {}.ec;`
