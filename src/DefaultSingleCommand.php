@@ -57,7 +57,6 @@ class DefaultSingleCommand extends Command
         }
         $outputExtension = $input->getOption('output-ext') ? ".step$targetStep.".($solution ? 'solution' : 'exercise') : '';
 
-
         $config = null;
         if ($this->getDefinition()->hasOption('config')) {
             $configFile = $input->getOption('config');
