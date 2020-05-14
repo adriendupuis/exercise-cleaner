@@ -1,6 +1,0 @@
-steps:
-    names:
-        # Using integer as step numbers
-        - 'First Step'
-        - 'Second Step'
-        - 'Third Step'

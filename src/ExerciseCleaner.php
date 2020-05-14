@@ -184,12 +184,17 @@ class ExerciseCleaner
         $targetStepName = $this->getStepName($targetStep);
         $targetStepName = null === $targetStepName ? '' : " “{$targetStepName}”";
         $this->outputWrite("<comment>Get step $targetStep{$targetStepName} in {$this->getStateName($solution)} state…</comment>", OutputInterface::VERBOSITY_NORMAL);
+
+        if (!$inputExtension && !empty($this->config['files']['input']['extension'])) {
+            $inputExtension = $this->config['files']['input']['extension'];
+        }
         if ($inputExtension && 0 !== strpos($inputExtension, '.')) {
             $inputExtension = ".$inputExtension";
         }
         if ($outputExtension && 0 !== strpos($outputExtension, '.')) {
             $outputExtension = ".$outputExtension";
         }
+
         foreach ($pathList as $path) {
             if ('' === $path) {
                 continue;

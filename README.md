@@ -14,6 +14,7 @@ Exercise Cleaner
   - [Run Examples](#run-examples)
   - [To Do](#todo)  
 
+
 Install
 -------
 
@@ -21,6 +22,7 @@ To quickly install Exercise Cleaner's phar asset:
 - Download last release's asset *exercise-cleaner.phar* from [Releases page](https://github.com/adriendupuis/exercise-cleaner/releases) to your project;
 - Make it executable for yourself with `chmod u+x exercise-cleaner.phar`;
 - Check executability, for example from same directory, with `./exercise-cleaner.phar --version`.
+
 
 Usage
 -----
@@ -254,7 +256,9 @@ In those migration examples, `git mv` may be used instead of `mv`.
 
 #### Step Naming
 
-Step naming enhance output.
+Step naming enhances output.
+
+##### Examples
 
 Using floats:
 ```yaml
@@ -275,6 +279,37 @@ steps:
 ```
 Note: If floats are finally used, a conversion to object list will be needed; So, using the previous format even if there is only integers could be recommended.
 
+#### File Extension
+
+Instead of using each time `--input-ext` with the command, the input file extension can be declared in config file.
+
+##### Examples
+
+The following sequence already using a config file to name steps can be simplified:
+```shell
+./exercise-cleaner.phar --config exercise-cleaner.yml --input-ext ec 1 examples/;
+./exercise-cleaner.phar --config exercise-cleaner.yml --input-ext ec 1 examples/ --solution;
+./exercise-cleaner.phar --config exercise-cleaner.yml --input-ext ec 2 examples/;
+./exercise-cleaner.phar --config exercise-cleaner.yml --input-ext ec 2 examples/ --solution;
+```
+
+Using the following config file:
+```yaml
+steps:
+    names:
+        - 'First Step'
+        - 'Second Step'
+
+files:
+    input:
+        extension: 'ec'
+```
+```shell
+./exercise-cleaner.phar --config exercise-cleaner.yml 1 examples/;
+./exercise-cleaner.phar --config exercise-cleaner.yml 1 examples/ --solution;
+./exercise-cleaner.phar --config exercise-cleaner.yml 2 examples/;
+./exercise-cleaner.phar --config exercise-cleaner.yml 2 examples/ --solution;
+```
 
 About
 -----
