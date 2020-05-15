@@ -177,7 +177,7 @@ class ExerciseCleaner
         return $tag;
     }
 
-    private function getCommentPattern(string $file = null): string
+    private function getCommentPattern(string $file = null): ?string
     {
         switch ($file ? pathinfo($file, PATHINFO_EXTENSION) : null) {
             case 'json':
