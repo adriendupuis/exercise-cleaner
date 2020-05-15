@@ -55,92 +55,42 @@ class ExerciseCleaner
     /** @return string[] */
     public function cleanCodeLines(array $lines, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $file = null): array
     {
-        $fileType = $file ? pathinfo($file, PATHINFO_EXTENSION) : null;
         $keptLines = [];
         $nestedTags = [];
-        $step = 0;
-        $commentPattern = null;
-        switch ($fileType) {
-            case 'json':
-                $commentPattern = null; // There is no comment in JSON
-                break;
-            case 'twig':
-                $commentPattern = '{# %CODE% #}';
-                break;
-            case 'php':
-                $commentPattern = '// %CODE%';
-                break;
-            case 'sh':
-            case 'zsh':
-            case 'bash':
-            case 'yaml':
-            case 'yml':
-            default:
-                $commentPattern = '# %CODE%';
-        }
+        $commentPattern = $this->getCommentPattern($file);
+
         foreach ($lines as $lineIndex => $line) {
             $lineNumber = 1 + $lineIndex;
-            if (false !== strpos($line, $this->stopTagConstant)) {
-                $matches = [];
-                preg_match($this->stopTagRegex, $line, $matches);
-                $step = (float) $matches['step'];
+            if (false !== strpos($line, $this->startTagConstant)) {
+                $startedTag = $this->parseTag(true, $line, $lineNumber, $file);
+                $nestedTags[] = $startedTag;
+
+                if ($keepTags && $startedTag['step'] <= $targetStep) {
+                    $keptLines[] = $line;
+                }
+
+                $this->outputWrite("Start step {$startedTag['step']}".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
+            } elseif (false !== strpos($line, $this->stopTagConstant)) {
+                $stoppingTag = $this->parseTag(false, $line, $lineNumber, $file);
                 $stoppedTag = array_pop($nestedTags);
-                if ($step !== $stoppedTag['step']) {
+                if ($stoppingTag['step'] !== $stoppedTag['step']) {
                     trigger_error('Parse Error: STOP tag not matching START tag'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_ERROR);
                 }
 
-                if ($keepTags && $step <= $targetStep) {
+                if ($keepTags && $stoppingTag['step'] <= $targetStep) {
                     $keptLines[] = $line;
                 }
 
-                $this->outputWrite("Stop step $step".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineNumber.", OutputInterface::VERBOSITY_VERBOSE);
+                $this->outputWrite("Stop step {$stoppingTag['step']}".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineNumber.", OutputInterface::VERBOSITY_VERY_VERBOSE);
                 if (count($nestedTags)) {
                     $currentTag = $nestedTags[count($nestedTags) - 1];
-                    $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERBOSE);
-                    $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERBOSE);
+                    $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                    $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
                 }
-            } elseif (false !== strpos($line, $this->startTagConstant)) {
-                $matches = [];
-                preg_match($this->startTagRegex, $line, $matches);
-                $step = (float) $matches['step'];
-                $action = strtoupper(trim($matches['action']));
-                if (null === $commentPattern && false !== strpos($action, 'COMMENT')) {
-                    trigger_error("Unsupported COMMENT action at line $lineNumber", E_USER_WARNING);
-                }
-                $intro = false !== strpos($action, 'INTRO');
-                if ($intro) {
-                    $action = trim(str_replace('  ', ' ', str_replace('INTRO', '', $action)));
-                }
-
-                $startedTag = [
-                    'step' => $step,
-                    'action' => $action,
-                    'name' => $this->getStepName($step) ?? '',
-                    'intro' => $intro,
-                ];
-                if ('' !== trim($action) && false !== strpos($action, ' ')) {
-                    $matches = [];
-                    if (preg_match($this->thresholdActionRegex, $action, $matches)) {
-                        $startedTag['before'] = strtoupper(trim($matches['action_before']));
-                        $startedTag['threshold'] = (float) $matches['threshold_step'];
-                        $startedTag['after'] = strtoupper(trim($matches['action_after']));
-                    }
-                    if ($matches['threshold_step'] <= $step) {
-                        trigger_error('Threshold less or equals to step'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_WARNING);
-                    }
-                }
-                $nestedTags[] = $startedTag;
-
-                if ($keepTags && $step <= $targetStep) {
-                    $keptLines[] = $line;
-                }
-
-                $this->outputWrite("Start step $step".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERBOSE);
-                $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…', OutputInterface::VERBOSITY_VERBOSE);
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
-                $step = (float) $currentTag['step'];
-                if ($step < $targetStep && false === strpos($line, $this->placeHolderTagConstant)) {
+                if ($targetStep > $currentTag['step'] && false === strpos($line, $this->placeHolderTagConstant)) {
                     $action = $currentTag['action'];
                     if (array_key_exists('threshold', $currentTag)) {
                         if ($currentTag['threshold'] >= $targetStep) {
@@ -163,7 +113,7 @@ class ExerciseCleaner
                         default:
                             $keptLines[] = $line;
                     }
-                } elseif ($step === $targetStep) {
+                } elseif ($targetStep === $currentTag['step']) {
                     $intro = $currentTag['intro'];
                     if (($solution || $intro) && false === strpos($line, $this->placeHolderTagConstant)) {
                         $keptLines[] = $line;
@@ -179,11 +129,89 @@ class ExerciseCleaner
         return $keptLines;
     }
 
-    public function cleanFiles(array $pathList, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $suffix = ''): void
+    private function parseTag(bool $start, string $line, int $lineNumber, string $file = null)
+    {
+        $regex = $start ? $this->startTagRegex : $this->stopTagRegex;
+        $commentPattern = $this->getCommentPattern($file);
+
+        $matches = [];
+        preg_match($regex, $line, $matches);
+        if (empty($matches['step'])) {
+            trigger_error('Parse Error: Step number is missing'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_ERROR);
+        }
+        $step = (float) $matches['step'];
+        $tag = [
+            'step' => $step,
+        ];
+
+        if ($start) {
+            $action = strtoupper(trim($matches['action']));
+            if (null === $commentPattern && false !== strpos($action, 'COMMENT')) {
+                trigger_error("Unsupported COMMENT action at line $lineNumber", E_USER_WARNING);
+            }
+            $intro = false !== strpos($action, 'INTRO');
+            if ($intro) {
+                $action = trim(str_replace('  ', ' ', str_replace('INTRO', '', $action)));
+            }
+
+            $tag = array_merge($tag, [
+                'action' => $action,
+                'name' => $this->getStepName($step) ?? '',
+                'intro' => $intro,
+            ]);
+            if ('' !== trim($action) && false !== strpos($action, ' ')) {
+                $matches = [];
+                if (preg_match($this->thresholdActionRegex, $action, $matches)) {
+                    $tag = array_merge($tag, [
+                        'before' => strtoupper(trim($matches['action_before'])),
+                        'threshold' => (float) $matches['threshold_step'],
+                        'after' => strtoupper(trim($matches['action_after'])),
+                    ]);
+                }
+                if ($tag['threshold'] <= $step) {
+                    trigger_error('Threshold less or equals to step'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_WARNING);
+                }
+            }
+        }
+
+        return $tag;
+    }
+
+    private function getCommentPattern(string $file = null)
+    {
+        switch ($file ? pathinfo($file, PATHINFO_EXTENSION) : null) {
+            case 'json':
+                return null; // There is no comment in JSON
+            case 'twig':
+                return '{# %CODE% #}';
+            case 'php':
+                return '// %CODE%';
+            case 'sh':
+            case 'zsh':
+            case 'bash':
+            case 'yaml':
+            case 'yml':
+            default:
+                return '# %CODE%';
+        }
+    }
+
+    public function cleanFiles(array $pathList, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $outputExtension = null, string $inputExtension = null): void
     {
         $targetStepName = $this->getStepName($targetStep);
         $targetStepName = null === $targetStepName ? '' : " “{$targetStepName}”";
         $this->outputWrite("<comment>Get step $targetStep{$targetStepName} in {$this->getStateName($solution)} state…</comment>", OutputInterface::VERBOSITY_NORMAL);
+
+        if (!$inputExtension && !empty($this->config['files']['input']['extension'])) {
+            $inputExtension = $this->config['files']['input']['extension'];
+        }
+        if ($inputExtension && 0 !== strpos($inputExtension, '.')) {
+            $inputExtension = ".$inputExtension";
+        }
+        if ($outputExtension && 0 !== strpos($outputExtension, '.')) {
+            $outputExtension = ".$outputExtension";
+        }
+
         foreach ($pathList as $path) {
             if ('' === $path) {
                 continue;
@@ -193,12 +221,16 @@ class ExerciseCleaner
             }
             if (is_dir($path)) {
                 if ('/' === substr($path, -1)) {
-                    // Avoid double slashes in grep result
+                    // Avoid double slashes in find or grep result
                     $path = substr($path, 0, -1);
                 }
-                $cmd = "grep '{$this->startTagConstant}' -Rl $path";
-                if ($suffix) {
-                    $cmd .= " | grep -v '$suffix$'";
+                if ($inputExtension) {
+                    $cmd = "find $path -name '*$inputExtension'";
+                } else {
+                    $cmd = "grep '{$this->startTagConstant}' -Rl $path";
+                    if ($outputExtension) {
+                        $cmd .= " | grep -v '$outputExtension$'";
+                    }
                 }
                 $fileList = Utils::getFileListFromShellCmd("$cmd;");
             } elseif (is_file($path)) {
@@ -207,16 +239,23 @@ class ExerciseCleaner
                 trigger_error("$path is not a file nor a directory", E_USER_WARNING);
                 continue;
             }
-            foreach ($fileList as $file) {
-                $this->outputWrite("<info>Treat {$file}…</info>", OutputInterface::VERBOSITY_NORMAL);
-                if (!is_file($file)) {
+            foreach ($fileList as $inputFile) {
+                $this->outputWrite("<info>Treat {$inputFile}…</info>", OutputInterface::VERBOSITY_VERBOSE);
+                if (!is_file($inputFile)) {
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
-                if (false !== file_put_contents($file.$suffix, implode(PHP_EOL, $this->cleanCodeLines(file($file, FILE_IGNORE_NEW_LINES), $targetStep, $solution, $keepTags, $file)))) {
-                    $this->outputWrite("<info>…{$file}{$suffix} written.</info>", OutputInterface::VERBOSITY_NORMAL);
+                $outputFile = $inputFile;
+                if ($inputExtension) {
+                    $outputFile = str_replace($inputExtension, '', $outputFile);
+                }
+                if ($outputExtension) {
+                    $outputFile = "$outputFile$outputExtension";
+                }
+                if (false !== file_put_contents($outputFile, implode(PHP_EOL, $this->cleanCodeLines(file($inputFile, FILE_IGNORE_NEW_LINES), $targetStep, $solution, $keepTags, $inputFile)))) {
+                    $this->outputWrite("<info>…$outputFile written.</info>", OutputInterface::VERBOSITY_VERBOSE);
                 } else {
-                    trigger_error("$file$suffix couldn't be written", E_USER_ERROR);
+                    trigger_error("$outputFile couldn't be written", E_USER_ERROR);
                 }
             }
         }
@@ -265,7 +304,7 @@ class ExerciseCleaner
         return 'Remove unknown step line(s)';
     }
 
-    private function outputWrite($messages, $verbosity = OutputInterface::VERBOSITY_QUIET)
+    private function outputWrite($messages, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
         if (null !== $this->output) {
             $this->output->writeln($messages, $verbosity);
