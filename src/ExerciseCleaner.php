@@ -61,7 +61,17 @@ class ExerciseCleaner
 
         foreach ($lines as $lineIndex => $line) {
             $lineNumber = 1 + $lineIndex;
-            if (false !== strpos($line, $this->stopTagConstant)) {
+            if (false !== strpos($line, $this->startTagConstant)) {
+                $startedTag = $this->parseTag(true, $line, $lineNumber, $file);
+                $nestedTags[] = $startedTag;
+
+                if ($keepTags && $startedTag['step'] <= $targetStep) {
+                    $keptLines[] = $line;
+                }
+
+                $this->outputWrite("Start step {$startedTag['step']}".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
+            } elseif (false !== strpos($line, $this->stopTagConstant)) {
                 $stoppingTag = $this->parseTag(false, $line, $lineNumber, $file);
                 $stoppedTag = array_pop($nestedTags);
                 if ($stoppingTag['step'] !== $stoppedTag['step']) {
@@ -78,16 +88,6 @@ class ExerciseCleaner
                     $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
                     $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
                 }
-            } elseif (false !== strpos($line, $this->startTagConstant)) {
-                $startedTag = $this->parseTag(true, $line, $lineNumber, $file);
-                $nestedTags[] = $startedTag;
-
-                if ($keepTags && $startedTag['step'] <= $targetStep) {
-                    $keptLines[] = $line;
-                }
-
-                $this->outputWrite("Start step {$startedTag['step']}".($startedTag['name'] ? " “{$startedTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
-                $this->outputWrite($this->getActionVerb($startedTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
                 if ($targetStep > $currentTag['step']  && false === strpos($line, $this->placeHolderTagConstant)) {
