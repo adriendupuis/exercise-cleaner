@@ -129,7 +129,7 @@ class ExerciseCleaner
         return $keptLines;
     }
 
-    private function parseTag(bool $start, string $line, int $lineNumber, string $file = null)
+    private function parseTag(bool $start, string $line, int $lineNumber, string $file = null): array
     {
         $regex = $start ? $this->startTagRegex : $this->stopTagRegex;
         $commentPattern = $this->getCommentPattern($file);
@@ -177,7 +177,7 @@ class ExerciseCleaner
         return $tag;
     }
 
-    private function getCommentPattern(string $file = null)
+    private function getCommentPattern(string $file = null): string
     {
         switch ($file ? pathinfo($file, PATHINFO_EXTENSION) : null) {
             case 'json':
