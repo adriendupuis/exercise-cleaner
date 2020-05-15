@@ -12,7 +12,7 @@ class ExerciseCleaner
     public $stopTagConstant = 'TRAINING EXERCISE STOP STEP';
     public $stopTagRegex;
     public $thresholdActionRegex = '@(?<action_before>[A-Z]+) UNTIL (?<threshold_step>[\.0-9]+) THEN (?<action_after>[A-Z]+)@';
-    public $placeHolderTagConstant = 'TRAINING EXERCISE STEP PLACEHOLDER';
+    public $placeholderTagConstant = 'TRAINING EXERCISE STEP PLACEHOLDER';
 
     /** @var bool */
     private $isPhar;
@@ -90,7 +90,7 @@ class ExerciseCleaner
                 }
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
-                if ($targetStep > $currentTag['step'] && false === strpos($line, $this->placeHolderTagConstant)) {
+                if ($targetStep > $currentTag['step'] && false === strpos($line, $this->placeholderTagConstant)) {
                     $action = $currentTag['action'];
                     if (array_key_exists('threshold', $currentTag)) {
                         if ($currentTag['threshold'] >= $targetStep) {
@@ -115,13 +115,13 @@ class ExerciseCleaner
                     }
                 } elseif ($targetStep === $currentTag['step']) {
                     $intro = $currentTag['intro'];
-                    if (($solution || $intro) && false === strpos($line, $this->placeHolderTagConstant)) {
+                    if (($solution || $intro) && false === strpos($line, $this->placeholderTagConstant)) {
                         $keptLines[] = $line;
-                    } elseif ((!$solution || $intro) && false !== strpos($line, $this->placeHolderTagConstant)) {
-                        $keptLines[] = preg_replace("@ *{$this->placeHolderTagConstant}@", '', $line);
+                    } elseif ((!$solution || $intro) && false !== strpos($line, $this->placeholderTagConstant)) {
+                        $keptLines[] = preg_replace("@ *{$this->placeholderTagConstant}@", '', $line);
                     }
                 }
-            } elseif (false === strpos($line, $this->placeHolderTagConstant)) {
+            } elseif (false === strpos($line, $this->placeholderTagConstant)) {
                 $keptLines[] = $line;
             }
         }
