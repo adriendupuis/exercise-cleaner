@@ -90,7 +90,7 @@ class ExerciseCleaner
                 }
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
-                if ($targetStep > $currentTag['step']  && false === strpos($line, $this->placeHolderTagConstant)) {
+                if ($targetStep > $currentTag['step'] && false === strpos($line, $this->placeHolderTagConstant)) {
                     $action = $currentTag['action'];
                     if (array_key_exists('threshold', $currentTag)) {
                         if ($currentTag['threshold'] >= $targetStep) {
