@@ -373,7 +373,7 @@ done;
 * Find a better mechanism and wording for `INTRO` and `PLACEHOLDER` (more understandable, more consistent)
 * Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
 * Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)
-* More unit tests
+* More unit tests; smaller unit tests
 * Test with / Update for eZ Platform v3
 * How to easily distribute the .phar?
 * Define a license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
