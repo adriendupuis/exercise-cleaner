@@ -102,13 +102,53 @@ class ExerciseCleanerTest extends TestCase
 
     //public function testParseTagBackwardCompatibility(): void
     //{
-        //TODO
+    //TODO
     //}
 
-    //public function testParseTagError(): void
-    //{
-        //TODO
-    //}
+    public function testParseTagError(): void
+    {
+        foreach ([
+                     'TRAINING EXERCISE' => [
+                         'msg' => 'Parse Error',
+                         'type' => E_USER_ERROR,
+                     ],
+                     'TRAINING EXERCISE START' => [
+                         'msg' => 'Parse Error',
+                         'type' => E_USER_ERROR,
+                     ],
+                     'TRAINING EXERCISE START STEP' => [
+                         'msg' => 'Parse Error',
+                         'type' => E_USER_ERROR,
+                     ],
+                     'TRAINING EXERCISE START STEP Test' => [
+                         'msg' => 'Parse Error',
+                         'type' => E_USER_ERROR,
+                     ],
+                     'TRAINING EXERCISE START STEP 1 UNKNOWN' => [
+                         'msg' => 'Parse Error',
+                         'type' => E_USER_ERROR,
+                     ],
+                    'TRAINING EXERCISE START STEP 1 INTRO' => [
+                        'msg' => 'INTRO keyword is deprecated',
+                        'type' => E_USER_DEPRECATED,
+                        'parsed' => [
+                            'boundary' => 'START',
+                            'start' => true,
+                            'step' => 1,
+                            'name' => null,
+                            'state' => 'WORKSHEET',
+                            'action' => 'KEEP',
+                        ],
+                    ],
+                 ] as $line => $feedback) {
+            $parsedTag = $this->exerciseCleaner->parseTag($line);
+            $this->assertEquals($feedback['type'], $this->getLastErrorType());
+            $this->assertStringContainsString($feedback['msg'], $this->getLastErrorMessage());
+            if (E_USER_ERROR !== $this->getLastErrorType()) {
+                $this->assertEquals($feedback['parsed'], $parsedTag);
+            }
+        }
+    }
 
     public function testSimplestTag()
     {
@@ -299,13 +339,15 @@ function example()
 {
     // Instructions
 }
-CODE), $cleanedCodeLines);
+CODE
+        ), $cleanedCodeLines);
         $expectedCodeLines = explode(PHP_EOL, <<<'CODE'
 function example()
 {
     return 'Solution';
 }
-CODE);
+CODE
+        );
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true);
         $this->assertEquals($expectedCodeLines, $cleanedCodeLines);
         $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false);
@@ -434,8 +476,8 @@ CODE;
 
         $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false));
         $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction', 'Step 1 Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
-        $this->assertStringContainsString('INTRO keyword is deprecated', $this->getLastErrorString());
-        $this->assertEquals(E_USER_DEPRECATED, $this->getLastErrorNumber());
+        $this->assertStringContainsString('INTRO keyword is deprecated', $this->getLastErrorMessage());
+        $this->assertEquals(E_USER_DEPRECATED, $this->getLastErrorType());
 
         $this->assertEquals(['Steps 1 & 2 Introduction', 'Step 2+ Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
         $this->assertEquals(['Steps 1 & 2 Introduction', 'Step 2+ Introduction', 'Step 2+ Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
@@ -507,9 +549,9 @@ CODE;
 
         $this->exerciseCleaner->cleanCodeLines($codeLines);
 
-        $this->assertStringContainsString('Parse Error', $this->getLastErrorString());
-        $this->assertStringContainsString('at line 4', $this->getLastErrorString());
-        $this->assertEquals(E_USER_ERROR, $this->getLastErrorNumber());
+        $this->assertStringContainsString('Parse Error', $this->getLastErrorMessage());
+        $this->assertStringContainsString('at line 4', $this->getLastErrorMessage());
+        $this->assertEquals(E_USER_ERROR, $this->getLastErrorType());
     }
 
     public function testThresholdWarning(): void
@@ -523,9 +565,9 @@ CODE;
 
         $this->exerciseCleaner->cleanCodeLines($codeLines);
 
-        $this->assertStringContainsString('Threshold less or equals to step', $this->getLastErrorString());
-        $this->assertStringContainsString('at line 1', $this->getLastErrorString());
-        $this->assertEquals(E_USER_WARNING, $this->getLastErrorNumber());
+        $this->assertStringContainsString('Threshold less or equals to step', $this->getLastErrorMessage());
+        $this->assertStringContainsString('at line 1', $this->getLastErrorMessage());
+        $this->assertEquals(E_USER_WARNING, $this->getLastErrorType());
     }
 
     public function testUnsupportedCommentWarning(): void
@@ -559,7 +601,7 @@ CODE;
         $this->errors[] = compact('number', 'string');
     }
 
-    private function getLastErrorString(): string
+    private function getLastErrorMessage(): string
     {
         if (count($this->errors)) {
             return $this->errors[count($this->errors) - 1]['string'];
@@ -568,7 +610,7 @@ CODE;
         return null;
     }
 
-    private function getLastErrorNumber(): int
+    private function getLastErrorType(): int
     {
         if (count($this->errors)) {
             return $this->errors[count($this->errors) - 1]['number'];

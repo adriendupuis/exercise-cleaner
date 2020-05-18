@@ -147,20 +147,21 @@ class ExerciseCleaner
     {
         $intro = false !== strpos($line, 'INTRO'); // backward compatibility
         if ($intro) {
-            trigger_error('INTRO keyword is deprecated, WORKSHEET should be used instead.', E_USER_DEPRECATED);
+            trigger_error('INTRO keyword is deprecated, WORKSHEET should be used instead; ' . ($file ? " in file $file" : '') . " at line $lineNumber", E_USER_DEPRECATED);
             $line = trim(str_replace('  ', ' ', str_replace('INTRO', '', $line)));
         }
 
         preg_match($this->tagRegex, $line, $matches);
 
-        if (empty($matches['step'])) {
-            trigger_error('Parse Error: Step number is missing' . ($file ? " in file $file" : '') . " at line $lineNumber", E_USER_ERROR);
+        if (!count($matches)) {
+            trigger_error('Parse Error' . ($file ? " in file $file" : '') . ($lineNumber ? " at line $lineNumber" : ''), E_USER_ERROR);
+            return [];
+            throw new \ParseError('Parse Error' . ($file ? " in file $file" : '') . ($lineNumber ? " at line $lineNumber" : ''));
         }
-
         $tag = [
-            'step' => (float)$matches['step'],
             'boundary' => $matches['boundary'],
             'start' => 'START' === $matches['boundary'],
+            'step' => (float)$matches['step'],
         ];
 
         if ($tag['start']) {
