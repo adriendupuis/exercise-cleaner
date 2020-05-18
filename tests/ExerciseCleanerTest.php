@@ -434,6 +434,8 @@ CODE;
 
         $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false));
         $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction', 'Step 1 Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
+        $this->assertStringContainsString('INTRO keyword is deprecated', $this->getLastErrorString());
+        $this->assertEquals(E_USER_DEPRECATED, $this->getLastErrorNumber());
 
         $this->assertEquals(['Steps 1 & 2 Introduction', 'Step 2+ Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
         $this->assertEquals(['Steps 1 & 2 Introduction', 'Step 2+ Introduction', 'Step 2+ Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
