@@ -43,6 +43,21 @@ The command get paths as arguments; for each given folder, the script will first
 
 A tag doesn't care if is embed in a comment or something else. When matching, the whole line containing the tag becomes the tag. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma.
 
+Syntax: `TRAINING EXERCISE <boundary> STEP <step_number> [<state>] [<action>] [UNTIL <step_number> [THEN <action>]]`
+
+* `<boundary>` defines if it's an opening or closing tag:
+  - `START`
+  - `STOP`
+* `<step_number>`: float
+* `<state>` defines what to do when the wanted tag equals the tag's step number:
+  - `SOLUTION` (default)
+  - `WORKSHEET` (or deprecated `INTRO)
+  - `PLACEHOLDER`
+* `<action>`:
+  - `KEEP` (`SOLUTION` and `WORKSHEET`'s default)
+  - `COMMENT`
+  - `REMOVE` (`PLACEHOLDER`'s default)`
+
 #### Simple Tag
 
 - `TRAINING EXERCISE START STEP <step_number>`
@@ -55,6 +70,49 @@ When `<step_number>` is **equal to** the wanted step number:
 * **keep** inside content into **solution**.
 
 When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
+
+The following is equivalent:
+
+- `TRAINING EXERCISE START STEP <step_number> SOLUTION`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+#### State Tag
+
+- `TRAINING EXERCISE START STEP <step_number> <state>`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+The `<state>` defines what will done when `<step_number>` is equal to or smaller than the wanted step number.
+
+- `TRAINING EXERCISE START STEP <step_number> SOLUTION`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+When `<step_number>` is **greater than** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **equal to** the wanted step number:
+* **remove** inside content from **exercise**;
+* **keep** inside content into **solution**.
+
+When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
+
+- `TRAINING EXERCISE START STEP <step_number> WORKSHEET`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+When `<step_number>` is **greater than** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **equal to** the wanted step number, keep in both **exercise and solution**.
+
+When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
+
+- `TRAINING EXERCISE START STEP <step_number> PLACEHOLDER`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+When `<step_number>` is **greater than** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **equal to** the wanted step number:
+* **keep** inside content into **exercise**;
+* **remove** inside content from **solution**.
+
+When `<step_number>` is **smaller than** the wanted step number, **remove** inside content.
 
 #### Single Afterward Action Tag
 
@@ -70,9 +128,14 @@ When `<step_number>` is **equal to** the wanted step number:
 When `<step_number>` is **smaller than** the wanted step number, **execute `<action>`** on inside content.
 
 Available actions:
-* `KEEP` (default)
+* `KEEP` (`SOLUTION` and `WORKSHEET` states' default)
 * `COMMENT`
-* `REMOVE`
+* `REMOVE` (`PLACEHOLDER` state's default)`
+
+The following is equivalent:
+
+- `TRAINING EXERCISE START STEP <step_number> SOLUTION  <action>`
+- `TRAINING EXERCISE STOP STEP <step_number>`
 
 #### Threshold Conditioned Afterward Action Tag
 
@@ -91,7 +154,11 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 `<threshold_step_number>` must be greater than `<step_number>`.
 
-#### Intro Keyword
+#### State Tags
+
+The `<state>` part
+
+#### Intro Keyword (deprecated)
 
 Previous tags can contain keyword `INTRO` anywhere after their step number.
 
@@ -99,13 +166,33 @@ Previous tags can contain keyword `INTRO` anywhere after their step number.
 
 With `INTRO`, when `<step_number>` is **equal to** the wanted step number, **keep** inside content in both **exercise and solution**.
 
-#### Placeholder Tag
+#### One-Line Placeholder Tag
 
 - `TRAINING EXERCISE STEP PLACEHOLDER`
 
 When `<step_number>` is **equal to** the wanted step number:
 * **keep** line containing this tag into **exercise** with this tag removed
 * **remove** line containing this tag from **solution
+
+The two following examples are equivalent:
+
+```php
+<?php
+// TRAINING EXERCISE START STEP 1
+// TRAINING EXERCISE STEP PLACEHOLDER TODO: Output the solution
+echo 'Solution';
+// TRAINING EXERCISE START STOP 1
+```
+
+```php
+<?php
+// TRAINING EXERCISE START STEP 1 PLACEHOLDER
+// TODO: Output the solution
+// TRAINING EXERCISE START STOP 1
+// TRAINING EXERCISE START STEP 1
+ echo 'Solution';
+// TRAINING EXERCISE START STOP 1
+```
 
 #### Examples
 
@@ -370,9 +457,6 @@ done;
 ### TODO
 
 * Version string as step numbers
-* Find a better mechanism and wording for `INTRO` and `PLACEHOLDER` (more understandable, more consistent)
-* Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
-* Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)
 * More unit tests; smaller unit tests
 * Test with / Update for eZ Platform v3
 * How to easily distribute the .phar?

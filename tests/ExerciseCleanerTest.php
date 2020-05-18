@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 use ExerciseCleaner\ExerciseCleaner;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +16,99 @@ class ExerciseCleanerTest extends TestCase
         set_error_handler([$this, 'errorHandler']);
         $this->resetErrors();
     }
+
+    public function testTagConstantVersusRegex(): void
+    {
+        $this->assertStringContainsString($this->exerciseCleaner->tagConstant, $this->exerciseCleaner->tagRegex);
+    }
+
+    public function testParseTag(): void
+    {
+        foreach ([
+                     '// TRAINING EXERCISE START STEP 1.0' => [
+                         'step' => 1,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'SOLUTION',
+                         'action' => 'KEEP',
+                     ],
+                     'TRAINING EXERCISE STOP STEP 1.0' => [
+                         'step' => 1.0,
+                         'boundary' => 'STOP',
+                         'start' => false,
+                     ],
+                     'TRAINING EXERCISE START STEP 1.0 COMMENT' => [
+                         'step' => 1.0,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'SOLUTION',
+                         'action' => 'COMMENT',
+                     ],
+                     '# TRAINING EXERCISE START STEP 1.0 PLACEHOLDER' => [
+                         'step' => 1.0,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'PLACEHOLDER',
+                         'action' => 'REMOVE',
+                     ],
+                     '{* TRAINING EXERCISE START STEP 1.0 PLACEHOLDER KEEP *}' => [
+                         'step' => 1.0,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'PLACEHOLDER',
+                         'action' => 'KEEP',
+                     ],
+                     'TRAINING EXERCISE START STEP 1.0 UNTIL 3.0' => [
+                         'step' => 1,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'SOLUTION',
+                         'action' => 'KEEP UNTIL 3 THEN REMOVE',
+                         'before' => 'KEEP',
+                         'threshold' => 3,
+                         'after' => 'REMOVE',
+                     ],
+                     'TRAINING EXERCISE START STEP 1.0 COMMENT UNTIL 3.0' => [
+                         'step' => 1,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'SOLUTION',
+                         'action' => 'COMMENT UNTIL 3 THEN REMOVE',
+                         'before' => 'COMMENT',
+                         'threshold' => 3,
+                         'after' => 'REMOVE',
+                     ],
+                     '/* TRAINING EXERCISE START STEP 1.1 WORKSHEET KEEP UNTIL 3.1 THEN COMMENT */' => [
+                         'step' => 1.1,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'WORKSHEET',
+                         'action' => 'KEEP UNTIL 3.1 THEN COMMENT',
+                         'before' => 'KEEP',
+                         'threshold' => 3.1,
+                         'after' => 'COMMENT',
+                     ],
+                 ] as $line => $parsedTag) {
+            $this->assertEquals($parsedTag, $this->exerciseCleaner->parseTag($line));
+        }
+    }
+
+    //public function testParseTagBackwardCompatibility(): void
+    //{
+        //TODO
+    //}
+
+    //public function testParseTagError(): void
+    //{
+        //TODO
+    //}
 
     public function testSimplestTag()
     {
@@ -177,6 +270,48 @@ CODE;
         $this->assertEquals($slicedCodeLines, $cleanedCodeLines);
 
         $this->assertEquals($codeLines, $this->exerciseCleaner->cleanCodeLines($codeLines, 3, false, true));
+    }
+
+    public function testStateTag(): void
+    {
+        $code = <<<'CODE'
+//TRAINING EXERCISE START STEP 1 WORKSHEET
+function example()
+{
+    //TRAINING EXERCISE START STEP 1 PLACEHOLDER
+    // Instructions
+    //TRAINING EXERCISE STOP STEP 1
+    //TRAINING EXERCISE START STEP 1 SOLUTION
+    return 'Solution';
+    //TRAINING EXERCISE STOP STEP 1
+}
+TRAINING EXERCISE STOP STEP 1
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 0, false);
+        $this->assertCount(0, $cleanedCodeLines);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 0, true);
+        $this->assertCount(0, $cleanedCodeLines);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false);
+        $this->assertEquals(explode(PHP_EOL, <<<'CODE'
+function example()
+{
+    // Instructions
+}
+CODE), $cleanedCodeLines);
+        $expectedCodeLines = explode(PHP_EOL, <<<'CODE'
+function example()
+{
+    return 'Solution';
+}
+CODE);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true);
+        $this->assertEquals($expectedCodeLines, $cleanedCodeLines);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false);
+        $this->assertEquals($expectedCodeLines, $cleanedCodeLines);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true);
+        $this->assertEquals($expectedCodeLines, $cleanedCodeLines);
     }
 
     public function testCommentActionTag(): void
