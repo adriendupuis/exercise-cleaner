@@ -51,12 +51,12 @@ Syntax: `TRAINING EXERCISE <boundary> STEP <step_number> [<state>] [<action>] [U
 * `<step_number>`: float
 * `<state>` defines what to do when the wanted tag equals the tag's step number:
   - `SOLUTION` (default)
-  - `WORKSHEET` (or deprecated `INTRO)
+  - `WORKSHEET` (or deprecated `INTRO`)
   - `PLACEHOLDER`
 * `<action>`:
   - `KEEP` (`SOLUTION` and `WORKSHEET`'s default)
   - `COMMENT`
-  - `REMOVE` (`PLACEHOLDER`'s default)`
+  - `REMOVE` (`PLACEHOLDER`'s default)
 
 #### Simple Tag
 
