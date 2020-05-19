@@ -39,7 +39,7 @@ The tags include a step number as an integer or a float.
 
 The command get a step as an argument and will remove content inside tags having a greater one. When it's equal or smaller, see details in below subsections.
 
-The command get paths as arguments; for each given folder, the script will first search recursively for files containing `TRAINING EXERCISE START STEP`, the core part of a starting tag.
+The command get paths as arguments; for each given folder, if there is no dedicated extension, the script will first search recursively for files containing `TRAINING EXERCISE` (case sensitive), the core part of a starting tag.
 
 A tag doesn't care if is embed in a comment or something else. When matching, the whole line containing the tag becomes the tag. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma.
 
