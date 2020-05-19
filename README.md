@@ -170,9 +170,13 @@ With `INTRO`, when `<step_number>` is **equal to** the wanted step number, **kee
 
 - `TRAINING EXERCISE STEP PLACEHOLDER`
 
+When `<step_number>` is **greater than** the wanted step number, **remove** line containing this tag from **solution**.
+
 When `<step_number>` is **equal to** the wanted step number:
-* **keep** line containing this tag into **exercise** with this tag removed
-* **remove** line containing this tag from **solution
+* **keep** line containing this tag into **exercise** with this tag removed;
+* **remove** line containing this tag from **solution**.
+
+When `<step_number>` is **smaller than** the wanted step number, **remove** line containing this tag from **solution**.
 
 The two following examples are equivalent:
 
@@ -255,8 +259,16 @@ protected function configure()
         // TRAINING EXERCISE START STEP 1 COMMENT
         ->setHelp('Step 1 feature');
         // TRAINING EXERCISE STOP STEP 1
+        // TRAINING EXERCISE START STEP 2 PLACEHOLDER
+        /* TODO:
+            - Add argument(s)
+            - Add option(s)
+            - Update help
+        */
+        // TRAINING EXERCISE STOP STEP 2
         // TRAINING EXERCISE START STEP 2
-        // TRAINING EXERCISE STEP PLACEHOLDER TODO: Update the description
+        ->addArgument('argument', InputArgument::OPTIONAL, 'An optional argument')
+        ->addOption('option', 'o', InputOption::VALUE_OPTIONAL, 'An option with an optional value')
         ->setHelp("Step 1 feature\nStep 2 feature");
         // TRAINING EXERCISE STOP STEP 2
     // TRAINING EXERCISE STOP STEP 1
@@ -288,16 +300,23 @@ protected function configure()
     $this
         ->setDescription('Just an example')
         // ->setHelp('Step 1 feature');
-        // TODO: Update the description
+        /* TODO:
+            - Add argument(s)
+            - Add option(s)
+            - Update help
+        */
 }
 ```
 Step 2's solution (and nex steps' worksheets and solutions):
 ```php
+<?php
 protected function configure()
 {
     $this
         ->setDescription('Just an example')
         // ->setHelp('Step 1 feature');
+        ->addArgument('argument', InputArgument::OPTIONAL, 'An optional argument')
+        ->addOption('option', 'o', InputOption::VALUE_OPTIONAL, 'An option with an optional value')
         ->setHelp("Step 1 feature\nStep 2 feature");
 }
 ```

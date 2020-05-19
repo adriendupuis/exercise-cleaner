@@ -53,7 +53,7 @@ class ExerciseCleaner
 
         foreach ($lines as $lineIndex => $line) {
             $lineNumber = 1 + $lineIndex;
-            if (false !== strpos($line, $this->tagConstant) && /* backward compatibility */ false === strpos($line, $this->placeholderTagConstant)) {
+            if (false !== strpos($line, $this->tagConstant) && false === strpos($line, $this->placeholderTagConstant)) {
                 $tag = $this->parseTag($line, $lineNumber, $file);
                 if ($tag['start']) {
                     $nestedTags[] = $tag;
