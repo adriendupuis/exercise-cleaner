@@ -130,7 +130,7 @@ When `<step_number>` is **smaller than** the wanted step number, **execute `<act
 Available actions:
 * `KEEP` (`SOLUTION` and `WORKSHEET` states' default)
 * `COMMENT`
-* `REMOVE` (`PLACEHOLDER` state's default)`
+* `REMOVE` (`PLACEHOLDER` state's default)
 
 The following is equivalent:
 
