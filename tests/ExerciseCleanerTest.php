@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use ExerciseCleaner\ExerciseCleaner;
 use PHPUnit\Framework\TestCase;
@@ -375,13 +375,24 @@ CODE;
         $this->assertEquals(['  // Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
         $this->assertEquals(['  // Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
 
-        // Sharp Style
+        // INI Style
+        $this->assertEquals(['  ; Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.ini'));
+        $this->assertEquals(['  ; Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.ini'));
+
+        // Number Sign Style
         $this->assertEquals(['  # Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.sh'));
         $this->assertEquals(['  # Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.yaml'));
+        // …As default
+        $this->assertEquals(['  # Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false));
+        $this->assertEquals(['  # Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, null));
 
         // Twig Style
         $this->assertEquals(['  {# Step 1 #}'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.twig'));
         $this->assertEquals(['  {# Step 1 #}', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.twig'));
+
+        // XML Style
+        $this->assertEquals(['  <!-- Step 1 -->'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.xml'));
+        $this->assertEquals(['  <!-- Step 1 -->', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.xml'));
 
         // Unsupported
         $this->assertEquals([], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.json'));
@@ -601,7 +612,7 @@ CODE;
         $this->errors[] = compact('number', 'string');
     }
 
-    private function getLastErrorMessage(): string
+    private function getLastErrorMessage(): ?string
     {
         if (count($this->errors)) {
             return $this->errors[count($this->errors) - 1]['string'];
@@ -610,7 +621,7 @@ CODE;
         return null;
     }
 
-    private function getLastErrorType(): int
+    private function getLastErrorType(): ?int
     {
         if (count($this->errors)) {
             return $this->errors[count($this->errors) - 1]['number'];

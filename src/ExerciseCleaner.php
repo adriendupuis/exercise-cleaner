@@ -32,7 +32,7 @@ class ExerciseCleaner
                     if (is_numeric($index) && is_string($name)) {
                         $stepNames["step_$index"] = $name;
                     } elseif (is_array($name) && array_key_exists('name', $name)) {
-                        $stepNames['step_' . (array_key_exists('n', $name) ? $name['n'] : $name['number'])] = $name['name'];
+                        $stepNames['step_'.(array_key_exists('n', $name) ? $name['n'] : $name['number'])] = $name['name'];
                     }
                 }
                 $config['steps']['names'] = $stepNames;
@@ -62,23 +62,23 @@ class ExerciseCleaner
                         $keptLines[] = $line;
                     }
 
-                    $this->outputWrite("Start step {$tag['step']}" . ($tag['name'] ? " “{$tag['name']}”" : '') . " at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
-                    $this->outputWrite($this->getActionVerb($tag, $targetStep) . '…', OutputInterface::VERBOSITY_VERY_VERBOSE);
+                    $this->outputWrite("Start step {$tag['step']}".($tag['name'] ? " “{$tag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                    $this->outputWrite($this->getActionVerb($tag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
                 } else {
                     $stoppedTag = array_pop($nestedTags);
                     if ($tag['step'] !== $stoppedTag['step']) {
-                        trigger_error('Parse Error: STOP tag not matching START tag' . ($file ? " in file $file" : '') . " at line $lineNumber", E_USER_ERROR);
+                        trigger_error('Parse Error: STOP tag not matching START tag'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_ERROR);
                     }
 
                     if ($keepTags && $tag['step'] <= $targetStep) {
                         $keptLines[] = $line;
                     }
 
-                    $this->outputWrite("Stop step {$tag['step']}" . ($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '') . " at line $lineNumber.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                    $this->outputWrite("Stop step {$tag['step']}".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineNumber.", OutputInterface::VERBOSITY_VERY_VERBOSE);
                     if (count($nestedTags)) {
                         $currentTag = $nestedTags[count($nestedTags) - 1];
-                        $this->outputWrite("Reenter step {$currentTag['step']}" . ($currentTag['name'] ? " “{$currentTag['name']}”" : '') . " at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
-                        $this->outputWrite($this->getActionVerb($currentTag, $targetStep) . '…', OutputInterface::VERBOSITY_VERY_VERBOSE);
+                        $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                        $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
                     }
                 }
             } elseif (count($nestedTags)) {
@@ -96,7 +96,7 @@ class ExerciseCleaner
                         case 'COMMENT':
                             if (null !== $commentPattern) {
                                 preg_match('@^(?<indent> *)(?<code>.*)$@', $line, $matches);
-                                $keptLines[] = ($matches['indent'] ?? '') . str_replace('%CODE%', $matches['code'] ?? '', $commentPattern);
+                                $keptLines[] = ($matches['indent'] ?? '').str_replace('%CODE%', $matches['code'] ?? '', $commentPattern);
                             }
                             break;
                         case 'REMOVE':
@@ -123,10 +123,10 @@ class ExerciseCleaner
                             $keptLines[] = $line;
                             break;
                         case 'SOLUTION':
-                        default;
+                        default:
                             if ($solution && false === strpos($line, $this->placeholderTagConstant)) {
                                 $keptLines[] = $line;
-                            } else if (!$solution && false !== strpos($line, $this->placeholderTagConstant)) {
+                            } elseif (!$solution && false !== strpos($line, $this->placeholderTagConstant)) {
                                 $keptLines[] = preg_replace("@ *{$this->placeholderTagConstant}@", '', $line);
                             }
                             break;
@@ -147,21 +147,22 @@ class ExerciseCleaner
     {
         $intro = false !== strpos($line, 'INTRO'); // backward compatibility
         if ($intro) {
-            trigger_error('INTRO keyword is deprecated, WORKSHEET should be used instead; ' . ($file ? " in file $file" : '') . " at line $lineNumber", E_USER_DEPRECATED);
+            trigger_error('INTRO keyword is deprecated, WORKSHEET should be used instead; '.($file ? " in file $file" : '')." at line $lineNumber", E_USER_DEPRECATED);
             $line = trim(str_replace('  ', ' ', str_replace('INTRO', '', $line)));
         }
 
         preg_match($this->tagRegex, $line, $matches);
 
         if (!count($matches)) {
-            trigger_error('Parse Error' . ($file ? " in file $file" : '') . ($lineNumber ? " at line $lineNumber" : ''), E_USER_ERROR);
+            trigger_error('Parse Error'.($file ? " in file $file" : '').($lineNumber ? " at line $lineNumber" : ''), E_USER_ERROR);
+
             return [];
-            throw new \ParseError('Parse Error' . ($file ? " in file $file" : '') . ($lineNumber ? " at line $lineNumber" : ''));
+            throw new \ParseError('Parse Error'.($file ? " in file $file" : '').($lineNumber ? " at line $lineNumber" : ''));
         }
         $tag = [
             'boundary' => $matches['boundary'],
             'start' => 'START' === $matches['boundary'],
-            'step' => (float)$matches['step'],
+            'step' => (float) $matches['step'],
         ];
 
         if ($tag['start']) {
@@ -198,7 +199,7 @@ class ExerciseCleaner
                 $tag['action'] = "{$tag['before']} UNTIL {$tag['threshold']} THEN {$tag['after']}";
 
                 if ($tag['threshold'] <= $tag['step']) {
-                    trigger_error('Threshold less or equals to step' . ($file ? " in file $file" : '') . " at line $lineNumber", E_USER_WARNING);
+                    trigger_error('Threshold less or equals to step'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_WARNING);
                 }
             }
 
@@ -210,22 +211,39 @@ class ExerciseCleaner
         return $tag;
     }
 
+    /**
+     * Get the comment pattern for a file type.
+     *
+     * @param string|null $file file name, file path or file extension; If not given, return number sign “#” comment pattern
+     *
+     * @return string|null a pattern with %CODE% as placeholder; or, null if language is not supported or doesn't support comments
+     */
     private function getCommentPattern(string $file = null): ?string
     {
+        if (null !== $file && false === strpos($file, '.')) {
+            // Only the extension has been given instead of full file name or path.
+            $file = ".$file";
+        }
         switch ($file ? pathinfo($file, PATHINFO_EXTENSION) : null) {
-            case 'json':
-                return null; // There is no comment in JSON
+            case 'html':
+            case 'xml':
+                return '<!-- %CODE% -->';
+            case 'ini':
+                return '; %CODE%';
             case 'twig':
                 return '{# %CODE% #}';
             case 'php':
                 return '// %CODE%';
+            case null: // Default if no argument; Available in PHP and several shell script languages
             case 'sh':
             case 'zsh':
             case 'bash':
             case 'yaml':
             case 'yml':
-            default:
                 return '# %CODE%';
+            case 'json': // There is no comment in JSON
+            default: // Default if unhandled file type
+                return null;
         }
     }
 
