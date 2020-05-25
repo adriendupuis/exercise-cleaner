@@ -7,8 +7,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class ExerciseCleaner
 {
     public $tagConstant = 'TRAINING EXERCISE';
-    public $tagRegex = '/TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[\.0-9]+) ?(?<state>PLACEHOLDER|SOLUTION|WORKSHEET)? ?(?<action>COMMENT|KEEP|REMOVE)? ?(UNTIL (?<threshold_step>[\.0-9]+))? ?(THEN (?<threshold_action>COMMENT|KEEP|REMOVE))?/';
+    public $tagRegex = '/TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[\.0-9]+) ?(?<state>PLACEHOLDER|SOLUTION|WORKSHEET|INTERNAL)? ?(?<action>COMMENT|KEEP|REMOVE)? ?(UNTIL (?<threshold_step>[\.0-9]+))? ?(THEN (?<threshold_action>COMMENT|KEEP|REMOVE))?/';
     public $placeholderTagConstant = 'TRAINING EXERCISE STEP PLACEHOLDER';
+    public $internalNoteTagConstant = 'TRAINING EXERCISE INTERNAL NOTE';
 
     /** @var bool */
     private $isPhar;
@@ -52,6 +53,9 @@ class ExerciseCleaner
         $commentPattern = $this->getCommentPattern($file);
 
         foreach ($lines as $lineIndex => $line) {
+            if (false !== strpos($line, $this->internalNoteTagConstant)) {
+                continue;
+            }
             $lineNumber = 1 + $lineIndex;
             if (false !== strpos($line, $this->tagConstant) && false === strpos($line, $this->placeholderTagConstant)) {
                 $tag = $this->parseTag($line, $lineNumber, $file);
@@ -83,6 +87,9 @@ class ExerciseCleaner
                 }
             } elseif (count($nestedTags)) {
                 $currentTag = $nestedTags[count($nestedTags) - 1];
+                if ('INTERNAL' === $currentTag['state']) {
+                    continue;
+                }
                 if ($targetStep > $currentTag['step'] && false === strpos($line, $this->placeholderTagConstant)) {
                     $action = $currentTag['action'];
                     if (array_key_exists('threshold', $currentTag)) {
@@ -177,6 +184,7 @@ class ExerciseCleaner
 
             if (empty($matches['action'])) {
                 switch ($tag['state']) {
+                    case 'INTERNAL':
                     case 'PLACEHOLDER':
                         $tag['action'] = 'REMOVE';
                         break;
