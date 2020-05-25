@@ -107,9 +107,6 @@ class ExerciseCleaner
                             $keptLines[] = $line;
                     }
                 } elseif ($targetStep === $currentTag['step']) {
-                    //if (false !== strpos($line, $this->placeholderTagConstant)) {
-                    //    trigger_error("{$this->placeholderTagConstant} one-line tag is deprecated; TRAINING EXERCISE START STEP <n> PLACEHOLDER syntax should be used instead.", E_USER_DEPRECATED);
-                    //}
                     switch ($currentTag['state']) {
                         case 'PLACEHOLDER':
                             if (!$solution) {
