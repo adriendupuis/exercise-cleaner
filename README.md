@@ -246,7 +246,7 @@ Step 2's solution:
 }
 ```
 
-#### PHP Examples w/ Nested Tags & Action Tag
+#### PHP Examples with Nested Tags and Action Tag
 
 Tagged Reference:
 ```php
@@ -274,7 +274,7 @@ protected function configure()
     // TRAINING EXERCISE STOP STEP 1
 }
 ```
-TODO: Update the following results
+
 Step 1's worksheet:
 ```php
 protected function configure()
