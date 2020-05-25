@@ -50,9 +50,9 @@ Syntax: `TRAINING EXERCISE <boundary> STEP <step_number> [<state>] [<action>] [U
   - `STOP`
 * `<step_number>`: float
 * `<state>` defines what to do when the wanted tag equals the tag's step number:
-  - `SOLUTION` (default)
-  - `WORKSHEET` (or deprecated `INTRO`)
-  - `PLACEHOLDER`
+  - `SOLUTION` (default) means succinctly that enclosed content is present only in solution
+  - `WORKSHEET` (or deprecated `INTRO`) means succinctly that enclosed content is present in both exercise and solution
+  - `PLACEHOLDER` means succinctly that enclosed content is present only in exercise
 * `<action>`:
   - `KEEP` (`SOLUTION` and `WORKSHEET`'s default)
   - `COMMENT`
