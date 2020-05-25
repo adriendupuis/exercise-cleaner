@@ -5,16 +5,16 @@
         https://symfony.com/schema/dic/services/services-1.0.xsd
         http://symfony.com/schema/dic/symfony
         https://symfony.com/schema/dic/symfony/symfony-1.0.xsd">
-    <!-- TRAINING EXERCISE START STEP 1  -->
+    <!-- TRAINING EXERCISE START STEP 1 -->
     <imports>
     </imports>
     <parameters>
-        <!-- TRAINING EXERCISE START STEP 1.1 COMMENT  -->
+        <!-- TRAINING EXERCISE START STEP 1.1 COMMENT -->
         <parameter key="example">test</parameter>
-        <!-- TRAINING EXERCISE STOP STEP 1.1  -->
-        <!-- TRAINING EXERCISE START STEP 2  -->
+        <!-- TRAINING EXERCISE STOP STEP 1.1 -->
+        <!-- TRAINING EXERCISE START STEP 2 -->
         <parameter key="example">test</parameter>
-        <!-- TRAINING EXERCISE STOP STEP 2  -->
+        <!-- TRAINING EXERCISE STOP STEP 2 -->
     </parameters>
-    <!-- TRAINING EXERCISE STOP STEP 1  -->
+    <!-- TRAINING EXERCISE STOP STEP 1 -->
 </container>
