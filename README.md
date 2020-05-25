@@ -154,10 +154,6 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 `<threshold_step_number>` must be greater than `<step_number>`.
 
-#### State Tags
-
-The `<state>` part
-
 #### Intro Keyword (deprecated)
 
 Previous tags can contain keyword `INTRO` anywhere after their step number.
@@ -416,6 +412,7 @@ files:
 ./exercise-cleaner.phar --config exercise-cleaner.yml 2 examples/;
 ./exercise-cleaner.phar --config exercise-cleaner.yml 2 examples/ --solution;
 ```
+
 
 About
 -----
