@@ -41,7 +41,7 @@ The command get a step as an argument and will remove content inside tags having
 
 The command get paths as arguments; for each given folder, if there is no dedicated extension, the script will first search recursively for files containing `TRAINING EXERCISE` (case sensitive), the core part of a tag.
 
-A tag doesn't care if is embed in a comment or something else. When matching, the whole line containing the tag becomes the tag. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma.
+A tag doesn't care if is embed in a comment or something else. When matching, the whole line containing the tag becomes the tag. For example, comment doesn't exist in JSON but there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma. The rest of the line can be used for internal notes.
 
 Syntax: `TRAINING EXERCISE <boundary> STEP <step_number> [<state>] [<action>] [UNTIL <step_number> [THEN <action>]]`
 
