@@ -474,7 +474,7 @@ done;
 
 Last [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html)' rules.
 
-Using last [PHP Coding Standards Fixer](https://cs.symfony.com/): `php-cs-fixer fix --rules=@Symfony src/;`
+Using [PHP Coding Standards Fixer](https://cs.symfony.com/): `vendor/bin/php-cs-fixer fix --rules=@Symfony src/;` — Note: A `composer install --dev` (or alike) must have been previously executed.
 
 ### TODO
 

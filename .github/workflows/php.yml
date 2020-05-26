@@ -20,5 +20,11 @@ jobs:
             - name: Install dependencies
               run: composer install --prefer-dist --no-progress --no-suggest
 
+            - name: Validate coding standards in source
+              run: ./vendor/bin/php-cs-fixer fix --dry-run --rules=@Symfony src/
+
+            - name: Validate coding standards in test suite
+              run: vendor/bin/php-cs-fixer fix --dry-run --rules=@Symfony tests/
+
             - name: Run test suite
               run: composer run-script test
