@@ -253,7 +253,7 @@ protected function configure()
     $this
         ->setDescription('Just an example')
         // TRAINING EXERCISE START STEP 1 COMMENT
-        ->setHelp('Step 1 feature');
+        ->setHelp('Step 1 feature')
         // TRAINING EXERCISE STOP STEP 1
         // TRAINING EXERCISE START STEP 2 PLACEHOLDER
         /* TODO:
@@ -265,8 +265,9 @@ protected function configure()
         // TRAINING EXERCISE START STEP 2
         ->addArgument('argument', InputArgument::OPTIONAL, 'An optional argument')
         ->addOption('option', 'o', InputOption::VALUE_OPTIONAL, 'An option with an optional value')
-        ->setHelp("Step 1 feature\nStep 2 feature");
+        ->setHelp("Step 1 feature\nStep 2 feature")
         // TRAINING EXERCISE STOP STEP 2
+    ;
     // TRAINING EXERCISE STOP STEP 1
 }
 ```
@@ -285,7 +286,8 @@ protected function configure()
 {
     $this
         ->setDescription('Just an example')
-        ->setHelp('Step 1 feature');
+        ->setHelp('Step 1 feature')
+    ;
 }
 ```
 
@@ -295,25 +297,26 @@ protected function configure()
 {
     $this
         ->setDescription('Just an example')
-        // ->setHelp('Step 1 feature');
+        // ->setHelp('Step 1 feature')
         /* TODO:
             - Add argument(s)
             - Add option(s)
             - Update help
         */
+    ;
 }
 ```
-Step 2's solution (and nex steps' worksheets and solutions):
+Step 2's solution (and next steps' worksheets and solutions):
 ```php
-<?php
 protected function configure()
 {
     $this
         ->setDescription('Just an example')
-        // ->setHelp('Step 1 feature');
+        // ->setHelp('Step 1 feature')
         ->addArgument('argument', InputArgument::OPTIONAL, 'An optional argument')
         ->addOption('option', 'o', InputOption::VALUE_OPTIONAL, 'An option with an optional value')
-        ->setHelp("Step 1 feature\nStep 2 feature");
+        ->setHelp("Step 1 feature\nStep 2 feature")
+    ;
 }
 ```
 
