@@ -167,7 +167,7 @@ class ExerciseCleaner
 
         $intro = false !== strpos($line, 'INTRO'); // backward compatibility
         if ($intro) {
-            trigger_error("INTRO keyword is deprecated (WORKSHEET should be used instead){$this->getLocationMessage($lineNumber, $file)}", E_USER_DEPRECATED);
+            trigger_error("WORKSHEET state should be used instead of INTRO keyword{$this->getLocationMessage($lineNumber, $file)}", E_USER_DEPRECATED);
             $line = trim(str_replace('  ', ' ', str_replace('INTRO', '', $line)));
             $line = preg_replace('/(TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[.0-9]+))/', '$1 WORKSHEET', $line);
         }

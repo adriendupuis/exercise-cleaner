@@ -117,24 +117,25 @@ class ExerciseCleanerTest extends TestCase
             'state' => 'WORKSHEET',
             'action' => 'KEEP',
         ];
+        $deprecatedIntroMessage = 'WORKSHEET state should be used instead of INTRO keyword';
         foreach ([
                      'TRAINING EXERCISE START STEP 1 INTRO' => [
-                         'msg' => 'INTRO keyword is deprecated',
+                         'msg' => $deprecatedIntroMessage,
                          'type' => E_USER_DEPRECATED,
                          'parsed' => $parsedIntroTag,
                      ],
                      'TRAINING EXERCISE START STEP INTRO 1' => [
-                         'msg' => 'INTRO keyword is deprecated',
+                         'msg' => $deprecatedIntroMessage,
                          'type' => E_USER_DEPRECATED,
                          'parsed' => $parsedIntroTag,
                      ],
                      'TRAINING EXERCISE START INTRO STEP 1' => [
-                         'msg' => 'INTRO keyword is deprecated',
+                         'msg' => $deprecatedIntroMessage,
                          'type' => E_USER_DEPRECATED,
                          'parsed' => $parsedIntroTag,
                      ],
                      'TRAINING EXERCISE INTRO START STEP 1' => [
-                         'msg' => 'INTRO keyword is deprecated',
+                         'msg' => $deprecatedIntroMessage,
                          'type' => E_USER_DEPRECATED,
                          'parsed' => $parsedIntroTag,
                      ],
@@ -533,7 +534,7 @@ CODE;
 
         $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false));
         $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction', 'Step 1 Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
-        $this->assertStringContainsString('INTRO keyword is deprecated', $this->getLastErrorMessage());
+        $this->assertStringContainsString('WORKSHEET state should be used instead of INTRO keyword', $this->getLastErrorMessage());
         $this->assertEquals(E_USER_DEPRECATED, $this->getLastErrorType());
 
         $this->assertEquals(['Steps 1 & 2 Introduction', 'Step 2+ Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
