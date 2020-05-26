@@ -607,11 +607,11 @@ CODE;
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
-        $this->exerciseCleaner->cleanCodeLines($codeLines);
+        $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false, false, './fake_file_name.php');
 
         $this->assertEquals(E_USER_ERROR, $this->getLastErrorType());
         $this->assertStringContainsStringIgnoringCase('STOP tag not matching START', $this->getLastErrorMessage());
-        $this->assertStringContainsString('on line 4', $this->getLastErrorMessage());
+        $this->assertStringContainsString('in ./fake_file_name.php on line 4', $this->getLastErrorMessage());
     }
 
     public function testUnclosedParseError(): void

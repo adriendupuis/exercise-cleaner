@@ -379,7 +379,7 @@ class ExerciseCleaner
 
     private function getLocationMessage(int $lineNumber = null, string $file = null): string
     {
-        return ($file ? " in file $file" : '').($lineNumber ? " on line $lineNumber" : '');
+        return ($file ? " in $file" : '').($lineNumber ? " on line $lineNumber" : '');
     }
 
     private function writeToOutput($messages, $verbosity = OutputInterface::VERBOSITY_NORMAL)
