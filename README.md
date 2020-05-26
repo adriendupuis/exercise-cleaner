@@ -246,7 +246,7 @@ Step 2's solution:
 
 Tagged Reference:
 ```php
-protected function configure()
+protected function configure(): void
 {
     // TRAINING EXERCISE START STEP 1
     // TRAINING EXERCISE STEP PLACEHOLDER TODO: Set the description and the help
@@ -274,7 +274,7 @@ protected function configure()
 
 Step 1's worksheet:
 ```php
-protected function configure()
+protected function configure(): void
 {
     // TODO: Set the description and the help
 }
@@ -282,7 +282,7 @@ protected function configure()
 
 Step 1's solution:
 ```php
-protected function configure()
+protected function configure(): void
 {
     $this
         ->setDescription('Just an example')
@@ -293,7 +293,7 @@ protected function configure()
 
 Step 2's worksheet:
 ```php
-protected function configure()
+protected function configure(): void
 {
     $this
         ->setDescription('Just an example')
@@ -308,7 +308,7 @@ protected function configure()
 ```
 Step 2's solution (and next steps' worksheets and solutions):
 ```php
-protected function configure()
+protected function configure(): void
 {
     $this
         ->setDescription('Just an example')

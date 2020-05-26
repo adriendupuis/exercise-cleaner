@@ -10,7 +10,7 @@ class ExampleCommand extends Command
 {
     protected static $defaultName = 'app:example';
 
-    protected function configure()
+    protected function configure(): void
     {
         // TRAINING EXERCISE START STEP 1
         // TRAINING EXERCISE STEP PLACEHOLDER TODO: Set the description and the help

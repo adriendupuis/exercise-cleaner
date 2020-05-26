@@ -17,7 +17,7 @@ class DefaultSingleCommand extends Command
     /** @var bool */
     private $isPhar;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Prepare files for an exercise or its solution at a given step')
@@ -37,7 +37,7 @@ class DefaultSingleCommand extends Command
         $this->isPhar = Utils::isPhar();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('white', 'yellow'));
 
