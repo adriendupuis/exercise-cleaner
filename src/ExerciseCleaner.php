@@ -246,6 +246,8 @@ class ExerciseCleaner
         }
         switch ($file ? pathinfo($file, PATHINFO_EXTENSION) : null) {
             case 'html':
+            case 'md':
+            case 'xhtml':
             case 'xml':
                 return '<!-- %CODE% -->';
             case 'ini':
