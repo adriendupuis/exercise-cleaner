@@ -611,7 +611,7 @@ CODE;
 
         $this->assertEquals(E_USER_ERROR, $this->getLastErrorType());
         $this->assertStringContainsStringIgnoringCase('STOP tag not matching START', $this->getLastErrorMessage());
-        $this->assertStringContainsString('at line 4', $this->getLastErrorMessage());
+        $this->assertStringContainsString('on line 4', $this->getLastErrorMessage());
     }
 
     public function testUnclosedParseError(): void
@@ -628,7 +628,7 @@ CODE;
 
         $this->assertEquals(E_USER_ERROR, $this->getLastErrorType());
         $this->assertStringContainsStringIgnoringCase('unclosed tag', $this->getLastErrorMessage());
-        $this->assertStringContainsString('at line 1', $this->getLastErrorMessage());
+        $this->assertStringContainsString('on line 1', $this->getLastErrorMessage());
 
         $this->resetErrors();
 
@@ -646,11 +646,11 @@ CODE;
 
         $this->assertEquals(E_USER_ERROR, $this->errors[0]['type']);
         $this->assertStringContainsStringIgnoringCase('unclosed tag', $this->errors[0]['message']);
-        $this->assertStringContainsString('at line 2', $this->errors[0]['message']);
+        $this->assertStringContainsString('on line 2', $this->errors[0]['message']);
 
         $this->assertEquals(E_USER_ERROR, $this->errors[1]['type']);
         $this->assertStringContainsStringIgnoringCase('unclosed tag', $this->errors[1]['message']);
-        $this->assertStringContainsString('at line 1', $this->errors[1]['message']);
+        $this->assertStringContainsString('on line 1', $this->errors[1]['message']);
     }
 
     public function testTagParseError(): void
@@ -663,7 +663,7 @@ CODE;
                      ] as $tag) {
             $this->exerciseCleaner->cleanCodeLines([$tag]);
             $this->assertStringContainsStringIgnoringCase('tag parse error', $this->getLastErrorMessage());
-            $this->assertStringContainsString('at line 1', $this->getLastErrorMessage());
+            $this->assertStringContainsString('on line 1', $this->getLastErrorMessage());
         }
     }
 
@@ -680,7 +680,7 @@ CODE;
 
         $this->assertEquals(E_USER_WARNING, $this->getLastErrorType());
         $this->assertStringContainsString('Threshold less or equals to step', $this->getLastErrorMessage());
-        $this->assertStringContainsString('at line 1', $this->getLastErrorMessage());
+        $this->assertStringContainsString('on line 1', $this->getLastErrorMessage());
     }
 
     public function testUnsupportedCommentWarning(): void
@@ -699,11 +699,11 @@ CODE;
 
         $this->assertEquals(E_USER_WARNING, $this->errors[0]['type']);
         $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[0]['message']);
-        $this->assertStringContainsString('at line 1', $this->errors[0]['message']);
+        $this->assertStringContainsString('on line 1', $this->errors[0]['message']);
 
         $this->assertEquals(E_USER_WARNING, $this->errors[1]['type']);
         $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[1]['message']);
-        $this->assertStringContainsString('at line 4', $this->errors[1]['message']);
+        $this->assertStringContainsString('on line 4', $this->errors[1]['message']);
     }
 
     public function testPlaceholderOutsideError(): void
@@ -720,7 +720,7 @@ CODE;
             $this->exerciseCleaner->cleanCodeLines($codeLines, $step);
             $this->assertEquals(E_USER_ERROR, $this->getLastErrorType());
             $this->assertStringContainsString("can't be used outside", $this->getLastErrorMessage());
-            $this->assertStringContainsString('at line 4', $this->getLastErrorMessage());
+            $this->assertStringContainsString('on line 4', $this->getLastErrorMessage());
         }
     }
 
@@ -737,7 +737,7 @@ CODE;
         $this->exerciseCleaner->cleanCodeLines($codeLines, 1);
         $this->assertEquals(E_USER_NOTICE, $this->getLastErrorType());
         $this->assertStringContainsStringIgnoringCase('unnecessary', $this->getLastErrorMessage());
-        $this->assertStringContainsString('at line 2', $this->getLastErrorMessage());
+        $this->assertStringContainsString('on line 2', $this->getLastErrorMessage());
     }
 
     /********************/
