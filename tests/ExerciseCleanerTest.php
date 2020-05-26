@@ -187,8 +187,8 @@ class ExerciseCleanerTest extends TestCase
     /** Do not parse, simply remove non alpha-numeric characters */
     private function cleanTag(string $tag): string
     {
-        $tag = preg_replace('/^[^A-Z0-9\.]*/', '', $tag);
-        $tag = preg_replace('/[^A-Z0-9\.]*$/', '', $tag);
+        $tag = preg_replace('/^[^A-Z0-9.]*/', '', $tag);
+        $tag = preg_replace('/[^A-Z0-9.]*$/', '', $tag);
 
         return trim($tag);
     }
@@ -196,7 +196,7 @@ class ExerciseCleanerTest extends TestCase
     /***********************/
     /* Code Cleaning Tests */
 
-    public function testSimplestTag()
+    public function testSimplestTag(): void
     {
         $code = <<<'CODE'
 TRAINING EXERCISE START STEP 2
@@ -233,7 +233,7 @@ CODE;
         $this->assertEquals('test', $cleanedCodeLines[0]);
     }
 
-    public function testSimplestTagWithFloats()
+    public function testSimplestTagWithFloats(): void
     {
         $code = <<<'CODE'
 TRAINING EXERCISE START STEP 1.0

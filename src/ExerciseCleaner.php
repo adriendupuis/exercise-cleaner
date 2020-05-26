@@ -50,7 +50,6 @@ class ExerciseCleaner
         $keptLines = [];
         $nestedTags = [];
         $commentPattern = $this->getCommentPattern($file);
-        $lineNumber = 0;
 
         foreach ($lines as $lineIndex => $line) {
             $lineNumber = 1 + $lineIndex;
@@ -161,14 +160,16 @@ class ExerciseCleaner
     {
         if (false === strpos($line, $this->tagConstant)) {
             throw new \InvalidArgumentException('Not a tag');
-        } elseif (false !== strpos($line, $this->placeholderTagConstant)) {
+        }
+        if (false !== strpos($line, $this->placeholderTagConstant)) {
             throw new \InvalidArgumentException('Not an enclosing tag but a one-line tag');
         }
+
         $intro = false !== strpos($line, 'INTRO'); // backward compatibility
         if ($intro) {
             trigger_error("INTRO keyword is deprecated (WORKSHEET should be used instead){$this->getLocationMessage($lineNumber, $file)}", E_USER_DEPRECATED);
             $line = trim(str_replace('  ', ' ', str_replace('INTRO', '', $line)));
-            $line = preg_replace('/(TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[\.0-9]+))/', '$1 WORKSHEET', $line);
+            $line = preg_replace('/(TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[.0-9]+))/', '$1 WORKSHEET', $line);
         }
 
         preg_match($this->tagRegex, $line, $matches);
