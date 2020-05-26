@@ -155,13 +155,13 @@ class ExerciseCleaner
     }
 
     /**
-     * Parse enclosing tag and return tag properties
+     * Parse enclosing tag and return tag properties.
      */
     public function parseTag(string $line, int $lineNumber = null, string $file = null): ?array
     {
         if (false === strpos($line, $this->tagConstant)) {
             throw new \InvalidArgumentException('Not a tag');
-        } else if (false !== strpos($line, $this->placeholderTagConstant)) {
+        } elseif (false !== strpos($line, $this->placeholderTagConstant)) {
             throw new \InvalidArgumentException('Not an enclosing tag but a one-line tag');
         }
         $intro = false !== strpos($line, 'INTRO'); // backward compatibility
