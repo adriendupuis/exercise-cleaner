@@ -27,7 +27,7 @@ class Utils
 
     public static function getRelativePath(string $absolutePath): string
     {
-        if ('' !== $absolutePath && '/' === $absolutePath[0]) {
+        if (0 === strpos($absolutePath, '/')) {
             return str_replace(trim(`pwd`), '.', $absolutePath);
         }
 
