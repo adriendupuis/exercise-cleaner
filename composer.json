@@ -15,7 +15,7 @@
     "scripts": {
         "test": [
             "composer install --quiet --no-scripts",
-            "vendor/bin/phpunit --colors tests"
+            "vendor/bin/phpunit --colors=always tests"
         ],
         "conform":  [
             "composer install --quiet --no-scripts",
