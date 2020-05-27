@@ -10,9 +10,6 @@ class ExerciseCleaner
     public $tagRegex = '/TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[\.0-9]+) ?(?<state>PLACEHOLDER|SOLUTION|WORKSHEET)? ?(?<action>COMMENT|KEEP|REMOVE)? ?(UNTIL (?<threshold_step>[\.0-9]+))? ?(THEN (?<threshold_action>COMMENT|KEEP|REMOVE))?/';
     public $placeholderTagConstant = 'TRAINING EXERCISE STEP PLACEHOLDER';
 
-    /** @var bool */
-    private $isPhar;
-
     /** @var array|null */
     private $config;
 
@@ -21,9 +18,6 @@ class ExerciseCleaner
 
     public function __construct(array $config = null, OutputInterface $output = null)
     {
-        // Executable Phar
-        $this->isPhar = Utils::isPhar();
-
         if (!is_null($config)) {
             // Step Names Parsing
             if (array_key_exists('steps', $config) && array_key_exists('names', $config['steps'])) {
