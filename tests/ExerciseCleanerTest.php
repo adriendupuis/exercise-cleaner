@@ -17,7 +17,187 @@ class ExerciseCleanerTest extends TestCase
         $this->resetErrors();
     }
 
-    public function testSimplestTag()
+    public function testTagConstantVersusRegex(): void
+    {
+        $this->assertStringContainsString($this->exerciseCleaner->tagConstant, $this->exerciseCleaner->tagRegex);
+    }
+
+    /*********************/
+    /* Tag Parsing Tests */
+
+    public function testParseTag(): void
+    {
+        foreach ([
+                     '// TRAINING EXERCISE START STEP 1.0' => [
+                         'step' => 1,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'SOLUTION',
+                         'action' => 'KEEP',
+                     ],
+                     'TRAINING EXERCISE STOP STEP 1.0' => [
+                         'step' => 1.0,
+                         'boundary' => 'STOP',
+                         'start' => false,
+                     ],
+                     'TRAINING EXERCISE START STEP 1.0 COMMENT' => [
+                         'step' => 1.0,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'SOLUTION',
+                         'action' => 'COMMENT',
+                     ],
+                     '# TRAINING EXERCISE START STEP 1.0 PLACEHOLDER' => [
+                         'step' => 1.0,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'PLACEHOLDER',
+                         'action' => 'REMOVE',
+                     ],
+                     '{* TRAINING EXERCISE START STEP 1.0 PLACEHOLDER KEEP *}' => [
+                         'step' => 1.0,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'PLACEHOLDER',
+                         'action' => 'KEEP',
+                     ],
+                     'TRAINING EXERCISE START STEP 1.0 UNTIL 3.0' => [
+                         'step' => 1,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'SOLUTION',
+                         'action' => 'KEEP UNTIL 3 THEN REMOVE',
+                         'before' => 'KEEP',
+                         'threshold' => 3,
+                         'after' => 'REMOVE',
+                     ],
+                     'TRAINING EXERCISE START STEP 1.0 COMMENT UNTIL 3.0' => [
+                         'step' => 1,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'SOLUTION',
+                         'action' => 'COMMENT UNTIL 3 THEN REMOVE',
+                         'before' => 'COMMENT',
+                         'threshold' => 3,
+                         'after' => 'REMOVE',
+                     ],
+                     '/* TRAINING EXERCISE START STEP 1.1 WORKSHEET KEEP UNTIL 3.1 THEN COMMENT */' => [
+                         'step' => 1.1,
+                         'name' => null,
+                         'boundary' => 'START',
+                         'start' => true,
+                         'state' => 'WORKSHEET',
+                         'action' => 'KEEP UNTIL 3.1 THEN COMMENT',
+                         'before' => 'KEEP',
+                         'threshold' => 3.1,
+                         'after' => 'COMMENT',
+                     ],
+                 ] as $line => $parsedTag) {
+            $parsedTag['tag'] = $this->cleanTag($line);
+            $parsedTag['line_number'] = null;
+
+            $this->assertEquals($parsedTag, $this->exerciseCleaner->parseTag($line));
+        }
+    }
+
+    public function testParseTagBackwardCompatibility(): void
+    {
+        $parsedIntroTag = [
+            'tag' => 'TRAINING EXERCISE START STEP 1 WORKSHEET',
+            'boundary' => 'START',
+            'start' => true,
+            'step' => 1,
+            'name' => null,
+            'state' => 'WORKSHEET',
+            'action' => 'KEEP',
+        ];
+        $deprecatedIntroMessage = 'WORKSHEET state should be used instead of INTRO keyword';
+        foreach ([
+                     'TRAINING EXERCISE START STEP 1 INTRO' => [
+                         'msg' => $deprecatedIntroMessage,
+                         'type' => E_USER_DEPRECATED,
+                         'parsed' => $parsedIntroTag,
+                     ],
+                     'TRAINING EXERCISE START STEP INTRO 1' => [
+                         'msg' => $deprecatedIntroMessage,
+                         'type' => E_USER_DEPRECATED,
+                         'parsed' => $parsedIntroTag,
+                     ],
+                     'TRAINING EXERCISE START INTRO STEP 1' => [
+                         'msg' => $deprecatedIntroMessage,
+                         'type' => E_USER_DEPRECATED,
+                         'parsed' => $parsedIntroTag,
+                     ],
+                     'TRAINING EXERCISE INTRO START STEP 1' => [
+                         'msg' => $deprecatedIntroMessage,
+                         'type' => E_USER_DEPRECATED,
+                         'parsed' => $parsedIntroTag,
+                     ],
+                 ] as $line => $feedback) {
+            $parsedTag = $this->exerciseCleaner->parseTag($line);
+
+            if (!array_key_exists('tag', $feedback['parsed'])) {
+                $feedback['parsed']['tag'] = $this->cleanTag($line);
+            }
+            $feedback['parsed']['line_number'] = null;
+
+            $this->assertEquals($feedback['parsed'], $parsedTag);
+            $this->assertEquals($feedback['type'], $this->getLastErrorType());
+            $this->assertStringContainsString($feedback['msg'], $this->getLastErrorMessage());
+        }
+    }
+
+    public function testParseTagError(): void
+    {
+        foreach ([
+                     'TRAINING EXERCISE',
+                     'TRAINING EXERCISE START',
+                     'TRAINING EXERCISE START STEP',
+                     'TRAINING EXERCISE START STEP Test',
+                 ] as $line) {
+            //$this->expectException(\ParseError::class); // Can't be used several times
+            try {
+                $this->exerciseCleaner->parseTag($line);
+                $this->fail("No ParseError thrown while parsing “{$line}”");
+            } catch (\ParseError $parseError) {
+                $this->assertStringContainsStringIgnoringCase('tag parse error', $parseError->getMessage());
+            }
+        }
+    }
+
+    public function testNotATagError(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Not a tag');
+        $this->exerciseCleaner->parseTag('TRAINING EXERCICE');
+    }
+
+    public function testNotAnEnclosingTagError(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Not an enclosing tag');
+        $this->exerciseCleaner->parseTag($this->exerciseCleaner->placeholderTagConstant);
+    }
+
+    /** Do not parse, simply remove non alpha-numeric characters */
+    private function cleanTag(string $tag): string
+    {
+        $tag = preg_replace('/^[^A-Z0-9.]*/', '', $tag);
+        $tag = preg_replace('/[^A-Z0-9.]*$/', '', $tag);
+
+        return trim($tag);
+    }
+
+    /***********************/
+    /* Code Cleaning Tests */
+
+    public function testSimplestTag(): void
     {
         $code = <<<'CODE'
 TRAINING EXERCISE START STEP 2
@@ -54,7 +234,7 @@ CODE;
         $this->assertEquals('test', $cleanedCodeLines[0]);
     }
 
-    public function testSimplestTagWithFloats()
+    public function testSimplestTagWithFloats(): void
     {
         $code = <<<'CODE'
 TRAINING EXERCISE START STEP 1.0
@@ -179,6 +359,50 @@ CODE;
         $this->assertEquals($codeLines, $this->exerciseCleaner->cleanCodeLines($codeLines, 3, false, true));
     }
 
+    public function testStateTag(): void
+    {
+        $code = <<<'CODE'
+//TRAINING EXERCISE START STEP 1 WORKSHEET
+function example()
+{
+    //TRAINING EXERCISE START STEP 1 PLACEHOLDER
+    // Instructions
+    //TRAINING EXERCISE STOP STEP 1
+    //TRAINING EXERCISE START STEP 1 SOLUTION
+    return 'Solution';
+    //TRAINING EXERCISE STOP STEP 1
+}
+TRAINING EXERCISE STOP STEP 1
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 0, false);
+        $this->assertCount(0, $cleanedCodeLines);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 0, true);
+        $this->assertCount(0, $cleanedCodeLines);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false);
+        $this->assertEquals(explode(PHP_EOL, <<<'CODE'
+function example()
+{
+    // Instructions
+}
+CODE
+        ), $cleanedCodeLines);
+        $expectedCodeLines = explode(PHP_EOL, <<<'CODE'
+function example()
+{
+    return 'Solution';
+}
+CODE
+        );
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true);
+        $this->assertEquals($expectedCodeLines, $cleanedCodeLines);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false);
+        $this->assertEquals($expectedCodeLines, $cleanedCodeLines);
+        $cleanedCodeLines = $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true);
+        $this->assertEquals($expectedCodeLines, $cleanedCodeLines);
+    }
+
     public function testCommentActionTag(): void
     {
         $code = <<<'CODE'
@@ -198,13 +422,24 @@ CODE;
         $this->assertEquals(['  // Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
         $this->assertEquals(['  // Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
 
-        // Sharp Style
+        // INI Style
+        $this->assertEquals(['  ; Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.ini'));
+        $this->assertEquals(['  ; Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.ini'));
+
+        // Number Sign Style
         $this->assertEquals(['  # Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.sh'));
         $this->assertEquals(['  # Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.yaml'));
+        // …As default
+        $this->assertEquals(['  # Step 1'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false));
+        $this->assertEquals(['  # Step 1', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, null));
 
         // Twig Style
         $this->assertEquals(['  {# Step 1 #}'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.twig'));
         $this->assertEquals(['  {# Step 1 #}', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.twig'));
+
+        // XML Style
+        $this->assertEquals(['  <!-- Step 1 -->'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.xml'));
+        $this->assertEquals(['  <!-- Step 1 -->', '  Step 2+'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.xml'));
 
         // Unsupported
         $this->assertEquals([], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.json'));
@@ -299,6 +534,8 @@ CODE;
 
         $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false));
         $this->assertEquals(['Step 1 Introduction', 'Steps 1 & 2 Introduction', 'Step 1 Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 1, true));
+        $this->assertStringContainsString('WORKSHEET state should be used instead of INTRO keyword', $this->getLastErrorMessage());
+        $this->assertEquals(E_USER_DEPRECATED, $this->getLastErrorType());
 
         $this->assertEquals(['Steps 1 & 2 Introduction', 'Step 2+ Introduction'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.php'));
         $this->assertEquals(['Steps 1 & 2 Introduction', 'Step 2+ Introduction', 'Step 2+ Solution'], $this->exerciseCleaner->cleanCodeLines($codeLines, 2, true, false, '.php'));
@@ -357,7 +594,10 @@ CODE;
         ], $cleanedCodeLines);
     }
 
-    public function testParseError(): void
+    /*****************/
+    /* Error Testing */
+
+    public function testEnclosureParseError(): void
     {
         $code = <<<'CODE'
 1 # TRAINING EXERCISE START STEP 1
@@ -368,11 +608,64 @@ CODE;
 CODE;
         $codeLines = explode(PHP_EOL, $code);
 
+        $this->exerciseCleaner->cleanCodeLines($codeLines, 1, false, false, './fake_file_name.php');
+
+        $this->assertEquals(E_USER_ERROR, $this->getLastErrorType());
+        $this->assertStringContainsStringIgnoringCase('STOP tag not matching START', $this->getLastErrorMessage());
+        $this->assertStringContainsString('in ./fake_file_name.php on line 4', $this->getLastErrorMessage());
+    }
+
+    public function testUnclosedParseError(): void
+    {
+        $code = <<<'CODE'
+1 # TRAINING EXERCISE START STEP 1
+2 # TRAINING EXERCISE START STEP 2
+3 Whatever
+4 # TRAINING EXERCISE STOP STEP 2
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
         $this->exerciseCleaner->cleanCodeLines($codeLines);
 
-        $this->assertStringContainsString('Parse Error', $this->getLastErrorString());
-        $this->assertStringContainsString('at line 4', $this->getLastErrorString());
-        $this->assertEquals(E_USER_ERROR, $this->getLastErrorNumber());
+        $this->assertEquals(E_USER_ERROR, $this->getLastErrorType());
+        $this->assertStringContainsStringIgnoringCase('unclosed tag', $this->getLastErrorMessage());
+        $this->assertStringContainsString('on line 1', $this->getLastErrorMessage());
+
+        $this->resetErrors();
+
+        $code = <<<'CODE'
+1 # TRAINING EXERCISE START STEP 1
+2 # TRAINING EXERCISE START STEP 2
+3 # TRAINING EXERCISE START STEP 3
+4 # TRAINING EXERCISE STOP STEP 3
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        $this->exerciseCleaner->cleanCodeLines($codeLines);
+
+        $this->assertCount(2, $this->errors);
+
+        $this->assertEquals(E_USER_ERROR, $this->errors[0]['type']);
+        $this->assertStringContainsStringIgnoringCase('unclosed tag', $this->errors[0]['message']);
+        $this->assertStringContainsString('on line 2', $this->errors[0]['message']);
+
+        $this->assertEquals(E_USER_ERROR, $this->errors[1]['type']);
+        $this->assertStringContainsStringIgnoringCase('unclosed tag', $this->errors[1]['message']);
+        $this->assertStringContainsString('on line 1', $this->errors[1]['message']);
+    }
+
+    public function testTagParseError(): void
+    {
+        foreach ([
+                     'TRAINING EXERCISE STEP 1 START',
+                     'TRAINING EXERCISE STEP START 1',
+                     'TRAINING EXERCISE START 1',
+                     '',
+                     ] as $tag) {
+            $this->exerciseCleaner->cleanCodeLines([$tag]);
+            $this->assertStringContainsStringIgnoringCase('tag parse error', $this->getLastErrorMessage());
+            $this->assertStringContainsString('on line 1', $this->getLastErrorMessage());
+        }
     }
 
     public function testThresholdWarning(): void
@@ -386,9 +679,9 @@ CODE;
 
         $this->exerciseCleaner->cleanCodeLines($codeLines);
 
-        $this->assertStringContainsString('Threshold less or equals to step', $this->getLastErrorString());
-        $this->assertStringContainsString('at line 1', $this->getLastErrorString());
-        $this->assertEquals(E_USER_WARNING, $this->getLastErrorNumber());
+        $this->assertEquals(E_USER_WARNING, $this->getLastErrorType());
+        $this->assertStringContainsString('Threshold less or equals to step', $this->getLastErrorMessage());
+        $this->assertStringContainsString('on line 1', $this->getLastErrorMessage());
     }
 
     public function testUnsupportedCommentWarning(): void
@@ -405,36 +698,73 @@ CODE;
 
         $this->exerciseCleaner->cleanCodeLines($codeLines, 2, false, false, '.json');
 
-        $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[0]['string']);
-        $this->assertStringContainsString('at line 1', $this->errors[0]['string']);
-        $this->assertEquals(E_USER_WARNING, $this->errors[0]['number']);
+        $this->assertEquals(E_USER_WARNING, $this->errors[0]['type']);
+        $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[0]['message']);
+        $this->assertStringContainsString('on line 1', $this->errors[0]['message']);
 
-        $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[1]['string']);
-        $this->assertStringContainsString('at line 4', $this->errors[1]['string']);
-        $this->assertEquals(E_USER_WARNING, $this->errors[1]['number']);
+        $this->assertEquals(E_USER_WARNING, $this->errors[1]['type']);
+        $this->assertStringContainsString('Unsupported COMMENT action', $this->errors[1]['message']);
+        $this->assertStringContainsString('on line 4', $this->errors[1]['message']);
     }
+
+    public function testPlaceholderOutsideError(): void
+    {
+        $code = <<<'CODE'
+1 # TRAINING EXERCISE START STEP 2
+2 Whatever
+3 # TRAINING EXERCISE STOP STEP 2
+4 # TRAINING EXERCISE STEP PLACEHOLDER instruction
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        for ($step = 1; $step < 4; ++$step) {
+            $this->exerciseCleaner->cleanCodeLines($codeLines, $step);
+            $this->assertEquals(E_USER_ERROR, $this->getLastErrorType());
+            $this->assertStringContainsString("can't be used outside", $this->getLastErrorMessage());
+            $this->assertStringContainsString('on line 4', $this->getLastErrorMessage());
+        }
+    }
+
+    public function testPlaceholderUnnecessaryNotice(): void
+    {
+        $code = <<<'CODE'
+1 # TRAINING EXERCISE START STEP 1 PLACEHOLDER
+2 TRAINING EXERCISE STEP PLACEHOLDER Instruction:
+3 Instruction
+4 # TRAINING EXERCISE STOP STEP 1
+CODE;
+        $codeLines = explode(PHP_EOL, $code);
+
+        $this->exerciseCleaner->cleanCodeLines($codeLines, 1);
+        $this->assertEquals(E_USER_NOTICE, $this->getLastErrorType());
+        $this->assertStringContainsStringIgnoringCase('unnecessary', $this->getLastErrorMessage());
+        $this->assertStringContainsString('on line 2', $this->getLastErrorMessage());
+    }
+
+    /********************/
+    /* Error Test Tools */
 
     /** @var array[] */
     private $errors = [];
 
-    public function errorHandler($number, $string): void
+    public function errorHandler($type, $message): void
     {
-        $this->errors[] = compact('number', 'string');
+        $this->errors[] = compact('type', 'message');
     }
 
-    private function getLastErrorString(): string
+    private function getLastErrorMessage(): ?string
     {
         if (count($this->errors)) {
-            return $this->errors[count($this->errors) - 1]['string'];
+            return $this->errors[count($this->errors) - 1]['message'];
         }
 
         return null;
     }
 
-    private function getLastErrorNumber(): int
+    private function getLastErrorType(): ?int
     {
         if (count($this->errors)) {
-            return $this->errors[count($this->errors) - 1]['number'];
+            return $this->errors[count($this->errors) - 1]['type'];
         }
 
         return null;
