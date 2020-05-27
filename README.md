@@ -431,13 +431,13 @@ composer run compile;
 ./exercise-cleaner.phar --version;
 ```
 
-Note: When a release is created, an asset is automatically compiled and attached to it (see [*Release Asset* workflow](.github/workflows/release.yml))
+Note: When creating a release, an asset is automatically compiled and attached to it (see [*Release Asset* workflow](.github/workflows/release.yml))
 
 ### Run Unit Tests
 
 `composer run test;`
 
-Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/php.yml))
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/tests.yml))
 
 ### Run Examples
 
@@ -474,11 +474,13 @@ for step in 1 1.1 1.2 2 3; do
 done;
 ```
 
-### Code Style
+### Conform to Standards
 
 Last [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html)' rules.
 
-Using [PHP Coding Standards Fixer](https://cs.symfony.com/): `vendor/bin/php-cs-fixer fix --rules=@Symfony src/;` — Note: A `composer install --dev` (or alike) must have been previously executed.
+Conform code (using [PHP Coding Standards Fixer](https://cs.symfony.com/)): `composer run conform;`
+
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, conformity tests are automatically run (see [*PHP Composer* workflow](.github/workflows/standards.yml))
 
 ### TODO
 
