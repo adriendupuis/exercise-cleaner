@@ -488,6 +488,5 @@ done;
 * Version string as step numbers
 * More unit tests; smaller unit tests
 * Test with / Update for eZ Platform v3
-* How to easily distribute the .phar?
 * Define a license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
 * Stop writing "exercise" with two 'c'
