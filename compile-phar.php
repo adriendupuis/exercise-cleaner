@@ -15,7 +15,7 @@ $phar = new Phar($pharFileName);
 $phar->addFromString('src/Application.php', preg_replace('@\$version = .+;@', "\$version = '$version';", file_get_contents('src/Application.php')));
 $phar->setStub("#!/usr/bin/env php\n".Phar::createDefaultStub('src/Application.php'));
 
-// Remove dev dependencies (like phpunit)
+// Remove dev dependencies (like phpunit or php-cs-fixer)
 shell_exec('composer install --no-dev --quiet;');
 
 foreach ([

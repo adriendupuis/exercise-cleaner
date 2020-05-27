@@ -420,10 +420,14 @@ files:
 About
 -----
 
+### Development Requirements
+
+* [Composer](https://getcomposer.org/) usable as `composer` (like in [global install](https://getcomposer.org/doc/00-intro.md#globally)).
+
 ### Compile Phar
 
 ```shell
-php -d phar.readonly=Off compile-phar.php;
+composer run compile;
 ./exercise-cleaner.phar --version;
 ```
 
@@ -431,9 +435,7 @@ Note: When a release is created, an asset is automatically compiled and attached
 
 ### Run Unit Tests
 
-Note: A `composer install --dev` (or alike) must have been previously executed.
-
-`./vendor/bin/phpunit --colors tests;`
+`composer run test;`
 
 Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/php.yml))
 
@@ -450,7 +452,7 @@ done;
 
 Treat examples after compiling and with verbosity:
 ```shell
-php -d phar.readonly=0 compile-phar.php;
+composer run compile;
 ./exercise-cleaner.phar --version;
 rm -f examples/*.step*.*; # Clean previous runs
 for step in 1 1.1 1.2 2 3; do
@@ -461,15 +463,14 @@ done;
 
 Treat shell example and execute the result:
 ```shell
+composer run compile;
 for step in 1 1.1 1.2 2 3; do
-    echo "\nSTEP $step EXERCISE";
-    php src/Application.php $step examples/example.sh;
-    zsh examples/example.sh;
-    git checkout -- examples/example.sh;
-    echo "\nSTEP $step SOLUTION";
-    php src/Application.php --solution $step examples/example.sh;
-    zsh examples/example.sh;
-    git checkout -- examples/example.sh;
+    for state in exercise solution; do
+        echo "\nStep $step $state";
+        ./exercise-cleaner.phar --$state $step examples/example.sh;
+        zsh examples/example.sh;
+        git checkout -- examples/example.sh;
+    done;
 done;
 ```
 
