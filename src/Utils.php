@@ -19,23 +19,4 @@ class Utils
 
         return $fileList;
     }
-
-    public static function getAbsolutePath(string $relativePath): string
-    {
-        return realpath($relativePath);
-    }
-
-    public static function getRelativePath(string $absolutePath): string
-    {
-        if (0 === strpos($absolutePath, '/')) {
-            return str_replace(trim(`pwd`), '.', $absolutePath);
-        }
-
-        return $absolutePath;
-    }
-
-    public static function isPhar(): bool
-    {
-        return (bool) preg_match('@^phar:///@', __DIR__);
-    }
 }
