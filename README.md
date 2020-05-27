@@ -8,9 +8,10 @@ Exercise Cleaner
   - [Tags](#tags)
   - [Command](#command)
   - [Config File](#config-file)
-* [About](#about)
+* [Development](#development)
   - [Compile Phar](#compile-phar)
   - [Run Tests](#run-tests)
+  - [Conform to Standards](#conform-to-standards)
   - [Run Examples](#run-examples)
   - [To Do](#todo)  
 
@@ -417,8 +418,8 @@ files:
 ```
 
 
-About
------
+Development
+-----------
 
 ### Development Requirements
 
@@ -438,6 +439,14 @@ Note: When creating a release, an asset is automatically compiled and attached t
 `composer run test;`
 
 Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/tests.yml))
+
+### Conform to Standards
+
+Last [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html)' rules.
+
+Conform code (using [PHP Coding Standards Fixer](https://cs.symfony.com/)): `composer run conform;`
+
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, conformity tests are automatically run (see [*PHP Composer* workflow](.github/workflows/standards.yml))
 
 ### Run Examples
 
@@ -473,14 +482,6 @@ for step in 1 1.1 1.2 2 3; do
     done;
 done;
 ```
-
-### Conform to Standards
-
-Last [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html)' rules.
-
-Conform code (using [PHP Coding Standards Fixer](https://cs.symfony.com/)): `composer run conform;`
-
-Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, conformity tests are automatically run (see [*PHP Composer* workflow](.github/workflows/standards.yml))
 
 ### TODO
 
