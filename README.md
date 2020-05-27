@@ -8,9 +8,10 @@ Exercise Cleaner
   - [Tags](#tags)
   - [Command](#command)
   - [Config File](#config-file)
-* [About](#about)
+* [Development](#development)
   - [Compile Phar](#compile-phar)
   - [Run Tests](#run-tests)
+  - [Conform to Standards](#conform-to-standards)
   - [Run Examples](#run-examples)
   - [To Do](#todo)  
 
@@ -39,9 +40,24 @@ The tags include a step number as an integer or a float.
 
 The command get a step as an argument and will remove content inside tags having a greater one. When it's equal or smaller, see details in below subsections.
 
-The command get paths as arguments; for each given folder, the script will first search recursively for files containing `TRAINING EXERCISE START STEP`, the core part of a starting tag.
+The command get paths as arguments; for each given folder, if there is no dedicated extension, the script will first search recursively for files containing `TRAINING EXERCISE` (case sensitive), the core part of a tag.
 
-A tag doesn't care if is embed in a comment or something else. When matching, the whole line containing the tag becomes the tag. For examples comment doesn't exist in JSON, there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma.
+A tag doesn't care if is embed in a comment or something else. When matching, the whole line containing the tag becomes the tag. For example, comment doesn't exist in JSON but there is some tricks to not trigger syntax errors but with a limitation for last line without ending comma. The rest of the line can be used for internal notes.
+
+Syntax: `TRAINING EXERCISE <boundary> STEP <step_number> [<state>] [<action>] [UNTIL <step_number> [THEN <action>]]`
+
+* `<boundary>` defines if it's an opening or closing tag:
+  - `START`
+  - `STOP`
+* `<step_number>`: float
+* `<state>` defines what to do when the wanted tag equals the tag's step number:
+  - `SOLUTION` (default) means succinctly that enclosed content is present only in solution
+  - `WORKSHEET` (or deprecated `INTRO`) means succinctly that enclosed content is present in both exercise and solution
+  - `PLACEHOLDER` means succinctly that enclosed content is present only in exercise
+* `<action>`:
+  - `KEEP` (`SOLUTION` and `WORKSHEET`'s default)
+  - `COMMENT`
+  - `REMOVE` (`PLACEHOLDER`'s default)
 
 #### Simple Tag
 
@@ -55,6 +71,49 @@ When `<step_number>` is **equal to** the wanted step number:
 * **keep** inside content into **solution**.
 
 When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
+
+The following is equivalent:
+
+- `TRAINING EXERCISE START STEP <step_number> SOLUTION`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+#### State Tag
+
+- `TRAINING EXERCISE START STEP <step_number> <state>`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+The `<state>` defines what will done when `<step_number>` is equal to or smaller than the wanted step number.
+
+- `TRAINING EXERCISE START STEP <step_number> SOLUTION`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+When `<step_number>` is **greater than** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **equal to** the wanted step number:
+* **remove** inside content from **exercise**;
+* **keep** inside content into **solution**.
+
+When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
+
+- `TRAINING EXERCISE START STEP <step_number> WORKSHEET`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+When `<step_number>` is **greater than** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **equal to** the wanted step number, keep in both **exercise and solution**.
+
+When `<step_number>` is **smaller than** the wanted step number, **keep** inside content.
+
+- `TRAINING EXERCISE START STEP <step_number> PLACEHOLDER`
+- `TRAINING EXERCISE STOP STEP <step_number>`
+
+When `<step_number>` is **greater than** the wanted step number, **remove** inside content.
+
+When `<step_number>` is **equal to** the wanted step number:
+* **keep** inside content into **exercise**;
+* **remove** inside content from **solution**.
+
+When `<step_number>` is **smaller than** the wanted step number, **remove** inside content.
 
 #### Single Afterward Action Tag
 
@@ -70,9 +129,14 @@ When `<step_number>` is **equal to** the wanted step number:
 When `<step_number>` is **smaller than** the wanted step number, **execute `<action>`** on inside content.
 
 Available actions:
-* `KEEP` (default)
+* `KEEP` (`SOLUTION` and `WORKSHEET` states' default)
 * `COMMENT`
-* `REMOVE`
+* `REMOVE` (`PLACEHOLDER` state's default)
+
+The following is equivalent:
+
+- `TRAINING EXERCISE START STEP <step_number> SOLUTION  <action>`
+- `TRAINING EXERCISE STOP STEP <step_number>`
 
 #### Threshold Conditioned Afterward Action Tag
 
@@ -91,7 +155,7 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 `<threshold_step_number>` must be greater than `<step_number>`.
 
-#### Intro Keyword
+#### Intro Keyword (deprecated)
 
 Previous tags can contain keyword `INTRO` anywhere after their step number.
 
@@ -99,13 +163,37 @@ Previous tags can contain keyword `INTRO` anywhere after their step number.
 
 With `INTRO`, when `<step_number>` is **equal to** the wanted step number, **keep** inside content in both **exercise and solution**.
 
-#### Placeholder Tag
+#### One-Line Placeholder Tag
 
 - `TRAINING EXERCISE STEP PLACEHOLDER`
 
+When `<step_number>` is **greater than** the wanted step number, **remove** line containing this tag from **solution**.
+
 When `<step_number>` is **equal to** the wanted step number:
-* **keep** line containing this tag into **exercise** with this tag removed
-* **remove** line containing this tag from **solution
+* **keep** line containing this tag into **exercise** with this tag removed;
+* **remove** line containing this tag from **solution**.
+
+When `<step_number>` is **smaller than** the wanted step number, **remove** line containing this tag from **solution**.
+
+The two following examples are equivalent:
+
+```php
+<?php
+// TRAINING EXERCISE START STEP 1
+// TRAINING EXERCISE STEP PLACEHOLDER TODO: Output the solution
+echo 'Solution';
+// TRAINING EXERCISE START STOP 1
+```
+
+```php
+<?php
+// TRAINING EXERCISE START STEP 1 PLACEHOLDER
+// TODO: Output the solution
+// TRAINING EXERCISE START STOP 1
+// TRAINING EXERCISE START STEP 1
+ echo 'Solution';
+// TRAINING EXERCISE START STOP 1
+```
 
 #### Examples
 
@@ -155,30 +243,39 @@ Step 2's solution:
 }
 ```
 
-#### PHP Examples w/ Nested Tags & Action Tag
+#### PHP Examples with Nested Tags and Action Tag
 
 Tagged Reference:
 ```php
-protected function configure()
+protected function configure(): void
 {
     // TRAINING EXERCISE START STEP 1
     // TRAINING EXERCISE STEP PLACEHOLDER TODO: Set the description and the help
     $this
         ->setDescription('Just an example')
         // TRAINING EXERCISE START STEP 1 COMMENT
-        ->setHelp('Step 1 feature');
+        ->setHelp('Step 1 feature')
         // TRAINING EXERCISE STOP STEP 1
-        // TRAINING EXERCISE START STEP 2
-        // TRAINING EXERCISE STEP PLACEHOLDER TODO: Update the description
-        ->setHelp("Step 1 feature\nStep 2 feature");
+        // TRAINING EXERCISE START STEP 2 PLACEHOLDER
+        /* TODO:
+            - Add argument(s)
+            - Add option(s)
+            - Update help
+        */
         // TRAINING EXERCISE STOP STEP 2
+        // TRAINING EXERCISE START STEP 2
+        ->addArgument('argument', InputArgument::OPTIONAL, 'An optional argument')
+        ->addOption('option', 'o', InputOption::VALUE_OPTIONAL, 'An option with an optional value')
+        ->setHelp("Step 1 feature\nStep 2 feature")
+        // TRAINING EXERCISE STOP STEP 2
+    ;
     // TRAINING EXERCISE STOP STEP 1
 }
 ```
-TODO: Update the following results
+
 Step 1's worksheet:
 ```php
-protected function configure()
+protected function configure(): void
 {
     // TODO: Set the description and the help
 }
@@ -186,32 +283,41 @@ protected function configure()
 
 Step 1's solution:
 ```php
-protected function configure()
+protected function configure(): void
 {
     $this
         ->setDescription('Just an example')
-        ->setHelp('Step 1 feature');
+        ->setHelp('Step 1 feature')
+    ;
 }
 ```
 
 Step 2's worksheet:
 ```php
-protected function configure()
+protected function configure(): void
 {
     $this
         ->setDescription('Just an example')
-        // ->setHelp('Step 1 feature');
-        // TODO: Update the description
+        // ->setHelp('Step 1 feature')
+        /* TODO:
+            - Add argument(s)
+            - Add option(s)
+            - Update help
+        */
+    ;
 }
 ```
-Step 2's solution (and nex steps' worksheets and solutions):
+Step 2's solution (and next steps' worksheets and solutions):
 ```php
-protected function configure()
+protected function configure(): void
 {
     $this
         ->setDescription('Just an example')
-        // ->setHelp('Step 1 feature');
-        ->setHelp("Step 1 feature\nStep 2 feature");
+        // ->setHelp('Step 1 feature')
+        ->addArgument('argument', InputArgument::OPTIONAL, 'An optional argument')
+        ->addOption('option', 'o', InputOption::VALUE_OPTIONAL, 'An option with an optional value')
+        ->setHelp("Step 1 feature\nStep 2 feature")
+    ;
 }
 ```
 
@@ -323,25 +429,35 @@ rm -rf ~/training;
 ```
 
 
-About
------
+Development
+-----------
+
+### Development Requirements
+
+* [Composer](https://getcomposer.org/) usable as `composer` (like in [global install](https://getcomposer.org/doc/00-intro.md#globally)).
 
 ### Compile Phar
 
 ```shell
-php -d phar.readonly=Off compile-phar.php;
+composer run compile;
 ./exercise-cleaner.phar --version;
 ```
 
-Note: When a release is created, an asset is automatically compiled and attached to it (see [*Release Asset* workflow](.github/workflows/release.yml))
+Note: When creating a release, an asset is automatically compiled and attached to it (see [*Release Asset* workflow](.github/workflows/release.yml))
 
 ### Run Unit Tests
 
-Note: A `composer install --dev` (or alike) must have been previously executed.
+`composer run test;`
 
-`./vendor/bin/phpunit --colors tests;`
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/tests.yml))
 
-Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/php.yml))
+### Conform to Standards
+
+Last [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html)' rules.
+
+Conform code (using [PHP Coding Standards Fixer](https://cs.symfony.com/)): `composer run conform;`
+
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, conformity tests are automatically run (see [*PHP Composer* workflow](.github/workflows/standards.yml))
 
 ### Run Examples
 
@@ -356,7 +472,7 @@ done;
 
 Treat examples after compiling and with verbosity:
 ```shell
-php -d phar.readonly=0 compile-phar.php;
+composer run compile;
 ./exercise-cleaner.phar --version;
 rm -f examples/*.step*.*; # Clean previous runs
 for step in 1 1.1 1.2 2 3; do
@@ -367,26 +483,21 @@ done;
 
 Treat shell example and execute the result:
 ```shell
+composer run compile;
 for step in 1 1.1 1.2 2 3; do
-    echo "\nSTEP $step EXERCISE";
-    php src/Application.php $step examples/example.sh;
-    zsh examples/example.sh;
-    git checkout -- examples/example.sh;
-    echo "\nSTEP $step SOLUTION";
-    php src/Application.php --solution $step examples/example.sh;
-    zsh examples/example.sh;
-    git checkout -- examples/example.sh;
+    for state in exercise solution; do
+        echo "\nStep $step $state";
+        ./exercise-cleaner.phar --$state $step examples/example.sh;
+        zsh examples/example.sh;
+        git checkout -- examples/example.sh;
+    done;
 done;
 ```
 
 ### TODO
 
 * Version string as step numbers
-* Find a better mechanism and wording for `INTRO` and `PLACEHOLDER` (more understandable, more consistent)
-* Handle just `TRAINING EXERCISE START STEP <step_number> <action_b> UNTIL <threshold_step_number>` (with default/implicit `THEN REMOVE`)
-* Handle just `TRAINING EXERCISE START STEP <step_number> UNTIL <threshold_step_number>` (with default/implicit `KEEP UNTIL <n> THEN REMOVE`)
 * More unit tests; smaller unit tests
 * Test with / Update for eZ Platform v3
-* How to easily distribute the .phar?
 * Define a license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
 * Stop writing "exercise" with two 'c'
