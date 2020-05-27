@@ -14,9 +14,6 @@ class DefaultSingleCommand extends Command
 {
     protected static $defaultName = 'exercise-cleaner.phar';
 
-    /** @var bool */
-    private $isPhar;
-
     protected function configure(): void
     {
         $this
@@ -33,8 +30,6 @@ class DefaultSingleCommand extends Command
             ->addArgument('step', InputArgument::OPTIONAL, 'Remove inside tags having this step float and greater.', 1)
             ->addArgument('paths', InputArgument::IS_ARRAY, 'Search inside this folder(s).', ['app', 'src'])
         ;
-
-        $this->isPhar = Utils::isPhar();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -61,10 +56,7 @@ class DefaultSingleCommand extends Command
         if ($this->getDefinition()->hasOption('config')) {
             $configFile = $input->getOption('config');
             if (!is_null($configFile)) {
-                if ($this->isPhar) {
-                    $configFile = Utils::getAbsolutePath($configFile);
-                }
-                if (is_file($configFile)) {
+                if (is_file(realpath($configFile))) {
                     switch (pathinfo($configFile, PATHINFO_EXTENSION)) {
                         case 'yaml':
                         case 'yml':
