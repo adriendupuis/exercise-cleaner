@@ -379,6 +379,9 @@ class ExerciseCleaner
 
     private function getLocationMessage(int $lineNumber = null, string $file = null): string
     {
+        if ($this->isPhar) {
+            $file = Utils::getRelativePath($file);
+        }
         return ($file ? " in $file" : '').($lineNumber ? " on line $lineNumber" : '');
     }
 

@@ -29,6 +29,15 @@ class Utils
         return $relativePath;
     }
 
+    public static function getRelativePath(string $absolutePath): string
+    {
+        if ('' !== $absolutePath && '/' === $absolutePath[0]) {
+            return str_replace(trim(`pwd`), '.', $absolutePath);
+        }
+
+        return $absolutePath;
+    }
+
     public static function isPhar(): bool
     {
         return (bool) preg_match('@^phar:///@', __DIR__);
