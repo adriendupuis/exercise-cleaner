@@ -13,7 +13,7 @@ switch ($version) {
         $ref = 'develop';
         break;
     default:
-        if (preg_match('@(?<version>v.*)-[0-9]-g(?<commit>[0-9a-f]{7})$@', $version, $matches)) {
+        if (preg_match('@(?<version>v.*)-(?<additional_commits>[0-9]+)-g(?<commit>[0-9a-f]{7})$@', $version, $matches)) {
             $ref = $matches['commit'];
         } else {
             $ref = $version;
