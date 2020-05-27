@@ -23,7 +23,7 @@ local_reference_branch=$remote_reference_branch; # TODO: Make this variable cust
 # Exercises config:
 exercise_cleaner_bin='src/Application.php';
 #exercise_cleaner_bin='./exercise-cleaner.phar';
-exercise_cleaner_config='examples/config2.yaml';
+exercise_cleaner_config='examples/config.yaml';
 path_list=(examples/);
 step_list=(1 1.1 1.2 2 3);
 state_list=('exercise' 'solution');
