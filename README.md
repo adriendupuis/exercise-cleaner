@@ -8,6 +8,7 @@ Exercise Cleaner
   - [Tags](#tags)
   - [Command](#command)
   - [Config File](#config-file)
+  - [Training](#training)
 * [Development](#development)
   - [Compile Phar](#compile-phar)
   - [Run Tests](#run-tests)
