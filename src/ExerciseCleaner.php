@@ -289,10 +289,7 @@ class ExerciseCleaner
             if ('' === $path) {
                 continue;
             }
-            if ($this->isPhar) {
-                $path = Utils::getAbsolutePath($path);
-            }
-            if (is_dir($path)) {
+            if (is_dir(realpath($path))) {
                 if ('/' === substr($path, -1)) {
                     // Avoid double slashes in find or grep result
                     $path = substr($path, 0, -1);
@@ -306,7 +303,7 @@ class ExerciseCleaner
                     }
                 }
                 $fileList = Utils::getFileListFromShellCmd("$cmd;");
-            } elseif (is_file($path)) {
+            } elseif (is_file(realpath($path))) {
                 $fileList = [$path];
             } else {
                 trigger_error("$path is not a file nor a directory", E_USER_WARNING);
@@ -314,7 +311,7 @@ class ExerciseCleaner
             }
             foreach ($fileList as $inputFile) {
                 $this->writeToOutput("<info>Treat {$inputFile}…</info>", OutputInterface::VERBOSITY_VERBOSE);
-                if (!is_file($inputFile)) {
+                if (!is_file(realpath($inputFile))) {
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
@@ -379,9 +376,6 @@ class ExerciseCleaner
 
     private function getLocationMessage(int $lineNumber = null, string $file = null): string
     {
-        if ($this->isPhar) {
-            $file = Utils::getRelativePath($file);
-        }
         return ($file ? " in $file" : '').($lineNumber ? " on line $lineNumber" : '');
     }
 
