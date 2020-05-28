@@ -41,7 +41,7 @@ class DefaultSingleCommand extends Command
         $output->getFormatter()->setStyle('warning', new OutputFormatterStyle('white', 'yellow'));
 
         $pathList = $input->getArgument('paths');
-        $targetStep = (float) $input->getArgument('step');
+        $targetStep = $input->getArgument('step');
         $solution = $input->getOption('solution');
         $keepTags = $input->getOption('keep-tags');
 
