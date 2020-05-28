@@ -1,0 +1,27 @@
+{
+    "name": "adriendupuis/exercise-cleaner",
+    "description": "Training exercises' steps manager and cleaner.",
+    "autoload": {
+        "psr-4": {"ExerciseCleaner\\": "src/"}
+    },
+    "require": {
+        "symfony/console": "^5.0",
+        "symfony/yaml": "^5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.1",
+        "friendsofphp/php-cs-fixer": "^2.16"
+    },
+    "scripts": {
+        "test": [
+            "composer install --quiet --no-scripts",
+            "vendor/bin/phpunit --colors=always tests"
+        ],
+        "conform":  [
+            "composer install --quiet --no-scripts",
+            "vendor/bin/php-cs-fixer fix --rules=@Symfony src/",
+            "vendor/bin/php-cs-fixer fix --rules=@Symfony tests/"
+        ],
+        "compile": "time php -d phar.readonly=Off compile-phar.php"
+    }
+}

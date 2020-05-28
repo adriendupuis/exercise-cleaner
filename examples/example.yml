@@ -1,0 +1,21 @@
+ezpublish:
+    system:
+        content_view:
+            full:
+                # TRAINING EXERCISE START STEP 1
+                release:
+                    # TRAINING EXERCISE START STEP 2
+                    controller: 'ez_query:contentQueryAction'
+                    # TRAINING EXERCISE STOP STEP 2
+                    template: '@ezdesign/full/release.html.twig'
+                    match:
+                        Identifier\ContentType: [release]
+                    # TRAINING EXERCISE START STEP 2
+                    params:
+                        query:
+                            query_type: "AppBundle:Children"
+                            parameters:
+                                parent_location_id: "@=location.id"
+                            assign_results_to: versions
+                    # TRAINING EXERCISE STOP STEP 2
+                # TRAINING EXERCISE STOP STEP 1

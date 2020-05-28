@@ -1,0 +1,13 @@
+steps:
+    names:
+        - { n: 1, name: 'First Step' }
+        - { n: 1.1, name: 'First Step: Exercise 1' }
+        - { n: 1.2, name: 'First Step: Exercise 2' }
+        - { n: 2, name: 'Second Step' }
+        - { n: 3, name: 'Third Step' }
+
+files:
+    input:
+        # If given, only file with this extension will be treated and this extension will be removed
+        # null|string
+        extension: ~
