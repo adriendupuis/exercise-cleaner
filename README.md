@@ -438,15 +438,15 @@ Note: When creating a release, an asset is automatically compiled and attached t
 
 `composer run test;`
 
-Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/tests.yml))
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*Unit Tests* workflow](.github/workflows/tests.yml))
 
 ### Conform to Standards
 
-Last [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html)' rules.
+The last [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html)' rules are to be applied.
 
-Conform code (using [PHP Coding Standards Fixer](https://cs.symfony.com/)): `composer run conform;`
+To conform code (using [PHP Coding Standards Fixer](https://cs.symfony.com/)): `composer run conform;`
 
-Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, conformity tests are automatically run (see [*PHP Composer* workflow](.github/workflows/standards.yml))
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, conformity tests are automatically run (see [*Coding Standards* workflow](.github/workflows/standards.yml))
 
 ### Run Examples
 
