@@ -66,23 +66,27 @@ git remote add $local_training_repository $remote_training_repository;
 git remote -v;
 echo 'Initialization: Create local training branch';
 git checkout --orphan $local_training_branch;
-echo 'Initialization: Ignore Exercise Cleaner';
+echo 'Initialization: Ignore Exercise Cleaner and GitHub Actions';
 {
   echo "###> training ###";
-  echo "$0";
   if [[ $exercise_cleaner_bin != *'Application.php'* ]]; then
+    # If not running on itself
+    echo "$0";
     echo "$exercise_cleaner_bin";
+    if [ -n "$exercise_cleaner_config" ]; then
+      echo "$exercise_cleaner_config";
+    fi
   fi;
-  if [ -n "$exercise_cleaner_config" ]; then
-    echo "$exercise_cleaner_config";
+  if [[ -d .github ]]; then
+    echo '.github/';
   fi
   echo "###< training ###"
 } >> .gitignore;
 git add .gitignore;
-git rm --cached $0 $exercise_cleaner_config;
 if [[ $exercise_cleaner_bin != *'Application.php'* ]]; then
-  git rm --cached $exercise_cleaner_bin;
+  git rm --cached $0 $exercise_cleaner_bin $exercise_cleaner_config;
 fi;
+git rm -r --cached .github/;
 echo 'Initialization: Apply and commit step 0';
 eval "$exercise_cleaner --verbose 0 $path_list";
 git add $path_list;
@@ -96,7 +100,7 @@ for step in $step_list; do
   for state in $state_list; do
     echo "Prepare step $step $state…";
     git checkout $local_reference_branch -- $path_list;
-    git reset $exercise_cleaner_bin $exercise_cleaner_config;
+    git reset $exercise_cleaner_bin $exercise_cleaner_config .github/;
     eval "$exercise_cleaner $step --$state $path_list";
     name=`eval "$exercise_cleaner --step-name $step";`
     git add $path_list;
