@@ -10,6 +10,7 @@ Exercise Cleaner
   - [Config File](#config-file)
   - [Training](#training)
 * [Development](#development)
+  - [Development Requirements](#development-requirements)
   - [Compile Phar](#compile-phar)
   - [Run Tests](#run-tests)
   - [Conform to Standards](#conform-to-standards)
@@ -202,7 +203,7 @@ Notes:
 - See [examples/](examples) folder and *[About/Run Examples](#run-examples)* section for more.
 - [tests/ExerciseCleanerTest.php](tests/ExerciseCleanerTest.php) also contains some (harder to read) usage examples
 
-##### JSON Example w/ Simple Tag
+##### JSON Example with Simple Tag
 
 Exercise's Tagged Reference:
 ```json
@@ -324,7 +325,7 @@ protected function configure(): void
 
 ### Command
 
-`./exercise-cleaner.phar [--keep-orig] [--keep-tag] <step> [folder [folder...]]`
+`./exercise-cleaner.phar [input-ext <extension>] [--output-ext] [--keep-tag] [--exercise|--solution] [--config <file>] <step> [path [path...]]`
 
 Options:
 * `--help`: Display usage help
@@ -332,14 +333,14 @@ Options:
 * `--output-ext`: Instead of replacing content in file, write a new file with extension .step<step_number>.<exercise|solution>.
 * `--keep-tag`: Do not remove tags
 * `--solution`: Compile exercise's solution (by default, it compile the exercise's worksheet)
-* `--config YAML_CONFIG_FILE`: associate a config file
+* `--config <yaml_config_file>`: associate a config file
+* `--quiet`: Do not display information about steps
 * `-v`: Display information about treated files
 * `-vv`: Also display information about found tags
-* `--quiet`: Do not display information about steps
 
 Arguments:
 * first argument: step number: clean inside this and higher tags; By default, step 1
-* following arguments: folder to search in; By default, it looks inside app/ and src/
+* following arguments: path(s) to file or folder to search in; By default, it looks inside app/ and src/
 
 #### File Extensions
 
@@ -361,9 +362,13 @@ In those migration examples, `git mv` may be used instead of `mv`.
 
 ### Config File
 
+Add `--config <file>` option to give the path to a config file. A config file must be in YAML. See what it can define below.
+
 #### Step Naming
 
 Step naming enhances output.
+
+`--step-name` option make the command return the name of a step instead of treating files; for example, `./exercise-cleaner.phar 1.1 --step-name --config examples/config.yaml;` will return the name of the stem number 1.1 if it's defined.
 
 ##### Examples
 
@@ -497,8 +502,12 @@ done;
 
 ### TODO
 
-* Version string as step numbers
-* More unit tests; smaller unit tests
-* Test with / Update for eZ Platform v3
-* Define a license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
+* Features
+  - Version string as step numbers
+  - Define a license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
+* Development & Quality
+  - Detailed requirements
+  - Test with other versions of PHP than PHP 7.4.3
+  - More unit tests; smaller unit tests
+  - Test with / Update for eZ Platform v3
 * Stop writing "exercise" with two 'c'
