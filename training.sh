@@ -97,10 +97,11 @@ for step in $step_list; do
     echo "Prepare step $step $state…";
     git checkout $local_reference_branch -- $path_list;
     git reset $exercise_cleaner_bin $exercise_cleaner_config;
-    step_desc=`eval "$exercise_cleaner $step --$state $path_list" | tee /dev/tty | sed -e "s/Get step \(.*\)…/\1/"`;
+    eval "$exercise_cleaner $step --$state $path_list";
+    name=`eval "$exercise_cleaner --step-name $step";`
     git add $path_list;
     if [[ -n "$(git status --short;)" ]]; then
-      git commit --quiet --message "Step $step_desc";
+      git commit --quiet --message "$state: step $step “$name”";
       echo "Step $step $state ready: Press 'enter' key to push it to training's remote repository…";
       read -r -n 0;
       echo "Push step $step $state…\n";
