@@ -9,6 +9,7 @@ Exercise Cleaner
   - [Command](#command)
   - [Config File](#config-file)
 * [Development](#development)
+  - [Development Requirements](#development-requirements)
   - [Compile Phar](#compile-phar)
   - [Run Tests](#run-tests)
   - [Conform to Standards](#conform-to-standards)
@@ -485,8 +486,12 @@ done;
 
 ### TODO
 
-* Version string as step numbers
-* More unit tests; smaller unit tests
-* Test with / Update for eZ Platform v3
-* Define a license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
+* Features
+  - Version string as step numbers
+  - Define a license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
+* Development & Quality
+  - Detailed requirements
+  - Test with other versions of PHP than PHP 7.4.3
+  - More unit tests; smaller unit tests
+  - Test with / Update for eZ Platform v3
 * Stop writing "exercise" with two 'c'
