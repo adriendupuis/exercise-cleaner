@@ -10,9 +10,6 @@ class ExerciseCleaner
     public $tagRegex = '/TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[\.0-9]+) ?(?<state>PLACEHOLDER|SOLUTION|WORKSHEET)? ?(?<action>COMMENT|KEEP|REMOVE)? ?(UNTIL (?<threshold_step>[\.0-9]+))? ?(THEN (?<threshold_action>COMMENT|KEEP|REMOVE))?/';
     public $placeholderTagConstant = 'TRAINING EXERCISE STEP PLACEHOLDER';
 
-    /** @var bool */
-    private $isPhar;
-
     /** @var array|null */
     private $config;
 
@@ -21,9 +18,6 @@ class ExerciseCleaner
 
     public function __construct(array $config = null, OutputInterface $output = null)
     {
-        // Executable Phar
-        $this->isPhar = Utils::isPhar();
-
         if (!is_null($config)) {
             // Step Names Parsing
             if (array_key_exists('steps', $config) && array_key_exists('names', $config['steps'])) {
@@ -289,10 +283,7 @@ class ExerciseCleaner
             if ('' === $path) {
                 continue;
             }
-            if ($this->isPhar) {
-                $path = Utils::getAbsolutePath($path);
-            }
-            if (is_dir($path)) {
+            if (is_dir(realpath($path))) {
                 if ('/' === substr($path, -1)) {
                     // Avoid double slashes in find or grep result
                     $path = substr($path, 0, -1);
@@ -306,7 +297,7 @@ class ExerciseCleaner
                     }
                 }
                 $fileList = Utils::getFileListFromShellCmd("$cmd;");
-            } elseif (is_file($path)) {
+            } elseif (is_file(realpath($path))) {
                 $fileList = [$path];
             } else {
                 trigger_error("$path is not a file nor a directory", E_USER_WARNING);
@@ -314,7 +305,7 @@ class ExerciseCleaner
             }
             foreach ($fileList as $inputFile) {
                 $this->writeToOutput("<info>Treat {$inputFile}…</info>", OutputInterface::VERBOSITY_VERBOSE);
-                if (!is_file($inputFile)) {
+                if (!is_file(realpath($inputFile))) {
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
