@@ -368,7 +368,7 @@ Add `--config <file>` option to give the path to a config file. A config file mu
 
 Step naming enhances output.
 
-`--step-name` option make the command return the name of a step instead of treating files; for example, `./exercise-cleaner.phar 1.1 --step-name --config examples/config.yaml;` will return the name of the stem number 1.1 if it's defined.
+`--step-name` option make the command return the name of a step instead of treating files; for example, `./exercise-cleaner.phar 1.1 --step-name --config examples/config.yaml;` will return the name of the step number 1.1 if it's defined.
 
 ##### Examples
 
