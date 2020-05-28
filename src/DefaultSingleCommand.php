@@ -25,6 +25,7 @@ class DefaultSingleCommand extends Command
             ->addOption('input-ext', 'i', InputOption::VALUE_REQUIRED, 'Treat only for file having this given extension and remove this extension')
             ->addOption('output-ext', 'o', InputOption::VALUE_NONE, 'Do not rewrite files but write a new one adding an extension which includes step number and if it\'s state (exercise or solution)')
             ->addOption('keep-orig', null, InputOption::VALUE_NONE, '<info>--output-ext</info> alias for backward compatibility')
+            ->addOption('no-empty', 'n', InputOption::VALUE_NONE, 'No empty file')
             ->addOption('keep-tags', 't', InputOption::VALUE_NONE, 'Do not remove start/stop tags')
             ->addOption('exercise', 'e', InputOption::VALUE_NONE, 'Write exercise\'s worksheet (default)')
             //->addOption('worksheet', 'w', InputOption::VALUE_NONE, 'Write exercise\'s worksheet (default)')

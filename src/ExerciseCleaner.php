@@ -263,7 +263,7 @@ class ExerciseCleaner
         }
     }
 
-    public function cleanFiles(array $pathList, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $outputExtension = null, string $inputExtension = null): void
+    public function cleanFiles(array $pathList, float $targetStep = 1, bool $solution = false, bool $keepTags = false, string $outputExtension = null, string $inputExtension = null, bool $noEmptyFile = false): void
     {
         $targetStepName = $this->getStepName($targetStep);
         $targetStepName = null === $targetStepName ? '' : " “{$targetStepName}”";
@@ -316,10 +316,20 @@ class ExerciseCleaner
                 if ($outputExtension) {
                     $outputFile = "$outputFile$outputExtension";
                 }
-                if (false !== file_put_contents($outputFile, implode(PHP_EOL, $this->cleanCodeLines(file($inputFile, FILE_IGNORE_NEW_LINES), $targetStep, $solution, $keepTags, $inputFile)))) {
-                    $this->writeToOutput("<info>…$outputFile written.</info>", OutputInterface::VERBOSITY_VERBOSE);
+
+                $outputContent = implode(PHP_EOL, $this->cleanCodeLines(file($inputFile, FILE_IGNORE_NEW_LINES), $targetStep, $solution, $keepTags, $inputFile));
+                if ($noEmptyFile && '' === trim($outputContent)) {
+                    if (unlink($inputFile)) {
+                        $this->writeToOutput("<info>…$outputFile removed.</info>", OutputInterface::VERBOSITY_VERBOSE);
+                    } else {
+                        trigger_error("Emptied $outputFile couldn't be removed.", E_USER_WARNING);
+                    }
                 } else {
-                    trigger_error("$outputFile couldn't be written", E_USER_ERROR);
+                    if (false !== file_put_contents($outputFile, $outputContent)) {
+                        $this->writeToOutput("<info>…$outputFile written.</info>", OutputInterface::VERBOSITY_VERBOSE);
+                    } else {
+                        trigger_error("$outputFile couldn't be written", E_USER_ERROR);
+                    }
                 }
             }
         }
