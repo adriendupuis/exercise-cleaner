@@ -201,7 +201,7 @@ Notes:
 - See [examples/](examples) folder and *[About/Run Examples](#run-examples)* section for more.
 - [tests/ExerciseCleanerTest.php](tests/ExerciseCleanerTest.php) also contains some (harder to read) usage examples
 
-##### JSON Example w/ Simple Tag
+##### JSON Example with Simple Tag
 
 Exercise's Tagged Reference:
 ```json
