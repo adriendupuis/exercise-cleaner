@@ -8,9 +8,10 @@ Exercise Cleaner
   - [Tags](#tags)
   - [Command](#command)
   - [Config File](#config-file)
-* [About](#about)
+* [Development](#development)
   - [Compile Phar](#compile-phar)
   - [Run Tests](#run-tests)
+  - [Conform to Standards](#conform-to-standards)
   - [Run Examples](#run-examples)
   - [To Do](#todo)  
 
@@ -50,9 +51,9 @@ Syntax: `TRAINING EXERCISE <boundary> STEP <step_number> [<state>] [<action>] [U
   - `STOP`
 * `<step_number>`: float
 * `<state>` defines what to do when the wanted tag equals the tag's step number:
-  - `SOLUTION` (default)
-  - `WORKSHEET` (or deprecated `INTRO`)
-  - `PLACEHOLDER`
+  - `SOLUTION` (default) means succinctly that enclosed content is present only in solution
+  - `WORKSHEET` (or deprecated `INTRO`) means succinctly that enclosed content is present in both exercise and solution
+  - `PLACEHOLDER` means succinctly that enclosed content is present only in exercise
 * `<action>`:
   - `KEEP` (`SOLUTION` and `WORKSHEET`'s default)
   - `COMMENT`
@@ -154,10 +155,6 @@ When `<step_number>` is **smaller than** the wanted step number, **execute** one
 
 `<threshold_step_number>` must be greater than `<step_number>`.
 
-#### State Tags
-
-The `<state>` part
-
 #### Intro Keyword (deprecated)
 
 Previous tags can contain keyword `INTRO` anywhere after their step number.
@@ -250,14 +247,14 @@ Step 2's solution:
 
 Tagged Reference:
 ```php
-protected function configure()
+protected function configure(): void
 {
     // TRAINING EXERCISE START STEP 1
     // TRAINING EXERCISE STEP PLACEHOLDER TODO: Set the description and the help
     $this
         ->setDescription('Just an example')
         // TRAINING EXERCISE START STEP 1 COMMENT
-        ->setHelp('Step 1 feature');
+        ->setHelp('Step 1 feature')
         // TRAINING EXERCISE STOP STEP 1
         // TRAINING EXERCISE START STEP 2 PLACEHOLDER
         /* TODO:
@@ -269,15 +266,16 @@ protected function configure()
         // TRAINING EXERCISE START STEP 2
         ->addArgument('argument', InputArgument::OPTIONAL, 'An optional argument')
         ->addOption('option', 'o', InputOption::VALUE_OPTIONAL, 'An option with an optional value')
-        ->setHelp("Step 1 feature\nStep 2 feature");
+        ->setHelp("Step 1 feature\nStep 2 feature")
         // TRAINING EXERCISE STOP STEP 2
+    ;
     // TRAINING EXERCISE STOP STEP 1
 }
 ```
 
 Step 1's worksheet:
 ```php
-protected function configure()
+protected function configure(): void
 {
     // TODO: Set the description and the help
 }
@@ -285,39 +283,41 @@ protected function configure()
 
 Step 1's solution:
 ```php
-protected function configure()
+protected function configure(): void
 {
     $this
         ->setDescription('Just an example')
-        ->setHelp('Step 1 feature');
+        ->setHelp('Step 1 feature')
+    ;
 }
 ```
 
 Step 2's worksheet:
 ```php
-protected function configure()
+protected function configure(): void
 {
     $this
         ->setDescription('Just an example')
-        // ->setHelp('Step 1 feature');
+        // ->setHelp('Step 1 feature')
         /* TODO:
             - Add argument(s)
             - Add option(s)
             - Update help
         */
+    ;
 }
 ```
-Step 2's solution (and nex steps' worksheets and solutions):
+Step 2's solution (and next steps' worksheets and solutions):
 ```php
-<?php
-protected function configure()
+protected function configure(): void
 {
     $this
         ->setDescription('Just an example')
-        // ->setHelp('Step 1 feature');
+        // ->setHelp('Step 1 feature')
         ->addArgument('argument', InputArgument::OPTIONAL, 'An optional argument')
         ->addOption('option', 'o', InputOption::VALUE_OPTIONAL, 'An option with an optional value')
-        ->setHelp("Step 1 feature\nStep 2 feature");
+        ->setHelp("Step 1 feature\nStep 2 feature")
+    ;
 }
 ```
 
@@ -417,25 +417,36 @@ files:
 ./exercise-cleaner.phar --config exercise-cleaner.yml 2 examples/ --solution;
 ```
 
-About
------
+
+Development
+-----------
+
+### Development Requirements
+
+* [Composer](https://getcomposer.org/) usable as `composer` (like in [global install](https://getcomposer.org/doc/00-intro.md#globally)).
 
 ### Compile Phar
 
 ```shell
-php -d phar.readonly=Off compile-phar.php;
+composer run compile;
 ./exercise-cleaner.phar --version;
 ```
 
-Note: When a release is created, an asset is automatically compiled and attached to it (see [*Release Asset* workflow](.github/workflows/release.yml))
+Note: When creating a release, an asset is automatically compiled and attached to it (see [*Release Asset* workflow](.github/workflows/release.yml))
 
 ### Run Unit Tests
 
-Note: A `composer install --dev` (or alike) must have been previously executed.
+`composer run test;`
 
-`./vendor/bin/phpunit --colors tests;`
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/tests.yml))
 
-Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, tests are automatically run (see [*PHP Composer* workflow](.github/workflows/php.yml))
+### Conform to Standards
+
+Last [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html)' rules.
+
+Conform code (using [PHP Coding Standards Fixer](https://cs.symfony.com/)): `composer run conform;`
+
+Note: When a push to `develop` branch, to `master` branch or to a pull request targeting one of this two branches is done, conformity tests are automatically run (see [*PHP Composer* workflow](.github/workflows/standards.yml))
 
 ### Run Examples
 
@@ -450,7 +461,7 @@ done;
 
 Treat examples after compiling and with verbosity:
 ```shell
-php -d phar.readonly=0 compile-phar.php;
+composer run compile;
 ./exercise-cleaner.phar --version;
 rm -f examples/*.step*.*; # Clean previous runs
 for step in 1 1.1 1.2 2 3; do
@@ -461,29 +472,21 @@ done;
 
 Treat shell example and execute the result:
 ```shell
+composer run compile;
 for step in 1 1.1 1.2 2 3; do
-    echo "\nSTEP $step EXERCISE";
-    php src/Application.php $step examples/example.sh;
-    zsh examples/example.sh;
-    git checkout -- examples/example.sh;
-    echo "\nSTEP $step SOLUTION";
-    php src/Application.php --solution $step examples/example.sh;
-    zsh examples/example.sh;
-    git checkout -- examples/example.sh;
+    for state in exercise solution; do
+        echo "\nStep $step $state";
+        ./exercise-cleaner.phar --$state $step examples/example.sh;
+        zsh examples/example.sh;
+        git checkout -- examples/example.sh;
+    done;
 done;
 ```
-
-### Code Style
-
-Last [Symfony coding standards](https://symfony.com/doc/current/contributing/code/standards.html)' rules.
-
-Using last [PHP Coding Standards Fixer](https://cs.symfony.com/): `php-cs-fixer fix --rules=@Symfony src/;`
 
 ### TODO
 
 * Version string as step numbers
 * More unit tests; smaller unit tests
 * Test with / Update for eZ Platform v3
-* How to easily distribute the .phar?
 * Define a license (at least in the [composer.json](https://getcomposer.org/doc/04-schema.md#license))
 * Stop writing "exercise" with two 'c'

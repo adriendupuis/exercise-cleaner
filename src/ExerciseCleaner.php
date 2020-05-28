@@ -11,9 +11,6 @@ class ExerciseCleaner
     public $placeholderTagConstant = 'TRAINING EXERCISE STEP PLACEHOLDER';
     public $internalNoteTagConstant = 'TRAINING EXERCISE INTERNAL NOTE';
 
-    /** @var bool */
-    private $isPhar;
-
     /** @var array|null */
     private $config;
 
@@ -22,9 +19,6 @@ class ExerciseCleaner
 
     public function __construct(array $config = null, OutputInterface $output = null)
     {
-        // Executable Phar
-        $this->isPhar = Utils::isPhar();
-
         if (!is_null($config)) {
             // Step Names Parsing
             if (array_key_exists('steps', $config) && array_key_exists('names', $config['steps'])) {
@@ -57,32 +51,43 @@ class ExerciseCleaner
                 continue;
             }
             $lineNumber = 1 + $lineIndex;
-            if (false !== strpos($line, $this->tagConstant) && false === strpos($line, $this->placeholderTagConstant)) {
-                $tag = $this->parseTag($line, $lineNumber, $file);
-                if ($tag['start']) {
-                    $nestedTags[] = $tag;
+            $isPlaceholder = false !== strpos($line, $this->placeholderTagConstant);
+            if ($isPlaceholder) {
+                $line = preg_replace("@ *{$this->placeholderTagConstant}@", '', $line);
+            }
+            if (!$isPlaceholder && false !== strpos($line, $this->tagConstant)) {
+                try {
+                    $tag = $this->parseTag($line, $lineNumber, $file);
+                } catch (\Throwable $error) {
+                    trigger_error("Parse Error: {$error->getMessage()}", E_USER_ERROR);
+                    $keptLines[] = $line;
+                }
+                if (isset($tag) && is_array($tag) && array_key_exists('start', $tag)) {
+                    if ($tag['start']) {
+                        $nestedTags[] = $tag;
 
-                    if ($keepTags && $tag['step'] <= $targetStep) {
-                        $keptLines[] = $line;
-                    }
+                        if ($keepTags && $tag['step'] <= $targetStep) {
+                            $keptLines[] = $line;
+                        }
 
-                    $this->outputWrite("Start step {$tag['step']}".($tag['name'] ? " “{$tag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
-                    $this->outputWrite($this->getActionVerb($tag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
-                } else {
-                    $stoppedTag = array_pop($nestedTags);
-                    if ($tag['step'] !== $stoppedTag['step']) {
-                        trigger_error('Parse Error: STOP tag not matching START tag'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_ERROR);
-                    }
+                        $this->writeToOutput("Start step {$tag['step']}".($tag['name'] ? " “{$tag['name']}”" : '')."{$this->getLocationMessage($lineNumber, $file)}.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                        $this->writeToOutput($this->getActionMessage($tag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
+                    } else {
+                        $stoppedTag = array_pop($nestedTags);
+                        if ($tag['step'] !== $stoppedTag['step']) {
+                            trigger_error("Parse Error: STOP tag not matching START tag'{$this->getLocationMessage($lineNumber, $file)}", E_USER_ERROR);
+                        }
 
-                    if ($keepTags && $tag['step'] <= $targetStep) {
-                        $keptLines[] = $line;
-                    }
+                        if ($keepTags && $tag['step'] <= $targetStep) {
+                            $keptLines[] = $line;
+                        }
 
-                    $this->outputWrite("Stop step {$tag['step']}".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')." at line $lineNumber.", OutputInterface::VERBOSITY_VERY_VERBOSE);
-                    if (count($nestedTags)) {
-                        $currentTag = $nestedTags[count($nestedTags) - 1];
-                        $this->outputWrite("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')." at line $lineNumber:", OutputInterface::VERBOSITY_VERY_VERBOSE);
-                        $this->outputWrite($this->getActionVerb($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
+                        $this->writeToOutput("Stop step {$tag['step']}".($stoppedTag['name'] ? " “{$stoppedTag['name']}”" : '')."{$this->getLocationMessage($lineNumber, $file)}.", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                        if (count($nestedTags)) {
+                            $currentTag = $nestedTags[count($nestedTags) - 1];
+                            $this->writeToOutput("Reenter step {$currentTag['step']}".($currentTag['name'] ? " “{$currentTag['name']}”" : '')."{$this->getLocationMessage($lineNumber, $file)}:", OutputInterface::VERBOSITY_VERY_VERBOSE);
+                            $this->writeToOutput($this->getActionMessage($currentTag, $targetStep).'…', OutputInterface::VERBOSITY_VERY_VERBOSE);
+                        }
                     }
                 }
             } elseif (count($nestedTags)) {
@@ -90,7 +95,7 @@ class ExerciseCleaner
                 if ('INTERNAL' === $currentTag['state']) {
                     continue;
                 }
-                if ($targetStep > $currentTag['step'] && false === strpos($line, $this->placeholderTagConstant)) {
+                if (!$isPlaceholder && $targetStep > $currentTag['step']) {
                     $action = $currentTag['action'];
                     if (array_key_exists('threshold', $currentTag)) {
                         if ($currentTag['threshold'] >= $targetStep) {
@@ -114,59 +119,68 @@ class ExerciseCleaner
                             $keptLines[] = $line;
                     }
                 } elseif ($targetStep === $currentTag['step']) {
-                    //if (false !== strpos($line, $this->placeholderTagConstant)) {
-                    //    trigger_error("{$this->placeholderTagConstant} one-line tag is deprecated; TRAINING EXERCISE START STEP <n> PLACEHOLDER syntax should be used instead.", E_USER_DEPRECATED);
-                    //}
                     switch ($currentTag['state']) {
                         case 'PLACEHOLDER':
+                            if ($isPlaceholder) {
+                                trigger_error("Unnecessary PLACEHOLDER one-line tag inside PLACEHOLDER enclosing tags{$this->getLocationMessage($lineNumber, $file)}", E_USER_NOTICE);
+                            }
                             if (!$solution) {
                                 $keptLines[] = $line;
                             }
                             break;
                         case 'WORKSHEET':
-                            if (false !== strpos($line, $this->placeholderTagConstant)) {
-                                $line = preg_replace("@ *{$this->placeholderTagConstant}@", '', $line);
-                            }
                             $keptLines[] = $line;
                             break;
                         case 'SOLUTION':
                         default:
-                            if ($solution && false === strpos($line, $this->placeholderTagConstant)) {
+                            if ($solution xor $isPlaceholder) {
                                 $keptLines[] = $line;
-                            } elseif (!$solution && false !== strpos($line, $this->placeholderTagConstant)) {
-                                $keptLines[] = preg_replace("@ *{$this->placeholderTagConstant}@", '', $line);
                             }
                             break;
                     }
                 }
             } else {
-                if (false !== strpos($line, $this->placeholderTagConstant)) {
-                    trigger_error("{$this->placeholderTagConstant} one-line tag can't be used outside a START/STOP STEP tags pair.", E_USER_DEPRECATED);
+                if ($isPlaceholder) {
+                    trigger_error("Parse Error: PLACEHOLDER one-line tag can't be used outside a START/STOP STEP tags pair{$this->getLocationMessage($lineNumber, $file)}", E_USER_ERROR);
                 }
                 $keptLines[] = $line;
             }
         }
 
+        foreach (array_reverse($nestedTags) as $unclosedTag) {
+            trigger_error("Parse Error: Unclosed tag{$this->getLocationMessage($unclosedTag['line_number'], $file)}", E_USER_ERROR);
+        }
+
         return $keptLines;
     }
 
-    public function parseTag(string $line, int $lineNumber = null, string $file = null): array
+    /**
+     * Parse enclosing tag and return tag properties.
+     */
+    public function parseTag(string $line, int $lineNumber = null, string $file = null): ?array
     {
+        if (false === strpos($line, $this->tagConstant)) {
+            throw new \InvalidArgumentException('Not a tag');
+        }
+        if (false !== strpos($line, $this->placeholderTagConstant)) {
+            throw new \InvalidArgumentException('Not an enclosing tag but a one-line tag');
+        }
+
         $intro = false !== strpos($line, 'INTRO'); // backward compatibility
         if ($intro) {
-            trigger_error('INTRO keyword is deprecated, WORKSHEET should be used instead; '.($file ? " in file $file" : '')." at line $lineNumber", E_USER_DEPRECATED);
+            trigger_error("WORKSHEET state should be used instead of INTRO keyword{$this->getLocationMessage($lineNumber, $file)}", E_USER_DEPRECATED);
             $line = trim(str_replace('  ', ' ', str_replace('INTRO', '', $line)));
+            $line = preg_replace('/(TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[.0-9]+))/', '$1 WORKSHEET', $line);
         }
 
         preg_match($this->tagRegex, $line, $matches);
-
         if (!count($matches)) {
-            trigger_error('Parse Error'.($file ? " in file $file" : '').($lineNumber ? " at line $lineNumber" : ''), E_USER_ERROR);
-
-            return [];
-            throw new \ParseError('Parse Error'.($file ? " in file $file" : '').($lineNumber ? " at line $lineNumber" : ''));
+            throw new \ParseError("Tag parse error{$this->getLocationMessage($lineNumber, $file)}");
         }
+
         $tag = [
+            'tag' => trim($matches[0]),
+            'line_number' => $lineNumber,
             'boundary' => $matches['boundary'],
             'start' => 'START' === $matches['boundary'],
             'step' => (float) $matches['step'],
@@ -207,12 +221,12 @@ class ExerciseCleaner
                 $tag['action'] = "{$tag['before']} UNTIL {$tag['threshold']} THEN {$tag['after']}";
 
                 if ($tag['threshold'] <= $tag['step']) {
-                    trigger_error('Threshold less or equals to step'.($file ? " in file $file" : '')." at line $lineNumber", E_USER_WARNING);
+                    trigger_error("Threshold less or equals to step{$this->getLocationMessage($lineNumber, $file)}", E_USER_WARNING);
                 }
             }
 
             if (false !== strpos($tag['action'], 'COMMENT') && null === $this->getCommentPattern($file)) {
-                trigger_error("Unsupported COMMENT action at line $lineNumber", E_USER_WARNING);
+                trigger_error("Unsupported COMMENT action{$this->getLocationMessage($lineNumber, $file)}", E_USER_WARNING);
             }
         }
 
@@ -234,6 +248,8 @@ class ExerciseCleaner
         }
         switch ($file ? pathinfo($file, PATHINFO_EXTENSION) : null) {
             case 'html':
+            case 'md':
+            case 'xhtml':
             case 'xml':
                 return '<!-- %CODE% -->';
             case 'ini':
@@ -259,7 +275,7 @@ class ExerciseCleaner
     {
         $targetStepName = $this->getStepName($targetStep);
         $targetStepName = null === $targetStepName ? '' : " “{$targetStepName}”";
-        $this->outputWrite("<comment>Get step $targetStep{$targetStepName} in {$this->getStateName($solution)} state…</comment>", OutputInterface::VERBOSITY_NORMAL);
+        $this->writeToOutput("<comment>Get step $targetStep{$targetStepName} in {$this->getStateName($solution)} state…</comment>", OutputInterface::VERBOSITY_NORMAL);
 
         if (!$inputExtension && !empty($this->config['files']['input']['extension'])) {
             $inputExtension = $this->config['files']['input']['extension'];
@@ -275,10 +291,7 @@ class ExerciseCleaner
             if ('' === $path) {
                 continue;
             }
-            if ($this->isPhar) {
-                $path = Utils::getAbsolutePath($path);
-            }
-            if (is_dir($path)) {
+            if (is_dir(realpath($path))) {
                 if ('/' === substr($path, -1)) {
                     // Avoid double slashes in find or grep result
                     $path = substr($path, 0, -1);
@@ -292,15 +305,15 @@ class ExerciseCleaner
                     }
                 }
                 $fileList = Utils::getFileListFromShellCmd("$cmd;");
-            } elseif (is_file($path)) {
+            } elseif (is_file(realpath($path))) {
                 $fileList = [$path];
             } else {
                 trigger_error("$path is not a file nor a directory", E_USER_WARNING);
                 continue;
             }
             foreach ($fileList as $inputFile) {
-                $this->outputWrite("<info>Treat {$inputFile}…</info>", OutputInterface::VERBOSITY_VERBOSE);
-                if (!is_file($inputFile)) {
+                $this->writeToOutput("<info>Treat {$inputFile}…</info>", OutputInterface::VERBOSITY_VERBOSE);
+                if (!is_file(realpath($inputFile))) {
                     trigger_error("$path is not a file", E_USER_WARNING);
                     continue;
                 }
@@ -312,7 +325,7 @@ class ExerciseCleaner
                     $outputFile = "$outputFile$outputExtension";
                 }
                 if (false !== file_put_contents($outputFile, implode(PHP_EOL, $this->cleanCodeLines(file($inputFile, FILE_IGNORE_NEW_LINES), $targetStep, $solution, $keepTags, $inputFile)))) {
-                    $this->outputWrite("<info>…$outputFile written.</info>", OutputInterface::VERBOSITY_VERBOSE);
+                    $this->writeToOutput("<info>…$outputFile written.</info>", OutputInterface::VERBOSITY_VERBOSE);
                 } else {
                     trigger_error("$outputFile couldn't be written", E_USER_ERROR);
                 }
@@ -330,7 +343,7 @@ class ExerciseCleaner
         return $solution ? 'solution' : 'exercise';
     }
 
-    private function getActionVerb(array $tag, float $targetStep): string
+    private function getActionMessage(array $tag, float $targetStep): string
     {
         if ($tag['step'] < $targetStep) {
             if (array_key_exists('threshold', $tag)) {
@@ -363,7 +376,12 @@ class ExerciseCleaner
         return 'Remove unknown step line(s)';
     }
 
-    private function outputWrite($messages, $verbosity = OutputInterface::VERBOSITY_NORMAL)
+    private function getLocationMessage(int $lineNumber = null, string $file = null): string
+    {
+        return ($file ? " in $file" : '').($lineNumber ? " on line $lineNumber" : '');
+    }
+
+    private function writeToOutput($messages, $verbosity = OutputInterface::VERBOSITY_NORMAL)
     {
         if (null !== $this->output) {
             $this->output->writeln($messages, $verbosity);
