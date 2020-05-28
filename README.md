@@ -8,6 +8,7 @@ Exercise Cleaner
   - [Tags](#tags)
   - [Command](#command)
   - [Config File](#config-file)
+  - [Training](#training)
 * [Development](#development)
   - [Development Requirements](#development-requirements)
   - [Compile Phar](#compile-phar)
@@ -420,6 +421,17 @@ files:
 ./exercise-cleaner.phar --config exercise-cleaner.yml 1 examples/ --solution;
 ./exercise-cleaner.phar --config exercise-cleaner.yml 2 examples/;
 ./exercise-cleaner.phar --config exercise-cleaner.yml 2 examples/ --solution;
+```
+
+### Training
+
+To run a training, training.sh script can be used as a base. Feel free to copy to your project and adapt to your needs.
+
+The distributed training.sh is actually configured to run a training example from Exercise Cleaner repository itself.
+
+```
+rm -rf ~/training;
+./training.sh;
 ```
 
 
