@@ -14,6 +14,9 @@ class DefaultSingleCommand extends Command
 {
     protected static $defaultName = 'exercise-cleaner.phar';
 
+    /** @var ExerciseCleaner */
+    private $exerciseCleaner;
+
     protected function configure(): void
     {
         $this
@@ -27,6 +30,7 @@ class DefaultSingleCommand extends Command
             //->addOption('worksheet', 'w', InputOption::VALUE_NONE, 'Write exercise\'s worksheet (default)')
             ->addOption('solution', 's', InputOption::VALUE_NONE, 'Write exercise\'s solution instead of exercise\'s worksheet')
             ->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Path to YAML config file')
+            ->addOption('step-name', 'l', InputOption::VALUE_NONE, 'Just get step name/label')
             ->addArgument('step', InputArgument::OPTIONAL, 'Remove inside tags having this step float and greater.', 1)
             ->addArgument('paths', InputArgument::IS_ARRAY, 'Search inside this folder(s).', ['app', 'src'])
         ;
@@ -70,7 +74,12 @@ class DefaultSingleCommand extends Command
         }
 
         if (is_numeric($targetStep)) {
-            (new ExerciseCleaner($config, $output))->cleanFiles($pathList, $targetStep, $solution, $keepTags, $outputExtension, $inputExtension);
+            $this->exerciseCleaner = new ExerciseCleaner($config, $output);
+            if ($input->getOption('step-name')) {
+                $output->write($this->exerciseCleaner->getStepName($targetStep));
+            } else {
+                $this->exerciseCleaner->cleanFiles($pathList, $targetStep, $solution, $keepTags, $outputExtension, $inputExtension);
+            }
         } elseif (!$output->isQuiet()) {
             $output->writeln('<error>Step argument is missing or isn\'t numeric</error>');
 
