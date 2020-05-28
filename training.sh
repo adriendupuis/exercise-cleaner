@@ -84,7 +84,7 @@ if [[ $exercise_cleaner_bin != *'Application.php'* ]]; then
   git rm --cached $exercise_cleaner_bin;
 fi;
 echo 'Initialization: Apply and commit step 0';
-eval "$exercise_cleaner 0 $path_list";
+eval "$exercise_cleaner --verbose 0 $path_list";
 git add $path_list;
 git commit --message "Initialization";
 echo 'Initialization: Force push step 0 on remote training branch (replace possible previous content)';
