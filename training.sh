@@ -27,6 +27,7 @@ exercise_cleaner_config='examples/config.yaml';
 path_list=(examples/);
 step_list=(1 1.1 1.2 2 3);
 state_list=('exercise' 'solution');
+ignore_list=(.github/); # Exercise Cleaner elements will be added to this list expect if running on Exercise Cleaner repository itself.
 
 if [ -e $local_working_directory ]; then
   echo "Error: $local_working_directory already exists.";
@@ -49,6 +50,10 @@ else
   exercise_cleaner="$exercise_cleaner_bin"
 fi;
 
+if [[ $exercise_cleaner_bin != *'Application.php'* ]]; then
+  ignore_list+=($0 $exercise_cleaner_bin $exercise_cleaner_config)
+fi;
+
 # Stop on error
 set -e;
 
@@ -69,24 +74,13 @@ git checkout --orphan $local_training_branch;
 echo 'Initialization: Ignore Exercise Cleaner and GitHub Actions';
 {
   echo "###> training ###";
-  if [[ $exercise_cleaner_bin != *'Application.php'* ]]; then
-    # If not running on itself
-    echo "$0";
-    echo "$exercise_cleaner_bin";
-    if [ -n "$exercise_cleaner_config" ]; then
-      echo "$exercise_cleaner_config";
-    fi
-  fi;
-  if [[ -d .github ]]; then
-    echo '.github/';
-  fi
+  for ignored_path in $ignore_list; do
+    echo "$ignored_path";
+  done;
   echo "###< training ###"
 } >> .gitignore;
 git add .gitignore;
-if [[ $exercise_cleaner_bin != *'Application.php'* ]]; then
-  git rm --cached $0 $exercise_cleaner_bin $exercise_cleaner_config;
-fi;
-git rm -r --cached .github/;
+git rm -r --cached $ignore_list;
 echo 'Initialization: Apply and commit step 0';
 eval "$exercise_cleaner --verbose 0 $path_list";
 git add $path_list;
@@ -100,7 +94,7 @@ for step in $step_list; do
   for state in $state_list; do
     echo "Prepare step $step $state…";
     git checkout $local_reference_branch -- $path_list;
-    git reset $exercise_cleaner_bin $exercise_cleaner_config .github/;
+    git reset $ignore_list;
     eval "$exercise_cleaner $step --$state $path_list";
     name=`eval "$exercise_cleaner --step-name $step";`
     git add $path_list;
