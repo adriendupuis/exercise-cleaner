@@ -6,9 +6,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ExerciseCleaner
 {
-    public $tagConstant = 'TRAINING EXERCISE';
-    public $tagRegex = '/TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[\.0-9]+) ?(?<state>PLACEHOLDER|SOLUTION|WORKSHEET)? ?(?<action>COMMENT|KEEP|REMOVE)? ?(UNTIL (?<threshold_step>[\.0-9]+))? ?(THEN (?<threshold_action>COMMENT|KEEP|REMOVE))?/';
-    public $placeholderTagConstant = 'TRAINING EXERCISE STEP PLACEHOLDER';
+    public const TAG_CORE = 'TRAINING EXERCISE';
+    public const TAG_REGEX = '/TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[\.0-9]+) ?(?<state>PLACEHOLDER|SOLUTION|WORKSHEET)? ?(?<action>COMMENT|KEEP|REMOVE)? ?(UNTIL (?<threshold_step>[\.0-9]+))? ?(THEN (?<threshold_action>COMMENT|KEEP|REMOVE))?/';
+    public const TAG_1_LINE_PLACEHOLDER = 'TRAINING EXERCISE STEP PLACEHOLDER';
 
     /** @var array|null */
     private $config;
@@ -44,14 +44,15 @@ class ExerciseCleaner
         $keptLines = [];
         $nestedTags = [];
         $commentPattern = $this->getCommentPattern($file);
+        $placeholderTagCore = self::TAG_1_LINE_PLACEHOLDER;
 
         foreach ($lines as $lineIndex => $line) {
             $lineNumber = 1 + $lineIndex;
-            $isPlaceholder = false !== strpos($line, $this->placeholderTagConstant);
+            $isPlaceholder = false !== strpos($line, self::TAG_1_LINE_PLACEHOLDER);
             if ($isPlaceholder) {
-                $line = preg_replace("@ *{$this->placeholderTagConstant}@", '', $line);
+                $line = preg_replace("@ *{$placeholderTagCore}@", '', $line);
             }
-            if (!$isPlaceholder && false !== strpos($line, $this->tagConstant)) {
+            if (!$isPlaceholder && false !== strpos($line, self::TAG_CORE)) {
                 try {
                     $tag = $this->parseTag($line, $lineNumber, $file);
                 } catch (\Throwable $error) {
@@ -152,10 +153,10 @@ class ExerciseCleaner
      */
     public function parseTag(string $line, int $lineNumber = null, string $file = null): ?array
     {
-        if (false === strpos($line, $this->tagConstant)) {
+        if (false === strpos($line, self::TAG_CORE)) {
             throw new \InvalidArgumentException('Not a tag');
         }
-        if (false !== strpos($line, $this->placeholderTagConstant)) {
+        if (false !== strpos($line, self::TAG_1_LINE_PLACEHOLDER)) {
             throw new \InvalidArgumentException('Not an enclosing tag but a one-line tag');
         }
 
@@ -166,7 +167,7 @@ class ExerciseCleaner
             $line = preg_replace('/(TRAINING EXERCISE (?<boundary>START|STOP) STEP (?<step>[.0-9]+))/', '$1 WORKSHEET', $line);
         }
 
-        preg_match($this->tagRegex, $line, $matches);
+        preg_match(self::TAG_REGEX, $line, $matches);
         if (!count($matches)) {
             throw new \ParseError("Tag parse error{$this->getLocationMessage($lineNumber, $file)}");
         }
@@ -279,6 +280,8 @@ class ExerciseCleaner
             $outputExtension = ".$outputExtension";
         }
 
+        $tagCore = self::TAG_CORE;
+
         foreach ($pathList as $path) {
             if ('' === $path) {
                 continue;
@@ -291,7 +294,7 @@ class ExerciseCleaner
                 if ($inputExtension) {
                     $cmd = "find $path -name '*$inputExtension'";
                 } else {
-                    $cmd = "grep '{$this->tagConstant}' -Rl $path";
+                    $cmd = "grep '{$tagCore}' -Rl $path";
                     if ($outputExtension) {
                         $cmd .= " | grep -v '$outputExtension$'";
                     }

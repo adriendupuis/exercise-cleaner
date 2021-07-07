@@ -19,7 +19,7 @@ class ExerciseCleanerTest extends TestCase
 
     public function testTagConstantVersusRegex(): void
     {
-        $this->assertStringContainsString($this->exerciseCleaner->tagConstant, $this->exerciseCleaner->tagRegex);
+        $this->assertStringContainsString(ExerciseCleaner::TAG_CORE, ExerciseCleaner::TAG_REGEX);
     }
 
     /*********************/
@@ -182,7 +182,7 @@ class ExerciseCleanerTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Not an enclosing tag');
-        $this->exerciseCleaner->parseTag($this->exerciseCleaner->placeholderTagConstant);
+        $this->exerciseCleaner->parseTag(ExerciseCleaner::TAG_1_LINE_PLACEHOLDER);
     }
 
     /** Do not parse, simply remove non alpha-numeric characters */
